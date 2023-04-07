@@ -4,5 +4,7 @@ Preparation is assumed:
 
 ```
 export DISK="/dev/disk/by-id/... /dev/disk/by-id/..."
-export INST_PARTSIZE_SWAP=16  # Swap size in GB
+export INST_PARTSIZE_SWAP=32  # Swap size in GB
 ```
+
+The `NixDotfiles` are inspired by [this](https://github.com/ne9z/dotfiles-flake)
