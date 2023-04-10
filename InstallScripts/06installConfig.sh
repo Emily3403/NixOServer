@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ROOT_PASSWORD="grootyroot"
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+
 
 mkdir -p /mnt/etc/nixos/
 cp -r "$SCRIPT_DIR"/../NixDotfiles/* /mnt/etc/nixos
