@@ -31,7 +31,7 @@ zpool create \
     -R /mnt \
     bpool \
     raidz1 \
-    $(for i in ${DRIVES}; do
+    $(for i in "${DRIVES[@]}"; do
        printf "$i-part2 ";
       done)
 
@@ -51,7 +51,7 @@ zpool create \
     rpool \
     raidz1 \
    $(
-   for i in ${DRIVES}; do
+   for i in "${DRIVES[@]}"; do
       printf "$i-part3 ";
      done
      )
