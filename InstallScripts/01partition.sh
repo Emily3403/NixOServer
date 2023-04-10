@@ -28,7 +28,6 @@ for disk in ${DRIVES}; do
 
     sync && udevadm settle && sleep 3
 
-    cryptsetup open --type plain --key-file /dev/random $disk-part4 ${disk##*/}-part4
     mkswap /dev/mapper/${disk##*/}-part4
     swapon /dev/mapper/${disk##*/}-part4
 done
