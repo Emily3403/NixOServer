@@ -13,6 +13,7 @@ for disk in ${DRIVES}; do
     # performance.
     # ALL DATA WILL BE LOST
     # blkdiscard -f $disk
+    echo $disk
 
     sgdisk --zap-all $disk
 
