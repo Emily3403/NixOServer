@@ -55,9 +55,5 @@ echo "HEEEEELP"
 # Execute the other scripts
 
 for script in "SCRIPT_DIR"/../InstallScripts/*; do
-    # Check if the source file exists before sourcing it
-    echo "uwu"
-    [ -e "$script" ] || continue
-    echo "owo"
     source "$script"
 done
