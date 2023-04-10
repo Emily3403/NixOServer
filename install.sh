@@ -34,10 +34,17 @@ BOOT_POOL_NAME="bpool"
 apt update
 apt install -y git vim openssh-server
 
-# Modify sources.list file
-sed -i '/security.debian.org/s/$/ bullseye-security/' /etc/apt/sources.list
-sed -i '/deb.debian.org/s/$/ bullseye-updates/' /etc/apt/sources.list
-sed -i '/deb.debian.org/s/$/ bullseye-backports/' /etc/apt/sources.list
+# Backup the existing sources.list file
+cp /etc/apt/sources.list /etc/apt/sources.list.backup."$(date --iso)"
+
+echo "deb http://deb.debian.org/debian/ bullseye-updates main contrib non-free" | tee -a /etc/apt/sources.list
+echo "deb-src http://deb.debian.org/debian/ bullseye-updates main contrib non-free" | tee -a /etc/apt/sources.list
+
+echo "deb http://deb.debian.org/debian/ bullseye-backports main contrib non-free" | tee -a /etc/apt/sources.list
+echo "deb-src http://deb.debian.org/debian/ bullseye-backports main contrib non-free" | tee -a /etc/apt/sources.list
+
+echo "deb http://security.debian.org/debian-security bullseye-security main contrib non-free" | tee -a /etc/apt/sources.list
+echo "deb-src http://security.debian.org/debian-security bullseye-security main contrib non-free" | tee -a /etc/apt/sources.list
 
 # Install zfsutils-linux from buster-backports
 apt install -y -t buster-backports zfsutils-linux
