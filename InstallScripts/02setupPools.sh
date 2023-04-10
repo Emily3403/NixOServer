@@ -14,7 +14,7 @@ check_zpool_status() {
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/utils.sh"
-check_variables DRIVES
+check_variables DRIVES RAID_LEVEL BOOT_POOL_NAME ROOT_POOL_NAME
 
 echo "Creating boot pool"
 echo "${DRIVES[@]/%/-part2}"
