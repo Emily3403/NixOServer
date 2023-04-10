@@ -49,10 +49,10 @@ apt install -y -t bullseye-backports zfsutils-linux
 
 # Get the config
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-source "$SCRIPT_DIR/bin/config.sh"
+source "$SCRIPT_DIR/config.sh"
 
 # Execute the other scripts
 
-source "$SCRIPT_DIR/InstallScripts/00diskSetup.sh"
+source "$SCRIPT_DIR../InstallScripts/00diskSetup.sh"
 
 printf "${drives_array[@]}"
