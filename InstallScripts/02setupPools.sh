@@ -19,7 +19,7 @@ check_variables DRIVES
 echo "Creating boot pool"
 echo "${DRIVES[@]/%/-part2}"
 
-zpool create \
+zpool create -f \
     -o compatibility=grub2 \
     -o ashift=12 \
     -o autotrim=on \
@@ -38,7 +38,7 @@ zpool create \
 
 echo "Creating root pool"
 
-zpool create \
+zpool create -f \
     -o ashift=12 \
     -o autotrim=on \
     -R /mnt \
