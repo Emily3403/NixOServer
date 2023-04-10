@@ -55,4 +55,4 @@ source "$SCRIPT_DIR/config.sh"
 
 source "$SCRIPT_DIR/../InstallScripts/00diskSetup.sh"
 
-printf "${drives_array[@]}"
+echo "${drives_array[@]}"
