@@ -36,7 +36,7 @@ zpool create -f \
     "$RAID_LEVEL" \
     "${DRIVES[@]/%/-part2}"
 
-echo "Creating root pool"
+echo "Creating root pool with name $ROOT_POOL_NAME"
 
 zpool create -f \
     -o ashift=12 \
@@ -52,8 +52,9 @@ zpool create -f \
     -O mountpoint=/ \
     "$ROOT_POOL_NAME" \
     "$RAID_LEVEL" \
-   "${DRIVES[@]/%/-part3}"
+    "${DRIVES[@]/%/-part3}"
 
+echo "Finished!"
 
 if zpool status "$pool_name" >/dev/null 2>&1; then
   echo "ZFS pool '$pool_name' created successfully with RAIDZ1."
