@@ -1,31 +1,34 @@
 #!/usr/bin/env bash
 
-for i in ${DISK}; do
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source "$SCRIPT_DIR/utils.sh"
 
-# wipe flash-based storage device to improve
-# performance.
-# ALL DATA WILL BE LOST
-# blkdiscard -f $i
+check_variables DRIVES SWAP_AMOUNT_GB
+EFFECTIVE_SWAP_PER_DRIVE=$(( SWAP_AMOUNT_GB / NUM_DRIVES ))
 
-sgdisk --zap-all $i
 
-sgdisk -n1:1M:+1G -t1:EF00 $i
+for disk in ${DRIVES}; do
 
-sgdisk -n2:0:+4G -t2:BE00 $i
+    # wipe flash-based storage device to improve
+    # performance.
+    # ALL DATA WILL BE LOST
+    # blkdiscard -f $disk
 
-sgdisk -n4:0:+${INST_PARTSIZE_SWAP}G -t4:8200 $i
+    sgdisk --zap-all $disk
 
-if test -z $INST_PARTSIZE_RPOOL; then
-    sgdisk -n3:0:0   -t3:BF00 $i
-else
-    sgdisk -n3:0:+${INST_PARTSIZE_RPOOL}G -t3:BF00 $i
-fi
+    sgdisk -n1:1M:+1G -t1:EF00 $disk
 
-sgdisk -a1 -n5:24K:+1000K -t5:EF02 $i
+    sgdisk -n2:0:+4G -t2:BE00 $disk
 
-sync && udevadm settle && sleep 3
+    sgdisk -n4:0:+${EFFECTIVE_SWAP_PER_DRIVE}G -t4:8200 $disk
 
-cryptsetup open --type plain --key-file /dev/random $i-part4 ${i##*/}-part4
-mkswap /dev/mapper/${i##*/}-part4
-swapon /dev/mapper/${i##*/}-part4
+    sgdisk -n3:0:0 -t3:BF00 $disk
+
+    sgdisk -a1 -n5:24K:+1000K -t5:EF02 $disk
+
+    sync && udevadm settle && sleep 3
+
+    cryptsetup open --type plain --key-file /dev/random $disk-part4 ${disk##*/}-part4
+    mkswap /dev/mapper/${disk##*/}-part4
+    swapon /dev/mapper/${disk##*/}-part4
 done

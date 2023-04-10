@@ -46,13 +46,14 @@ apt-get update
 # Install zfsutils-linux from buster-backports
 apt install -y -t bullseye-backports zfsutils-linux
 
-
 # Get the config
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/config.sh"
 
 # Execute the other scripts
 
-source "$SCRIPT_DIR/../InstallScripts/00diskSetup.sh"
-
-echo "${drives_array[@]}"
+for script in "SCRIPT_DIR"/../InstallScripts/*; do
+    # Check if the source file exists before sourcing it
+    [ -e "$script" ] || continue
+    source "$script"
+done
