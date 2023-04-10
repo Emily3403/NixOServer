@@ -51,7 +51,6 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/config.sh"
 
 # Execute the other scripts
-
 for script in "SCRIPT_DIR"/../InstallScripts/*; do
     source "$script"
 done
