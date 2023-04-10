@@ -54,4 +54,4 @@ zpool create -f \
     "$RAID_LEVEL" \
     "${DRIVES[@]/%/-part3}"
 
-check_zpool_status "ROOT_POOL_NAME"
+check_zpool_status "$ROOT_POOL_NAME"
