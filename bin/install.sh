@@ -23,6 +23,8 @@ if ! command -v apt > /dev/null 2>&1; then
     exit 1
 fi
 
+set -e
+
 # Install dependencies
 apt update
 apt install -y git vim openssh-server gdisk
