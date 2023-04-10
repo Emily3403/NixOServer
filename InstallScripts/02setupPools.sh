@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 
 check_zpool_status() {
-  local pool_name="$1"
+    local pool_name="$1"
 
-  if zpool status "$pool_name" >/dev/null 2>&1; then
-    echo "ZFS pool '$pool_name' created successfully with RAIDZ1"
-    return 0
-  else
-    echo "Error: ZFS pool '$pool_name' not found or is unhealthy."
-    return 1
-  fi
+    if zpool status "$pool_name" > /dev/null 2>&1; then
+        echo "ZFS pool '$pool_name' created successfully with $RAID_LEVEL"
+        return 0
+    else
+        echo "Error: ZFS pool '$pool_name' not found or is unhealthy."
+        return 1
+    fi
 }
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
@@ -55,3 +55,10 @@ zpool create -f \
     "${DRIVES[@]/%/-part3}"
 
 check_zpool_status "$ROOT_POOL_NAME"
+
+zfs create \
+    -o canmount=off \
+    -o mountpoint=none \
+    "$ROOT_POOL_NAME"/nixos
+
+check_zpool_status "$ROOT_POOL_NAME"/nixos

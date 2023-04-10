@@ -1,13 +1,9 @@
 #!/usr/bin/env bash
 
-ROOT_PASSWORD="grootyroot"
-
 
 mkdir -p /mnt/etc/nixos/
 cp -r "$SCRIPT_DIR"/../NixDotfiles/* /mnt/etc/nixos
 
-curl -o /mnt/etc/nixos/configuration.nix -L \
-https://github.com/openzfs/openzfs-docs/raw/master/docs/Getting%20Started/NixOS/Root%20on%20ZFS/configuration.nix
 
 for i in $DISK; do
   sed -i \

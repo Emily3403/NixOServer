@@ -1,10 +1,5 @@
 #!/usr/bin/env bash
 
-zfs create \
-    -o canmount=off \
-    -o mountpoint=none \
-    rpool/nixos
-
 zfs create -o mountpoint=legacy rpool/nixos/root
 mount -t zfs rpool/nixos/root /mnt/
 zfs create -o mountpoint=legacy rpool/nixos/home
@@ -19,3 +14,11 @@ mkdir /mnt/boot
 mount -t zfs bpool/nixos/root /mnt/boot
 zfs create -o mountpoint=legacy rpool/nixos/empty
 zfs snapshot rpool/nixos/empty@start
+
+
+for i in ${DISK}; do
+    mkfs.vfat -n EFI ${i}-part1
+    mkdir -p /mnt/boot/efis/${i##*/}-part1
+    mount -t vfat ${i}-part1 /mnt/boot/efis/${i##*/}-part1
+done
+
