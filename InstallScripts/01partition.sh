@@ -7,7 +7,7 @@ check_variables DRIVES SWAP_AMOUNT_GB
 EFFECTIVE_SWAP_PER_DRIVE=$(( SWAP_AMOUNT_GB / NUM_DRIVES ))
 
 
-for disk in ${DRIVES}; do
+for disk in "${DRIVES[@]}"; do
 
     # wipe flash-based storage device to improve
     # performance.
