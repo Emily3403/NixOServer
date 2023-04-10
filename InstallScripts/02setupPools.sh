@@ -16,6 +16,9 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/utils.sh"
 check_variables DRIVES
 
+echo "Creating boot pool"
+echo "${DRIVES[@]/%/-part2}"
+
 zpool create \
     -o compatibility=grub2 \
     -o ashift=12 \
@@ -29,12 +32,11 @@ zpool create \
     -O xattr=sa \
     -O mountpoint=/boot \
     -R /mnt \
-    bpool \
-    raidz1 \
-    $(for i in "${DRIVES[@]}"; do
-       printf "$i-part2 ";
-      done)
+    "$BOOT_POOL_NAME" \
+    "$RAID_LEVEL" \
+    "${DRIVES[@]/%/-part2}"
 
+echo "Creating root pool"
 
 zpool create \
     -o ashift=12 \
@@ -48,14 +50,9 @@ zpool create \
     -O relatime=on \
     -O xattr=sa \
     -O mountpoint=/ \
-    rpool \
-    raidz1 \
-   $(
-   for i in "${DRIVES[@]}"; do
-      printf "$i-part3 ";
-     done
-     )
-
+    "$ROOT_POOL_NAME" \
+    "$RAID_LEVEL" \
+   "${DRIVES[@]/%/-part3}"
 
 
 if zpool status "$pool_name" >/dev/null 2>&1; then
