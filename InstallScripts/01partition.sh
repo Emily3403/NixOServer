@@ -29,5 +29,4 @@ for disk in ${DRIVES}; do
     sync && udevadm settle
 
     mkswap "$disk"-part4
-    swapon "$disk"-part4
 done
