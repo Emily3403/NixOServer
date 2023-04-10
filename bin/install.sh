@@ -25,7 +25,7 @@ fi
 
 # Install dependencies
 apt update
-apt install -y git vim openssh-server
+apt install -y git vim openssh-server gdisk
 
 # Backup the existing sources.list file
 cp /etc/apt/sources.list /etc/apt/sources.list.backup."$(date --iso)"
@@ -49,6 +49,9 @@ apt install -y -t bullseye-backports zfsutils-linux
 # Get the config
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/config.sh"
+
+# The fdisk binary in located in `/sbin` ...
+export PATH="$PATH:/sbin"
 
 # Execute the other scripts
 for script in "$SCRIPT_DIR"/../InstallScripts/*; do
