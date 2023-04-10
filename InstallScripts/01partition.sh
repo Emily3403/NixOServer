@@ -26,8 +26,8 @@ for disk in ${DRIVES}; do
 
     sgdisk -a1 -n5:24K:+1000K -t5:EF02 $disk
 
-    sync && udevadm settle && sleep 3
+    sync && udevadm settle
 
-    mkswap /dev/mapper/${disk##*/}-part4
-    swapon /dev/mapper/${disk##*/}-part4
+    mkswap "$disk"-part4
+    swapon "$disk"-part4
 done
