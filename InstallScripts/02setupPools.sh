@@ -12,6 +12,10 @@ check_zpool_status() {
   fi
 }
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source "$SCRIPT_DIR/utils.sh"
+check_variables DRIVES
+
 zpool create \
     -o compatibility=grub2 \
     -o ashift=12 \
