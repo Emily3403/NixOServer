@@ -72,9 +72,6 @@
 
     programs.git.enable = true;
 
-    # Select the default editor.
-    programs.editor = "nvim";
-
     # Select console keymap.
      console = {
        font = "Lat2-Terminus16";
