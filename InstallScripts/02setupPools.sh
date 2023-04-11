@@ -19,6 +19,7 @@ check_variables DRIVES RAID_LEVEL BOOT_POOL_NAME ROOT_POOL_NAME
 echo "Creating boot pool"
 echo "${DRIVES[@]/%/-part2}"
 
+# TODO: Maybe change the raid level to mirror in order to boot off of it
 zpool create -f \
     -o compatibility=grub2 \
     -o ashift=12 \
