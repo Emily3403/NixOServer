@@ -48,7 +48,6 @@
         hostId = "c0ffee"; # Set a unique 6-digit hex value
         networkmanager.enable = true;  # Enable Networking
     };
-    time.timeZone = "Europe/Berlin";
 
     # Configure Systemd services
     services.openssh = {
