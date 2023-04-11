@@ -20,7 +20,6 @@ echo "Creating boot pool"
 echo "${DRIVES[@]/%/-part2}"
 
 zpool create -f \
-    -o compatibility=grub2 \
     -o ashift=12 \
     -o autotrim=on \
     -O acltype=posixacl \
