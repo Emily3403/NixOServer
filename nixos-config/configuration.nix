@@ -35,7 +35,12 @@
     # boot.loader.efi.efiSysMountPoint = "/boot/efi";
     # Define on which hard drive you want to install Grub.
     # boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
-    boot.loader.grub.devices = [ "/dev/sda" ]; # Set to the appropriate device(s)
+    boot.loader.grub.devices = [
+        "/dev/disk/by-id/ata-QEMU_HARDDISK_QM00003-part2"
+        "/dev/disk/by-id/ata-QEMU_HARDDISK_QM00005-part2"
+        "/dev/disk/by-id/ata-QEMU_HARDDISK_QM00007-part2"
+        "/dev/disk/by-id/ata-QEMU_HARDDISK_QM00009-part2"
+    ];
 
     # TODO: Firewall?
     networking = {
