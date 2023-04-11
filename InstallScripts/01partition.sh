@@ -17,7 +17,7 @@ for disk in "${DRIVES[@]}"; do
 
     sgdisk --zap-all $disk
 
-    sgdisk -n1:0:+4G -t2:BE00 $disk
+    sgdisk -n1:0:+4G -t1:BE00 $disk
 
     sgdisk -n4:0:+${EFFECTIVE_SWAP_PER_DRIVE}G -t4:8200 $disk
 
