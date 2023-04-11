@@ -34,7 +34,7 @@ zpool create -f \
     -R /mnt \
     "$BOOT_POOL_NAME" \
     "$RAID_LEVEL" \
-    "${DRIVES[@]/%/-part2}"
+    "${DRIVES[@]/%/-part1}"
 
 check_zpool_status "$BOOT_POOL_NAME"
 
