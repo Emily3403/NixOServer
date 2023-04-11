@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+return
+
 # https://nixos.org/manual/nixos/stable/index.html#sec-installing-from-other-distro
 
 # Get the Nix package manager
