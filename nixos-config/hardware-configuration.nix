@@ -34,22 +34,22 @@
     };
 
   fileSystems."/boot/efis/ata-QEMU_HARDDISK_QM00003-part1" =
-    { device = "/dev/disk/by-uuid/E4E5-933B";
+    { device = "/dev/disk/by-uuid/A29F-1995";
       fsType = "vfat";
     };
 
   fileSystems."/boot/efis/ata-QEMU_HARDDISK_QM00005-part1" =
-    { device = "/dev/disk/by-uuid/E4E6-13B8";
+    { device = "/dev/disk/by-uuid/A2A0-5B7B";
       fsType = "vfat";
     };
 
   fileSystems."/boot/efis/ata-QEMU_HARDDISK_QM00007-part1" =
-    { device = "/dev/disk/by-uuid/E4E6-A557";
+    { device = "/dev/disk/by-uuid/A2A0-DBCA";
       fsType = "vfat";
     };
 
   fileSystems."/boot/efis/ata-QEMU_HARDDISK_QM00009-part1" =
-    { device = "/dev/disk/by-uuid/E4E7-1CB6";
+    { device = "/dev/disk/by-uuid/A2A1-6559";
       fsType = "vfat";
     };
 

@@ -12,4 +12,7 @@ source "$HOME/.nix-profile/etc/profile.d/nix.sh"
 nix-channel --add https://nixos.org/channels/nixos-22.11 nixpkgs
 nix-channel --update
 
+# Install the install tools
+nix-env -f '<nixpkgs>' -iA nixos-install-tools
+
 #nixos-install --no-root-passwd --root /mnt
