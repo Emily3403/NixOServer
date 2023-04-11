@@ -48,6 +48,7 @@ tee -a /mnt/etc/nixos/machine.nix <<EOF
 EOF
 
 # Change password
+rootHashPwd=$(echo "$ROOT_PASSWORD" | mkpasswd -m SHA-512 -s)
 sed -i \
-"s|PLACEHOLDER_FOR_ROOT_PWD_HASH|\""${rootPwd}"\"|" \
+"s|rootHash_placeholder|\""${rootHashPwd}"\"|" \
 /mnt/etc/nixos/configuration.nix
