@@ -89,7 +89,6 @@
      console = {
        font = "Lat2-Terminus16";
        keyMap = "de-latin1";
-       useXkbConfig = true; # use xkbOptions in tty.
      };
 
     # Packages to be installed
