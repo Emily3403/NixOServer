@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-return
-
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/utils.sh"
 
