@@ -60,5 +60,3 @@ zfs create \
     -o canmount=off \
     -o mountpoint=none \
     "$ROOT_POOL_NAME"/nixos
-
-check_zpool_status "$ROOT_POOL_NAME"/nixos
