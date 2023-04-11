@@ -18,7 +18,7 @@
     # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
     system.stateVersion = "22.11"; # Did you read the comment?
 
-    nix.settings.experimental-features = lib.mkDefault [ "nix-command"];
+    nix.settings.experimental-features = [ "nix-command"];
     nixpkgs.config.allowUnfree = true;  # Enable the nixpkgs-unstable channel for a larger package selection.
 
 
@@ -42,8 +42,8 @@
 
     # Configure Systemd services
     services.openssh = {
-        enable = lib.mkDefault true;
-        passwordAuthentication = lib.mkDefault false;
+        enable = true;
+        passwordAuthentication = false;
     };
 
     # Set your time zone.
@@ -73,7 +73,7 @@
     programs.git.enable = true;
 
     # Select the default editor.
-    programs.editor = lib.mkDefault "nvim";
+    programs.editor = "nvim";
 
     # Select console keymap.
      console = {
