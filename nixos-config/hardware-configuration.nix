@@ -14,11 +14,6 @@
   boot.extraModulePackages = [ ];
 
   fileSystems."/" =
-    { device = "rpool";
-      fsType = "zfs";
-    };
-
-  fileSystems."/" =
     { device = "rpool/nixos/root";
       fsType = "zfs";
     };
@@ -34,22 +29,22 @@
     };
 
   fileSystems."/boot/efis/ata-QEMU_HARDDISK_QM00003-part1" =
-    { device = "/dev/disk/by-uuid/A29F-1995";
+    { device = "/dev/disk/by-uuid/DA92-FCA4";
       fsType = "vfat";
     };
 
   fileSystems."/boot/efis/ata-QEMU_HARDDISK_QM00005-part1" =
-    { device = "/dev/disk/by-uuid/A2A0-5B7B";
+    { device = "/dev/disk/by-uuid/DA93-7CA7";
       fsType = "vfat";
     };
 
   fileSystems."/boot/efis/ata-QEMU_HARDDISK_QM00007-part1" =
-    { device = "/dev/disk/by-uuid/A2A0-DBCA";
+    { device = "/dev/disk/by-uuid/DA93-FE1B";
       fsType = "vfat";
     };
 
   fileSystems."/boot/efis/ata-QEMU_HARDDISK_QM00009-part1" =
-    { device = "/dev/disk/by-uuid/A2A1-6559";
+    { device = "/dev/disk/by-uuid/DA94-887D";
       fsType = "vfat";
     };
 
