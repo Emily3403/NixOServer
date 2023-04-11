@@ -50,5 +50,5 @@ EOF
 # Change password
 rootHashPwd=$(echo "$ROOT_PASSWORD" | mkpasswd -m SHA-512 -s)
 sed -i \
-"s|rootHash_placeholder|\""${rootHashPwd}"\"|" \
+"s|rootHash_placeholder|"${rootHashPwd}"|" \
 /mnt/etc/nixos/configuration.nix
