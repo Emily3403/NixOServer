@@ -19,6 +19,8 @@
     system.stateVersion = "22.11"; # Did you read the comment?
 
     nix.settings.experimental-features = lib.mkDefault [ "nix-command"];
+    nixpkgs.config.allowUnfree = true;  # Enable the nixpkgs-unstable channel for a larger package selection.
+
 
     # Copy the NixOS configuration file and link it from the resulting system
     # (/run/current-system/configuration.nix). This is useful in case you
@@ -69,6 +71,9 @@
     };
 
     programs.git.enable = true;
+
+    # Select the default editor.
+    programs.editor = lib.mkDefault "nvim";
 
     # Select console keymap.
      console = {
