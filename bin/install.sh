@@ -27,7 +27,7 @@ set -e
 
 # Install dependencies
 apt update
-apt install -y git vim openssh-server gdisk dosfstools
+apt install -y git vim openssh-server gdisk dosfstools whois
 
 # Backup the existing sources.list file
 cp /etc/apt/sources.list /etc/apt/sources.list.backup."$(date --iso)"
