@@ -35,16 +35,25 @@
     # boot.loader.efi.efiSysMountPoint = "/boot/efi";
     # Define on which hard drive you want to install Grub.
     # boot.loader.grub.device = "/dev/sda"; # or "nodev" for efi only
+    boot.loader.grub.devices = [ "/dev/sda" ]; # Set to the appropriate device(s)
 
-    networking.hostName = "ruwushOnNixOS"; # Define your hostname.
-    networking.networkmanager.enable = true;  # Enable Networking
     # TODO: Firewall?
+    networking = {
+        hostName = "ruwushOnNixOS";
+        timeZone = "Europe/Berlin";
+        hostId = "c0ffee"; # Set a unique 6-digit hex value
+        networkmanager.enable = true;  # Enable Networking
+    };
 
     # Configure Systemd services
     services.openssh = {
         enable = true;
         passwordAuthentication = false;
     };
+
+    # Disable the sudo password for the wheel group.  TODO: Is this a good idea?
+    security.sudo.wheelNeedsPassword = false;
+
 
     # Set your time zone.
     time.timeZone = "Europe/Berlin";
