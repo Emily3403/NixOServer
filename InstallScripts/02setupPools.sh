@@ -61,5 +61,3 @@ zfs create \
     -o mountpoint=none \
     "$ROOT_POOL_NAME"/nixos
 
-echo "Disks are $DRIVES"
-

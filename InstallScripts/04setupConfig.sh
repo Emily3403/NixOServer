@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-echo "Disks are $DRIVES"
-
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/utils.sh"
 check_variables DRIVES BOOT_POOL_NAME ROOT_POOL_NAME

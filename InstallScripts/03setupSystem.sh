@@ -24,5 +24,3 @@ for disk in "${DRIVES[@]}"; do
     mkdir -p /mnt/boot/efis/"${disk##*/}"-part1
     mount -t vfat "$disk"-part1 /mnt/boot/efis/"${disk##*/}"-part1
 done
-
-echo "Disks are $DRIVES"
