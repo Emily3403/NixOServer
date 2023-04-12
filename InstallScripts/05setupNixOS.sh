@@ -2,9 +2,11 @@
 
 # https://nixos.org/manual/nixos/stable/index.html#sec-installing-from-other-distro
 
-# Create the necessary groups
-sudo groupadd -r -g 30000 nixbld
-sudo useradd -r -u 30000 -g nixbld -G nixbld nixbld
+# Check if the group 'nixbld' exists, if not, create it
+if ! getent group nixbld >/dev/null; then
+    sudo groupadd -g 30000 nixbld
+    sudo useradd -u 30000 -g nixbld -G nixbld nixbld
+fi
 
 # Get the Nix package manager
 curl -L https://nixos.org/nix/install | sh
