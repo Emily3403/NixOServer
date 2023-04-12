@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-return
-
 # https://nixos.org/manual/nixos/stable/index.html#sec-installing-from-other-distro
 
 # Create the necessary groups
