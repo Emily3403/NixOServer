@@ -20,7 +20,7 @@ if [ "${#unmounted_drives[@]}" -lt "$NUM_DRIVES" ]; then
     exit 1
 fi
 
-# Sort drives by size and select the n biggest drives
+# Sort drives by size and select the $NUM_DRIVES biggest drives
 selected_drives=()
 for device in $(lsblk -lnbdo NAME,SIZE | sort -k2,2nr | awk '{print "/dev/"$1}' | head -n "$NUM_DRIVES"); do
     for drive_id in "${unmounted_drives[@]}"; do

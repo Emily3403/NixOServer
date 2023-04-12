@@ -45,7 +45,7 @@
     # TODO: Firewall?
     networking = {
         hostName = "ruwushOnNixOS";
-        hostId = "c1263b5a"; # Set a unique 6-digit hex value
+        hostId = "c1263b5a";
         networkmanager.enable = true;  # Enable Networking
     };
 
