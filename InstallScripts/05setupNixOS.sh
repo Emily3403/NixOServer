@@ -19,4 +19,36 @@ nix-channel --update
 # Install the install tools
 nix-env -f '<nixpkgs>' -iA nixos-install-tools
 
-#nixos-install --no-root-passwd --root /mnt
+# Initialize the git repository for NixOS
+git -C /mnt/etc/nixos init
+git -C /mnt/etc/nixos add --all
+git -C /mnt/etc/nixos commit "Initial Install"
+
+# Update flake lock file
+nix \
+  --extra-experimental-features 'nix-command flakes' \
+  flake update --commit-lock-file \
+  "git+file:///mnt/etc/nixos"
+
+# Install the system
+nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#exampleHost" --max-jobs "$(nproc)"
+
+umount "${DRIVES[@]}" || true
+zpool export -a
+
+echo -e "\n"
+
+# Prompt the user for verification
+while true; do
+    read -rp "The installation procedure is now complete. Do you wish to reboot? (y/n): " user_input
+    case $user_input in
+        [Yy]*) break ;;
+        [Nn]*)
+            echo "Alright, staying up."
+            exit 1
+            ;;
+        *) echo "Please enter 'y' or 'n'." ;;
+    esac
+done
+
+reboot

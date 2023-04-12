@@ -42,7 +42,6 @@
         "/dev/disk/by-id/ata-QEMU_HARDDISK_QM00009-part2"
     ];
 
-    # TODO: Firewall?
     networking = {
         hostName = "ruwushOnNixOS";
         hostId = "c1263b5a";
