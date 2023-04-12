@@ -129,7 +129,7 @@ in {
             efiSupport = true;
             zfsSupport = true;
             extraInstallCommands = (toString (map (diskName: ''
-              cp -r ${config.boot.loader.efi.efiSysMountPoint}/EFI /boot/efis/${diskName}${cfg.partitionScheme.efiBoot}
+              ${pkgs.coreutils-full}/bin/cp -r ${config.boot.loader.efi.efiSysMountPoint}/EFI /boot/efis/${diskName}${cfg.partitionScheme.efiBoot}
             '') (tail cfg.bootDevices)));
           };
         };

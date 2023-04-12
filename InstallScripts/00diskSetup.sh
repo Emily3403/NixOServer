@@ -33,12 +33,13 @@ for device in $(lsblk -lnbdo NAME,SIZE | sort -k2,2nr | awk '{print "/dev/"$1}' 
 done
 
 # Print the selected drives
-echo "The following drives have been auto-detected. Please verify that they are correct by pressing \"y\""
+echo -e "The following drives have been auto-detected. Please verify that they are correct by pressing \"y\"\n"
 for drive_id in "${selected_drives[@]}"; do
     device_path=$(readlink -f "$drive_id")
     capacity=$(lsblk -bndo SIZE "$device_path" | numfmt --to=iec)
     echo "$drive_id -> $device_path (Capacity: $capacity)"
 done
+echo
 
 # Prompt the user for verification
 #while true; do
