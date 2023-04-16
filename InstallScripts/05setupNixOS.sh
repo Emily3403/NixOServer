@@ -33,7 +33,7 @@ nix \
 # Install the system
 nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#exampleHost"
 
-umount "${DRIVES[@]}" || true
+umount -R /mnt
 zpool export -a
 
 echo -e "\n"
