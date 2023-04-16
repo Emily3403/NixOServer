@@ -38,8 +38,11 @@ chmod 600 "$USER/.ssh/authorized_keys"
 systemctl enable ssh
 systemctl start ssh
 
-# Clone the repository
-git clone https://github.com/Emily3403/NixOServer ~/NixOServer
+if [ -d "$HOME/NixOServer" ]; then
+    git -C "$HOME/NixOServer" pull
+else
+    git clone https://github.com/Emily3403/NixOServer "$HOME/NixOServer"
+fi
 
 # Install dependencies for installation
 apt install -y gdisk dosfstools whois
