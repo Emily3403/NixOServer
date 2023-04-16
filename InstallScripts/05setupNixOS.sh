@@ -22,7 +22,7 @@ nix-env -f '<nixpkgs>' -iA nixos-install-tools
 # Initialize the git repository for NixOS
 git -C /mnt/etc/nixos init
 git -C /mnt/etc/nixos add --all
-git -C /mnt/etc/nixos commit "Initial Install"
+git -C /mnt/etc/nixos commit -m "Initial Install"
 
 # Update flake lock file
 nix \
