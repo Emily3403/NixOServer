@@ -41,7 +41,7 @@ repo_dir="/home/$SUDO_USER/NixOServer"
 if [ -d "$repo_dir" ]; then
     git -C "$repo_dir" pull
 else
-    su -c "git clone https://github.com/Emily3403/NixOServer $repo_dir; git -C "$repo_dir" config pull.rebase false" $SUDO USER
+    su -c "git clone https://github.com/Emily3403/NixOServer $repo_dir; git -C $repo_dir config pull.rebase false" "$SUDO_USER"
 fi
 
 # Install dependencies for installation
