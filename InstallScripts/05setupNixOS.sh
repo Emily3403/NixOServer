@@ -31,7 +31,7 @@ nix \
   "git+file:///mnt/etc/nixos"
 
 # Install the system
-nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#exampleHost" --max-jobs "$(nproc)"
+nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#exampleHost"
 
 umount "${DRIVES[@]}" || true
 zpool export -a
