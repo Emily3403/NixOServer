@@ -38,10 +38,12 @@ chmod 600 "$USER/.ssh/authorized_keys"
 systemctl enable ssh
 systemctl start ssh
 
-if [ -d "$HOME/NixOServer" ]; then
-    git -C "$HOME/NixOServer" pull
+repo_dir="$HOME/NixOServer"
+if [ -d "$repo_dir" ]; then
+    git -C "$repo_dir" pull
 else
-    git clone https://github.com/Emily3403/NixOServer "$HOME/NixOServer"
+    git clone https://github.com/Emily3403/NixOServer "$repo_dir"
+    git -C "$repo_dir" config pull.rebase false
 fi
 
 # Install dependencies for installation
