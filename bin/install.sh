@@ -13,40 +13,20 @@ if [ "$(uname -s)" != "Linux" ]; then
     exit 1
 fi
 
-if ! command -v lsb_release &> /dev/null; then
-    echo "Error: This script requires the 'lsb-release' package."
-    exit 1
-fi
+check_dependency() {
+    command -v "$1" > /dev/null 2>&1 || {
+        echo >&2 "Error: The required command '$1' is not installed. Please install it and try again."
+        exit 1
+    }
+}
 
-if ! command -v apt > /dev/null 2>&1; then
-    echo "Error: This script requires a Linux distribution with the 'apt' package manager."
-    exit 1
-fi
+# Check for required dependencies
+dependencies=("mkpasswd" "lsblk" "sgdisk" "udevadm" "mkswap" "zpool" "zfs" "mkfs.vfat")
+for dependency in "${dependencies[@]}"; do
+    check_dependency "$dependency"
+done
 
 set -e
-
-# Install dependencies
-apt update
-apt install -y git vim openssh-server gdisk dosfstools whois
-
-# Backup the existing sources.list file
-cp /etc/apt/sources.list /etc/apt/sources.list.backup."$(date --iso)"
-
-# Define the repositories
-bullseye_updates="deb http://deb.debian.org/debian/ bullseye-updates main contrib non-free"
-bullseye_backports="deb http://deb.debian.org/debian/ bullseye-backports main contrib non-free"
-bullseye_security="deb http://security.debian.org/debian-security bullseye-security main contrib non-free"
-
-# Add repositories if not already present
-grep -qxF "$bullseye_updates" /etc/apt/sources.list || echo "$bullseye_updates" | tee -a /etc/apt/sources.list
-grep -qxF "$bullseye_backports" /etc/apt/sources.list || echo "$bullseye_backports" | tee -a /etc/apt/sources.list
-grep -qxF "$bullseye_security" /etc/apt/sources.list || echo "$bullseye_security" | tee -a /etc/apt/sources.list
-
-# Update package index
-apt-get update
-
-# Install zfsutils-linux from buster-backports
-apt install -y -t bullseye-backports zfsutils-linux
 
 # Get the config
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
