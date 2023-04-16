@@ -15,7 +15,7 @@ for disk in "${DRIVES[@]}"; do
     # blkdiscard -f $disk
     echo $disk
 
-    sgdisk --zap-all $disk
+#    sgdisk --zap-all $disk
 
     sgdisk -n1:1M:+1G -t1:EF00 $disk
 
