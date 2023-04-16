@@ -37,7 +37,7 @@ su -c 'chmod 600 ~/.ssh/authorized_keys' "$SUDO_USER"
 systemctl enable ssh
 systemctl start ssh
 
-repo_dir="$HOME/NixOServer"
+repo_dir="/home/$SUDO_USER/NixOServer"
 if [ -d "$repo_dir" ]; then
     git -C "$repo_dir" pull
 else
