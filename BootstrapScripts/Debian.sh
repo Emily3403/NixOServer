@@ -21,18 +21,17 @@ set -e
 apt-get update
 apt-get install -y git vim openssh-server fish
 
-chsh -s /usr/bin/fish "$USER"
+chsh -s /usr/bin/fish "$SUDO_USER"
 
 # Create the .ssh directory and set permissions
-mkdir -p "$USER/.ssh"
-chmod 700 "$USER/.ssh"
+su -c 'mkdir -p ~/.ssh; chmod 700 ~/.ssh' "$SUDO_USER"
 
 # Download and install SSH keys
-curl -sL https://github.com/Emily3403.keys >> "$USER/.ssh/authorized_keys"
-curl -sL https://github.com/D-VAmpire.keys >> "$USER/.ssh/authorized_keys"
+su -c 'curl -sL https://github.com/Emily3403.keys >> ~/.ssh/authorized_keys' "$SUDO_USER"
+su -c 'curl -sL https://github.com/D-VAmpire.keys >> ~/.ssh/authorized_keys' "$SUDO_USER"
 
 # Set permissions for the authorized_keys file
-chmod 600 "$USER/.ssh/authorized_keys"
+su -c 'chmod 600 ~/.ssh/authorized_keys' "$SUDO_USER"
 
 # Start the SSH daemon
 systemctl enable ssh
