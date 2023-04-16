@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: This script must be run as root."
+    exit 1
+fi
+
+if [ "$(uname -s)" != "Linux" ]; then
+    echo "Error: This script requires a Linux distribution."
+    exit 1
+fi
+
 if [ "$(lsb_release -is)" != "Debian" ]; then
     echo "This script is only for Debian systems."
     exit 1
 fi
 
-# Check if the script is executed with sudo, if not, re-execute it with sudo
-if [ "$EUID" -ne 0 ]; then
-    echo "Re-running the script with sudo..."
-    exec sudo -E "$0" "$@"
-fi
+set -e
 
 # Update package lists and install development dependencies
 apt-get update

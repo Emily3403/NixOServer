@@ -13,6 +13,8 @@ if [ "$(uname -s)" != "Linux" ]; then
     exit 1
 fi
 
+set -e
+
 check_dependency() {
     command -v "$1" > /dev/null 2>&1 || {
         echo >&2 "Error: The required command '$1' is not installed. Please install it and try again."
@@ -25,8 +27,6 @@ dependencies=("mkpasswd" "lsblk" "sgdisk" "udevadm" "mkswap" "zpool" "zfs" "mkfs
 for dependency in "${dependencies[@]}"; do
     check_dependency "$dependency"
 done
-
-set -e
 
 # Get the config
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
