@@ -66,9 +66,6 @@ apt-get update
 # Install zfsutils-linux from buster-backports
 apt install -y -t bullseye-backports zfsutils-linux
 
-# TODO: Should this script also start the installer?
-
 local_ip=$(hostname -I | awk '{print $1}')
-
 echo -e "\n\nDebian bootstrap script completed successfully!\nYou may now run the install.sh script!\n"
 echo "My current local IP address is: $local_ip"
