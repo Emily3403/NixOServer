@@ -70,5 +70,5 @@ apt install -y -t bullseye-backports zfsutils-linux
 
 local_ip=$(hostname -I | awk '{print $1}')
 
-echo -e "\n\nDebian bootstrap script completed successfully!"
+echo -e "\n\nDebian bootstrap script completed successfully!\nYou may now run the install.sh script!\n"
 echo "My current local IP address is: $local_ip"
