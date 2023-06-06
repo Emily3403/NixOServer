@@ -4,8 +4,7 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/utils.sh"
 
 check_variables DRIVES SWAP_AMOUNT_GB
-EFFECTIVE_SWAP_PER_DRIVE=$(( SWAP_AMOUNT_GB / NUM_DRIVES ))
-
+EFFECTIVE_SWAP_PER_DRIVE=$((SWAP_AMOUNT_GB / NUM_DRIVES))
 
 for disk in "${DRIVES[@]}"; do
 
@@ -15,7 +14,7 @@ for disk in "${DRIVES[@]}"; do
     # blkdiscard -f $disk
     echo $disk
 
-#    sgdisk --zap-all $disk
+    #    sgdisk --zap-all $disk
 
     sgdisk -n1:1M:+1G -t1:EF00 $disk
 

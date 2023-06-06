@@ -3,7 +3,7 @@
 # https://nixos.org/manual/nixos/stable/index.html#sec-installing-from-other-distro
 
 # Check if the group 'nixbld' exists, if not, create it
-if ! getent group nixbld >/dev/null; then
+if ! getent group nixbld > /dev/null; then
     sudo groupadd -g 30000 nixbld
     sudo useradd -u 30000 -g nixbld -G nixbld nixbld
 fi
@@ -26,9 +26,9 @@ git -C /mnt/etc/nixos commit -m "Initial Install"
 
 # Update flake lock file
 nix \
-  --extra-experimental-features 'nix-command flakes' \
-  flake update --commit-lock-file \
-  "git+file:///mnt/etc/nixos"
+    --extra-experimental-features 'nix-command flakes' \
+    flake update --commit-lock-file \
+    "git+file:///mnt/etc/nixos"
 
 # Install the system
 nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#exampleHost"
