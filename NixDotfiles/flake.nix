@@ -1,22 +1,32 @@
 {
-  ## ensure a successful installation by pinning nixpkgs to a known
-  ## good revision
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/5b7cd5c39befee629be284970415b6eb3b0ff000";
-  ## after reboot, you can track latest stable by using
-  #inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-22.11";
-  ## or track rolling release by using
-  #inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  # TODO: flake-parts, systems, devenv
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/23.05";
 
-  outputs = { self, nixpkgs }@inputs:
+    agenix.url = "github:ryantm/agenix";
+    agenix.inputs.darwin.follows = "";
+  };
+
+  outputs = { self, nixpkgs, agenix }@inputs:
     let
       lib = nixpkgs.lib;
       mkHost = { zfs-root, pkgs, system, ... }:
         lib.nixosSystem {
           inherit system;
           modules = [
+            ./configuration.nix
             ./modules
-            (import ./configuration.nix { inherit zfs-root inputs pkgs lib; })
+            agenix.nixosModules.default
+
+            ./programs/KeyCloak.nix
+            ./programs/Wiki-js.nix
+            ./programs/Nginx.nix
+            ./programs/Nextcloud.nix
           ];
+
+          specialArgs = {
+              inherit zfs-root inputs pkgs lib;
+          };
         };
     in {
       nixosConfigurations = {

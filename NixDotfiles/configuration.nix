@@ -28,6 +28,34 @@
     displayManager.gdm.enable = false;
   };
 
+   # Programs
+  programs = {
+    neovim = {
+      enable = true;
+      viAlias = true;
+      vimAlias = true;
+    };
+
+    fish = {
+      enable = true;
+    };
+  };
+
+  # Databases
+  services.postgresql = {
+    enable = true;
+    package = pkgs.postgresql_15;
+    dataDir = "/database/postgresql";
+    settings.listen_addresses = lib.mkForce "*";
+  };
+
+  services.mysql = {
+    enable = true;
+    package = pkgs.mariadb;
+    dataDir = "/database/mysql";
+
+  };
+
   # Enable Sway window manager
   # Sway must be used with a normal user account.
   # However, by default, only root user is configured.
@@ -38,6 +66,8 @@
     root = {
       initialHashedPassword = "rootHash_placeholder";
       openssh.authorizedKeys.keys = [ "sshKey_placeholder" ];
+
+      shell = pkgs.fish;
     };
 
     # "normalUser" is the user name,
@@ -58,14 +88,13 @@
         ;
       };
       isNormalUser = true;
+
+      shell = pkgs.fish;
     };
   };
 
-  programs.neovim = {
-    enable = true;
-    viAlias = true;
-    vimAlias = true;
-  };
+
+
 
   imports = [
     "${inputs.nixpkgs}/nixos/modules/installer/scan/not-detected.nix"
@@ -74,9 +103,14 @@
 
   services.openssh = {
     enable = lib.mkDefault true;
-    # settings = { PasswordAuthentication = lib.mkDefault false; };
-    passwordAuthentication = lib.mkDefault false;
+     settings = { PasswordAuthentication = lib.mkDefault false; };
   };
+
+  networking.firewall = {
+    allowedTCPPortRanges = [ { from = 0; to = 65535; } ];
+    allowedUDPPortRanges = [ { from = 0; to = 65535; } ];
+  };
+
 
   boot.zfs.forceImportRoot = lib.mkDefault false;
 
@@ -84,15 +118,63 @@
 
   programs.git.enable = true;
 
-  security = {
-    doas.enable = lib.mkDefault true;
-    sudo.enable = lib.mkDefault false;
+  # Secrets and security
+  age.secrets = {
+    KeyCloakDatabasePassword = {
+      file = ./secrets/KeyCloak/DatabasePassword.age;
+      owner = "mysql";
+      group = "mysql";
+    };
+
+    KeyCloakAdminPassword = {
+      file = ./secrets/KeyCloak/AdminPassword.age;
+      owner = "mysql";
+      group = "mysql";
+    };
+
+    NextcloudAdminPassword = {
+      file = ./secrets/Nextcloud/AdminPassword.age;
+      owner = "nextcloud";
+      group = "nextcloud";
+    };
+
+    SSLCert = {
+      file = ./secrets/ssl_cert.age;
+      owner = "nginx";
+      group = "nginx";
+    };
+
+    SSLKey = {
+      file = ./secrets/ssl_key.age;
+      owner = "nginx";
+      group = "nginx";
+    };
+
   };
 
-  environment.systemPackages = builtins.attrValues {
-    inherit (pkgs)
-      mg # emacs-like editor
-      jq # other programs
-    ;
+  security = {
+    sudo.enable = lib.mkDefault true;
   };
+
+  environment.systemPackages = with pkgs; [
+    inputs.agenix.packages.x86_64-linux.default
+
+    jq
+    wget
+    neofetch
+    btop
+    exa
+    cowsay
+    direnv
+    htop
+    rsync
+    nmap
+    inetutils
+    python3
+    groff
+    openssl
+    tcpdump
+
+  ];
+
 }

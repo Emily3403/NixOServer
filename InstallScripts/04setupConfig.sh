@@ -5,7 +5,7 @@ source "$SCRIPT_DIR/utils.sh"
 check_variables DRIVES BOOT_POOL_NAME ROOT_POOL_NAME
 
 mkdir -p /mnt/etc/nixos/
-cp -r "$SCRIPT_DIR"/../NewNixDotfiles/* /mnt/etc/nixos
+cp -r "$SCRIPT_DIR"/../NixDotfiles/* /mnt/etc/nixos
 
 for i in "${DRIVES[@]}"; do
     sed -i \

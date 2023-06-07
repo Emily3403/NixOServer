@@ -42,17 +42,17 @@ done
 echo
 
 # Prompt the user for verification
-#while true; do
-#    read -rp "Are these drives correct? (y/n): " user_input
-#    case $user_input in
-#        [Yy]*) break ;;
-#        [Nn]*)
-#            echo "Please check the drives manually and rerun the script."
-#            exit 1
-#            ;;
-#        *) echo "Please enter 'y' or 'n'." ;;
-#    esac
-#done
+while true; do
+    read -rp "Are these drives correct? (y/n): " user_input
+    case $user_input in
+        [Yy]*) break ;;
+        [Nn]*)
+            echo "Please check the drives manually and rerun the script."
+            exit 1
+            ;;
+        *) echo "Please enter 'y' or 'n'." ;;
+    esac
+done
 
 # Save the drives into an array and export it
 export DRIVES=("${selected_drives[@]}")
