@@ -17,7 +17,7 @@ source "$SCRIPT_DIR/utils.sh"
 check_variables DRIVES RAID_LEVEL BOOT_POOL_NAME ROOT_POOL_NAME
 
 echo "Creating boot pool"
-echo "${DRIVES[@]/%/-part2}"
+echo "${DRIVES[@]/%/2}"
 
 # TODO: Maybe change the raid level to mirror in order to boot off of it
 zpool create -f \
@@ -35,7 +35,7 @@ zpool create -f \
     -R /mnt \
     "$BOOT_POOL_NAME" \
     "$RAID_LEVEL" \
-    "${DRIVES[@]/%/-part2}"
+    "${DRIVES[@]/%/2}"
 
 check_zpool_status "$BOOT_POOL_NAME"
 
@@ -53,7 +53,7 @@ zpool create -f \
     -O mountpoint=/ \
     "$ROOT_POOL_NAME" \
     "$RAID_LEVEL" \
-    "${DRIVES[@]/%/-part3}"
+    "${DRIVES[@]/%/3}"
 
 check_zpool_status "$ROOT_POOL_NAME"
 

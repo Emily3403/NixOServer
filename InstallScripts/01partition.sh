@@ -28,5 +28,5 @@ for disk in "${DRIVES[@]}"; do
 
     sync && udevadm settle
 
-    mkswap "$disk"-part4
+    mkswap "$disk"4
 done

@@ -4,32 +4,28 @@
 
     settings.db = {
       host = "localhost";
-      user = "wikijs";
+      user = "wiki";
       pass = "UwU";
     };
-
-    settings.logLevel = "silly";
-
-    environmentFile = "/root/wiki-js.env";
   };
 
   services.postgresql = {
     ensureDatabases = [ "wiki" ];
     ensureUsers = [
       {
-        name = "wikijs";
+        name = "wiki";
         ensurePermissions = { "DATABASE wiki" = "ALL PRIVILEGES"; };
       }
     ];
   };
 
   services.nginx.virtualHosts = {
-    "wiki.uwu.com" = {
-      onlySSL = true;
-      locations."/".proxyPass = "http://localhost:3000/";
+    "new-wiki.${config.domainName}" = {
+      forceSSL = true;
+      enableACME = true;
 
-      sslCertificate = config.age.secrets.SSLCert.path;
-      sslCertificateKey = config.age.secrets.SSLKey.path;
+      locations."/".proxyPass = "http://localhost:3000/";
+      serverAliases = [ "wiki.${config.domainName}" ];
     };
   };
 }

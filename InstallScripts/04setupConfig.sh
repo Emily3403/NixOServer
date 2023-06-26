@@ -57,5 +57,5 @@ Emily_Key=$(curl -sL https://github.com/Emily3403.keys)
 Carsten_Key=$(curl -sL https://github.com/D-VAmpire.keys)
 
 sed -i \
-    "s|\"sshKey_placeholder\"|\"$Emily_Key\" \"$Carsten_Key\"|" \
+    "s|\"sshKey_placeholder\"|\"$Emily_Key\"|" \
     /mnt/etc/nixos/configuration.nix

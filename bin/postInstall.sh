@@ -24,6 +24,7 @@ git config --global user.name "$GIT_UNAME"
 git config -C "$SCRIPT_DIR" pull.rebase true
 
 # Move and symlink the Nix directory
+# TODO: Backup the directory before it
 rm -rf /etc/nixos/.git
 rm -rf "$SCRIPT_DIR/../NixDotfiles"
 mv /etc/nixos "$SCRIPT_DIR/../NixDotfiles"
@@ -34,11 +35,15 @@ git -C "$SCRIPT_DIR" add -A
 git -C "$SCRIPT_DIR" commit -m "Replace placeholders"
 
 # Setup directories needed for installation
-mkdir -p /database/postgresql
-mkdir -p /database/mysql
+mkdir -p /data/postgresql
+mkdir -p /data/mysql
+mkdir -p /data/nextcloud
+mkdir -p /data/wiki
 
-chown -R postgres /database/postgresql
-chown -R mysql /database/mysql
+chown -R postgres /data/postgresql
+chown -R mysql /data/mysql
+chown -R nextcloud /data/nextcloud
+chown -R wiki-js /data/wiki
 
 
 nixos-rebuild switch

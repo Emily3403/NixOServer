@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# TODO: Failsafe if /dev/disk/by-id/ does not contain any drives
 
 # Find all drives using /dev/disk/by-id and store the names in a variable
 drive_names=$(find /dev/disk/by-id -type l -not -name "*part*")
@@ -55,4 +56,5 @@ while true; do
 done
 
 # Save the drives into an array and export it
-export DRIVES=("${selected_drives[@]}")
+#export DRIVES=("${selected_drives[@]}")
+export DRIVES=("/dev/xvdb" "/dev/xvdc" "/dev/xvdd")

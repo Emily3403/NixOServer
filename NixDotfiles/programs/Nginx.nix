@@ -8,12 +8,10 @@
     recommendedTlsSettings = true;
 
     virtualHosts = {
-      "localhost" = {
-
-        serverAliases = [  ];
-        locations."/" = {
-          proxyPass = "http://localhost:1234/";
-        };
+      "nixie.${config.domainName}" = {
+        forceSSL = true;
+        enableACME = true;
+        locations."/".proxyPass = "http://localhost:3000/";
       };
     };
   };
@@ -21,9 +19,9 @@
 
   security.acme = {
     acceptTerms = true;
-
-    defaults.email = "emily.seebeck3403@gmail.com";
-    defaults.server = "https://acme-staging-v02.api.letsencrypt.org";
+    defaults.email = "nixie3403@gmail.com";
   };
+
+  users.users.nginx.extraGroups = [ "acme" ];
 
 }

@@ -1,16 +1,12 @@
-##
-##
-##  per-host configuration for exampleHost
-##
-##
+{ system, pkgs, modules, ... }: {
+  inherit pkgs system modules;
 
-{ system, pkgs, ... }: {
-  inherit pkgs system;
   zfs-root = {
     boot = {
-      devNodes = "/dev/disk/by-id/";
+      devNodes = "/dev/";
       bootDevices = [ "bootDevices_placeholder" ];
       immutable = false;
+
       availableKernelModules = [
         # for booting virtual machine
         # with virtio disk controller
@@ -22,20 +18,20 @@
         "nvme"
         # for external usb drive
         "uas"
+        "xen_blkfront"
+        "xen_netfront"
       ];
+
       removableEfi = true;
       kernelParams = [ ];
-      sshUnlock = {
-        # read sshUnlock.txt file.
-        enable = false;
-        authorizedKeys = [ ];
-      };
+
     };
+
     networking = {
-      # read changeHostName.txt file.
-      hostName = "exampleHost";
+      hostName = "nixie-vm";
       timeZone = "Europe/Berlin";
-      hostId = "abcd1234";
+      hostId = "d5dabe5e";
     };
   };
+
 }

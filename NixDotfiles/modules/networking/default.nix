@@ -5,25 +5,33 @@ let
 in {
   options.zfs-root.networking = {
     hostName = mkOption {
-      description = "The name of the machine.  Used by nix flake.";
+      description = "The name of the machine. Used by nix flake.";
       type = types.str;
       default = "exampleHost";
     };
+
     timeZone = mkOption {
       type = types.str;
       default = "Etc/UTC";
     };
+
     hostId = mkOption {
       description = "Set host id";
       type = types.str;
     };
   };
+
+  options.domainName = mkOption {
+    type = types.str;
+    description = "Domain name to be used";
+  };
+
   config = {
-    networking.hostId = cfg.hostId;
     time.timeZone = cfg.timeZone;
     networking = {
       firewall.enable = mkDefault true;
       hostName = cfg.hostName;
+      hostId = cfg.hostId;
     };
   };
 }

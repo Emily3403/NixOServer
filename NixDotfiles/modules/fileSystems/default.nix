@@ -10,22 +10,26 @@ in {
       type = types.attrsOf types.str;
       default = { };
     };
+
     bindmounts = mkOption {
       description = "Set mountpoint for bindmounts";
       type = types.attrsOf types.str;
       default = { };
     };
+
     efiSystemPartitions = mkOption {
       description = "Set mountpoint for efi system partitions";
       type = types.listOf types.str;
       default = [ ];
     };
+
     swapPartitions = mkOption {
       description = "Set swap partitions";
       type = types.listOf types.str;
       default = [ ];
     };
   };
+
   config.fileSystems = mkMerge (mapAttrsToList (dataset: mountpoint: {
     "${mountpoint}" = {
       device = "${dataset}";
@@ -54,7 +58,7 @@ in {
     };
   }) cfg.efiSystemPartitions);
   config.swapDevices = mkDefault (map (swap: {
-    device = "${config.zfs-root.boot.devNodes}/${swap}";
+    device = "${config.zfs-root.boot.devNodes}${swap}";
     discardPolicy = mkDefault "both";
     randomEncryption = {
       enable = true;

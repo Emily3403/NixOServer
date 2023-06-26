@@ -5,6 +5,6 @@
     enable = true;
     mathjax = true;
 
-    stateDir = "/database/gollum";
+    stateDir = "/data/gollum";
   };
 }

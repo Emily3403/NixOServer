@@ -31,4 +31,6 @@ The `NixDotfiles` are inspired by [this](https://github.com/ne9z/dotfiles-flake)
 
 # TODO
 
+- [ ] Setup Docker containers for each service
 - [ ] How to get a string secret from agenix to the config (Keycloak.initialAdminPassword)
+- [ ] How to speed up rebuilding

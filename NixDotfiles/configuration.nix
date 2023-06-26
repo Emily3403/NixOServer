@@ -1,32 +1,24 @@
-{ zfs-root, inputs, pkgs, lib, ... }: {
+{ zfs-root, inputs, pkgs, config, lib, ... }: {
   # load module config to here
   inherit zfs-root;
 
-  # Let 'nixos-version --json' know about the Git revision
-  # of this flake.
+  # Let 'nixos-version --json' know about the Git revision of this flake.
   system.configurationRevision = if (inputs.self ? rev) then
     inputs.self.rev
   else
     throw "refuse to build: git tree is dirty";
 
-  system.stateVersion = "22.11";
+  system.stateVersion = "23.05";
+  nix.settings.experimental-features = lib.mkDefault [ "nix-command" "flakes" ];
 
-  # Enable NetworkManager for wireless networking,
-  # You can configure networking with "nmtui" command.
-  networking.useDHCP = true;
-  networking.networkmanager.enable = false;
+  # TODO: Add symlinks for wiki, acme and other /var/lib services with their respective groups
+  #  Also: Setup database correctly from the get-go for the next install
 
-  # Enable GNOME
-  # GNOME must be used with a normal user account.
-  # However, by default, only root user is configured.
-  # Create a normal user and set password.
-  #
-  # You need to enable all options in this attribute set.
-  services.xserver = {
-    enable = false;
-    desktopManager.gnome.enable = false;
-    displayManager.gdm.enable = false;
-  };
+  # "it is highly recommended to disable this option, as it bypasses some of the safeguards ZFS uses to protect your ZFS pools."
+  boot.zfs.forceImportRoot = lib.mkDefault false;
+
+  # Don't build man pages. This saves a *lot* of time when rebuilding
+  documentation.man.generateCaches = false;
 
    # Programs
   programs = {
@@ -36,32 +28,23 @@
       vimAlias = true;
     };
 
-    fish = {
-      enable = true;
+    fish.enable = true;
+    git.enable = true;
+  };
+
+  security = {
+    sudo.enable = lib.mkDefault true;
+  };
+
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication =  false;
+      KbdInteractiveAuthentication = false;
     };
   };
 
-  # Databases
-  services.postgresql = {
-    enable = true;
-    package = pkgs.postgresql_15;
-    dataDir = "/database/postgresql";
-    settings.listen_addresses = lib.mkForce "*";
-  };
-
-  services.mysql = {
-    enable = true;
-    package = pkgs.mariadb;
-    dataDir = "/database/mysql";
-
-  };
-
-  # Enable Sway window manager
-  # Sway must be used with a normal user account.
-  # However, by default, only root user is configured.
-  # Create a normal user and set password.
-  programs.sway.enable = false;
-
+  # TODO: Migrate this away
   users.users = {
     root = {
       initialHashedPassword = "rootHash_placeholder";
@@ -91,69 +74,6 @@
 
       shell = pkgs.fish;
     };
-  };
-
-
-
-
-  imports = [
-    "${inputs.nixpkgs}/nixos/modules/installer/scan/not-detected.nix"
-    # "${inputs.nixpkgs}/nixos/modules/profiles/qemu-guest.nix"
-  ];
-
-  services.openssh = {
-    enable = lib.mkDefault true;
-     settings = { PasswordAuthentication = lib.mkDefault false; };
-  };
-
-  networking.firewall = {
-    allowedTCPPortRanges = [ { from = 0; to = 65535; } ];
-    allowedUDPPortRanges = [ { from = 0; to = 65535; } ];
-  };
-
-
-  boot.zfs.forceImportRoot = lib.mkDefault false;
-
-  nix.settings.experimental-features = lib.mkDefault [ "nix-command" "flakes" ];
-
-  programs.git.enable = true;
-
-  # Secrets and security
-  age.secrets = {
-    KeyCloakDatabasePassword = {
-      file = ./secrets/KeyCloak/DatabasePassword.age;
-      owner = "mysql";
-      group = "mysql";
-    };
-
-    KeyCloakAdminPassword = {
-      file = ./secrets/KeyCloak/AdminPassword.age;
-      owner = "mysql";
-      group = "mysql";
-    };
-
-    NextcloudAdminPassword = {
-      file = ./secrets/Nextcloud/AdminPassword.age;
-      owner = "nextcloud";
-      group = "nextcloud";
-    };
-
-    SSLCert = {
-      file = ./secrets/ssl_cert.age;
-      owner = "nginx";
-      group = "nginx";
-    };
-
-    SSLKey = {
-      file = ./secrets/ssl_key.age;
-      owner = "nginx";
-      group = "nginx";
-    };
-
-  };
-
-  security = {
-    sudo.enable = lib.mkDefault true;
   };
 
   environment.systemPackages = with pkgs; [

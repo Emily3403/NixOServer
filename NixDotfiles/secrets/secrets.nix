@@ -8,7 +8,11 @@ in
   "KeyCloak/AdminPassword.age".publicKeys = [ nixie ];
 
   "Nextcloud/AdminPassword.age".publicKeys = [ nixie ];
+  "Nextcloud/KeycloakClientSecret.age".publicKeys = [ nixie ];
 
   "ssl_cert.age".publicKeys = [ nixie ];
   "ssl_key.age".publicKeys = [ nixie ];
+
+  "ssh_key.age".publicKeys = [ nixie ];
+  "ssh_key_pub.age".publicKeys = [ nixie ];
 }

@@ -4,6 +4,6 @@
   services.traefik = {
     enable = true;
 
-    dataDir = "/database/traefik";
+    dataDir = "/data/traefik";
   };
 }
