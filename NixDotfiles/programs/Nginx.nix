@@ -11,7 +11,8 @@
       "nixie.${config.domainName}" = {
         forceSSL = true;
         enableACME = true;
-        locations."/".proxyPass = "http://localhost:3000/";
+
+        locations."/".proxyPass = "http://192.168.7.102:3000/";
       };
     };
   };
