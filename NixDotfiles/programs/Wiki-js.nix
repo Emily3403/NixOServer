@@ -28,4 +28,31 @@
       serverAliases = [ "wiki.${config.domainName}" ];
     };
   };
+
+  containers.wiki-js = {
+    autoStart = true;
+    privateNetwork = true;
+    hostAddress = "192.168.7.1";
+    localAddress = "192.168.7.101";
+
+    config = { pkgs, config, lib, ...}: {
+      system.stateVersion = "23.05";
+
+      networking.firewall = {
+        enable = true;
+        allowedTCPPorts = [ 80 ];
+      };
+
+      services.wiki-js = {
+        enable = true;
+
+        settings.port = 80;
+        settings.db = {
+          host = "localhost";
+          user = "wiki";
+          pass = "UwU";
+        };
+      };
+    };
+  };
 }
