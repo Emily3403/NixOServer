@@ -20,11 +20,12 @@
             agenix.nixosModules.default
             ./secrets/secret-config.nix
 
-            ./programs/Database.nix
-            ./programs/KeyCloak.nix
-            ./programs/Wiki-js.nix
-            ./programs/Nginx.nix
-            ./programs/Nextcloud.nix
+            ./services/Database.nix
+            ./services/KeyCloak.nix
+            ./services/Wiki-js.nix
+            ./services/Nginx.nix
+            ./services/Nextcloud.nix
+            ./services/HedgeDoc.nix
 
             modules
           ];

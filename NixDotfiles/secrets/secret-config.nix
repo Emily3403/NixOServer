@@ -20,6 +20,11 @@
       owner = "nextcloud";
     };
 
+    HedgeDocEnvironmentFile = {
+      file = ./HedgeDoc/EnvironmentFile.age;
+      owner = "hedgedoc";
+    };
+
     SSLCert = {
       file = ./ssl_cert.age;
       owner = "nginx";

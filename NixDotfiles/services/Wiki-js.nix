@@ -98,8 +98,8 @@
   };
 
   systemd.tmpfiles.rules = [
-    "d /data/wiki/postgresql 0755 wiki-js"
-    "d /data/wiki/wiki-js 0755 postgres"
+    "d /data/wiki/postgresql 0755 postgres"
+    "d /data/wiki/wiki-js 0755 wiki-js"
   ];
 
 }

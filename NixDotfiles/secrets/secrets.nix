@@ -10,6 +10,8 @@ in
   "Nextcloud/AdminPassword.age".publicKeys = [ nixie ];
   "Nextcloud/KeycloakClientSecret.age".publicKeys = [ nixie ];
 
+  "HedgeDoc/EnvironmentFile.age".publicKeys = [ nixie ];
+
   "ssl_cert.age".publicKeys = [ nixie ];
   "ssl_key.age".publicKeys = [ nixie ];
 
