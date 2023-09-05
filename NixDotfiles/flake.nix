@@ -20,12 +20,13 @@
             agenix.nixosModules.default
             ./secrets/secret-config.nix
 
-            ./services/Database.nix
             ./services/KeyCloak.nix
             ./services/Wiki-js.nix
             ./services/Nginx.nix
             ./services/Nextcloud.nix
             ./services/HedgeDoc.nix
+
+            ./services/PasswordManagers/VaultWarden.nix
 
             modules
           ];

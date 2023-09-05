@@ -6,6 +6,7 @@
       enableACME = true;
 
       locations."/".proxyPass = "http://192.168.7.104:3000/";
+      serverAliases = [ "hackmd.${config.domainName}" ];
     };
   };
 
@@ -138,6 +139,7 @@
 
     postgres = {
       uid = 71;
+      group = "postgres";
     };
   };
 

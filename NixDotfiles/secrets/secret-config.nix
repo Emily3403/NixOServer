@@ -25,6 +25,11 @@
       owner = "hedgedoc";
     };
 
+    VaultWardenEnvironmentFile = {
+      file = ./VaultWarden/EnvironmentFile.age;
+      owner = "vaultwarden";
+    };
+
     SSLCert = {
       file = ./ssl_cert.age;
       owner = "nginx";

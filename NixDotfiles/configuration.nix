@@ -76,6 +76,12 @@
     };
   };
 
+  users.groups = {
+    postgres.members = [ "postgres" ];
+    hedgedoc.members = [ "hedgedoc" ];
+    vaultwarden.members = [ "vaultwarden" ];
+  };
+
   environment.systemPackages = with pkgs; [
     inputs.agenix.packages.x86_64-linux.default
 
