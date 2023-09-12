@@ -80,6 +80,7 @@
     postgres.members = [ "postgres" ];
     hedgedoc.members = [ "hedgedoc" ];
     vaultwarden.members = [ "vaultwarden" ];
+    mail.members = [ "mail" ];
   };
 
   environment.systemPackages = with pkgs; [
@@ -100,6 +101,7 @@
     groff
     openssl
     tcpdump
+    traceroute
 
   ];
 

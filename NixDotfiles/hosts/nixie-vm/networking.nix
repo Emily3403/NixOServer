@@ -18,7 +18,7 @@
 
     interfaces.enX0 = {
       ipv4.addresses = [{
-        address = "130.149.220.7";
+        address = "130.149.220.242";
         prefixLength = 25;
       }];
     };
@@ -32,7 +32,7 @@
 
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 80 443 ];
+      allowedTCPPorts = [ 22 25 80 443 465 587 993 ];
     };
 
     # For the containers

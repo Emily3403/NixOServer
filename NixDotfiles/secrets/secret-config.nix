@@ -30,6 +30,18 @@
       owner = "vaultwarden";
     };
 
+    MailEnvironmentFile = {
+      file = ./Mail/EnvironmentFile.age;
+      owner = "root";
+      group = "root";
+    };
+
+    MailSSLCerts = {
+      file = ./Mail/ssl_certs.age;
+      owner = "root";
+      group = "root";
+    };
+
     SSLCert = {
       file = ./ssl_cert.age;
       owner = "nginx";
@@ -47,6 +59,7 @@
       owner = "wiki-js";
       path = "/etc/wiki";
     };
+
 
   };
 }

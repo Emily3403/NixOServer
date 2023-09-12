@@ -28,6 +28,8 @@
 
             ./services/PasswordManagers/VaultWarden.nix
 
+            ./services/Mail.nix
+
             modules
           ];
 
