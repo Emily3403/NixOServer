@@ -21,6 +21,11 @@
         address = "130.149.220.242";
         prefixLength = 25;
       }];
+
+      ipv6.addresses = [{
+        address = "2001:638:809:ff11:130:149:220:242";
+        prefixLength = 64;
+      }];
     };
 
     interfaces.enX1 = {

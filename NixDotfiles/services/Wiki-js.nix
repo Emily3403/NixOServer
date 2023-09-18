@@ -29,6 +29,11 @@
       "/run/agenix/SSHKey" = {
         hostPath = "/run/agenix/SSHKey";
       };
+
+      "/root/Wiki-js" = {
+        hostPath = "/root/Wiki-js";
+        isReadOnly = false;
+      };
     };
 
     config = { pkgs, config, lib, ...}: {
@@ -66,6 +71,8 @@
           host = "/run/postgresql";
           user = "wiki-js";
         };
+
+        settings.logLevel = "silly";
       };
 
       environment.systemPackages = with pkgs; [

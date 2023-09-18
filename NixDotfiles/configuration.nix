@@ -39,7 +39,7 @@
   services.openssh = {
     enable = true;
     settings = {
-      PasswordAuthentication =  false;
+      PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
     };
   };
@@ -88,6 +88,7 @@
 
     jq
     wget
+    zsh
     neofetch
     btop
     exa
@@ -102,6 +103,8 @@
     openssl
     tcpdump
     traceroute
+    pv
+    wireguard-tools
 
   ];
 

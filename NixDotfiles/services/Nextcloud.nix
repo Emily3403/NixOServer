@@ -155,8 +155,8 @@
           oidc_login_default_group = "Authenticated";
           oidc_login_disable_registration = false;
           oidc_create_groups = true;
-          oidc_login_webdav_enabled = true;  # TODO
-          oidc_login_password_authentication = true;  # TODO
+          oidc_login_webdav_enabled = true;
+          oidc_login_password_authentication = false;
 
           # Defaults to acknowledge I have understood them
           oidc_login_use_external_storage = false;
