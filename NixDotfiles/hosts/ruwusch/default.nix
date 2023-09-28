@@ -1,5 +1,5 @@
 # Services that should exist:
-# - Plex
+# - Jellyfin
 # - Transmission-openvpn (docker)
 # - openvpn compatible vpn
 #    - Bonus: Able to use mulvad
@@ -26,9 +26,13 @@
 # - SX64 Ryzen 5 3600 (Passmark: 17785), 4× 16TB, 96.75€ @ 11.09
 #
 # Auction:
-# - 2176962 i7-3770 (Passmark: 6398), 4× 6TB, 50.81€ @ 11.09
-# - 2176338 i7-3770 (Passmark: 6398), 4× 6TB, 61.52  @ 11.09
-# - 2168961 Xeon E3-1271V3 (Passmark: 7486), 4× 10TB, 66.28€ @ 11.09
-# - 2153211 i7-8700 (Passmark: 12921), 4× 8TB, 76.99€ @ 11.09
-# - 2146981 i7-8700 (Passmark: 12921), 4× 8TB, €79.37 @ 11.09
-
+# - 2176962 i7-3770 (Passmark: 6398), 4× 6TB, 50.81€ @ 11.09 – SOLD
+# - 2176338 i7-3770 (Passmark: 6398), 4× 6TB, 61.52  @ 11.09 – SOLD
+# - 2168961 Xeon E3-1271V3 (Passmark: 7486), 4× 10TB, 66.28€ @ 11.09 – SOLD
+# - 2153211 i7-8700 (Passmark: 12921), 4× 8TB, 76.99€ @ 11.09 – SOLD
+# - 2146981 i7-8700 (Passmark: 12921), 4× 8TB, 79.37€ @ 11.09 – SOLD
+#
+# ---
+#
+# - 2182771 i7-6700 (Passmark: 8090), 4× 4TB, 56.76€ @ 25.09 – SOLD
+# - 2182050 Xeon E3-1271V3 (Passmark: 7486), 4× 10TB, 67.47 @ 25.09 – 4× available

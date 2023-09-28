@@ -24,6 +24,7 @@
       "/data/Mail/mail-data:/var/mail"
       "/data/Mail/mail-state:/var/mail-state"
       "/data/Mail/mail-logs:/var/log/mail"
+      "/data/Mail/restored-backup:/var/restored-backup"
       "/data/Mail/config:/tmp/docker-mailserver"
       "/etc/localtime:/etc/localtime"
       "/etc/postfix/postfix-main.cf:/tmp/docker-mailserver/postfix-main.cf"
@@ -45,6 +46,8 @@
       SSL_CERT_PATH = "/var/lib/acme/new-mail.inet.tu-berlin.de/fullchain.pem";
       SSL_KEY_PATH = "/var/lib/acme/new-mail.inet.tu-berlin.de/key.pem";
 
+      ENABLE_QUOTAS = "0";
+
       # Disable legacy framework for domain legitimacy. The *new* version is with Rspamd and it integrates way better.
 #      ENABLE_RSPAMD = "1";
       ENABLE_OPENDKIM = "0";
@@ -65,7 +68,8 @@
   };
 
   environment.etc."postfix/postfix-main.cf".text = ''
-    message_size_limit = 262144000
+    message_size_limit = 26214400000
+    mailbox_size_limit = 26214400000
   '';
 
   environment.etc."dovecot/dovecot.cf".text = ''
