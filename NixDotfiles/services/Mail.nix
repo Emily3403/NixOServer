@@ -75,6 +75,7 @@
   environment.etc."dovecot/dovecot.cf".text = ''
     submission_max_mail_size = 262144000
     imap_max_line_length = 67108864
+    mail_cache_max_size=200 MB
   '';
 
 
