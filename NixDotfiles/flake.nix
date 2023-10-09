@@ -10,6 +10,7 @@
   outputs = { self, nixpkgs, agenix }@inputs:
     let
       lib = nixpkgs.lib;
+
       mkHost = { zfs-root, pkgs, system, modules, ... }:
         lib.nixosSystem {
           inherit system;
@@ -25,6 +26,7 @@
             ./services/Nginx.nix
             ./services/Nextcloud.nix
             ./services/HedgeDoc.nix
+            ./services/YouTrack.nix
 
             ./services/PasswordManagers/VaultWarden.nix
 
@@ -36,13 +38,15 @@
           specialArgs = {
               inherit zfs-root inputs pkgs lib;
           };
+
         };
 
     in {
       nixosConfigurations = {
         nixie-vm = let
           system = "x86_64-linux";
-          pkgs = nixpkgs.legacyPackages.${system}.appendOverlays [ (import ./overlays/Wiki-js.nix) ];
+          pkgs = import nixpkgs { system = "x86_64-linux"; config.allowUnfree = true; };
+
           modules = [
             ./hosts/nixie-vm/networking.nix
           ];
@@ -51,7 +55,7 @@
 
         ruwusch = let
           system = "x86_64-linux";
-          pkgs = nixpkgs.legacyPackages.${system}.appendOverlays [ (import ./overlays/Wiki-js.nix) ];
+          pkgs = import nixpkgs { system = "x86_64-linux"; config.allowUnfree = true; };
           modules = [ ];
         in mkHost (import ./hosts/ruwusch { inherit system pkgs modules; });
 

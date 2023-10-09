@@ -81,6 +81,7 @@
     hedgedoc.members = [ "hedgedoc" ];
     vaultwarden.members = [ "vaultwarden" ];
     mail.members = [ "mail" ];
+    youtrack.members = [ "youtrack" ];
   };
 
   environment.systemPackages = with pkgs; [

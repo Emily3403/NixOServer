@@ -75,10 +75,6 @@
         settings.logLevel = "silly";
       };
 
-      environment.systemPackages = with pkgs; [
-        traceroute
-      ];
-
       services.postgresql = {
         enable = true;
         package = pkgs.postgresql_15;
