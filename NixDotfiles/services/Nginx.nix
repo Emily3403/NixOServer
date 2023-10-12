@@ -25,4 +25,12 @@
 
   users.users.nginx.extraGroups = [ "acme" ];
 
+
+  services.nginx.virtualHosts."${config.domainName}" = {
+    forceSSL = true;
+    enableACME = true;
+
+    globalRedirect = "tu.berlin/eninet";
+  };
+
 }

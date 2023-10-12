@@ -11,7 +11,7 @@
 
 
   virtualisation.oci-containers.containers.youtrack = {
-    image = "jetbrains/youtrack:2023.2.19679";  # TODO: This needs manual updating.
+    image = "jetbrains/youtrack:2023.2.19783";  # TODO: This needs manual updating.
 
     ports = [
       "127.0.0.1:3000:8080"
