@@ -21,7 +21,7 @@ in
       forceSSL = true;
       enableACME = true;
 
-      serverAliases = [ "keycloak-admin.inet.tu-berlin.de" ];
+#      serverAliases = [ "keycloak-admin.inet.tu-berlin.de" ];
 
       # According to https://www.keycloak.org/server/reverseproxy#_exposed_path_recommendations
       locations = {
@@ -39,11 +39,16 @@ in
 
     "keycloak-admin.${config.domainName}" = {
       forceSSL = true;
+      enableACME = true;
 
-      sslCertificate = "/var/lib/acme/keycloak.inet.tu-berlin.de/fullchain.pem";
-      sslCertificateKey = "/var/lib/acme/keycloak.inet.tu-berlin.de/key.pem";
+#      sslCertificate = "/var/lib/acme/keycloak.inet.tu-berlin.de/fullchain.pem";
+#      sslCertificateKey = "/var/lib/acme/keycloak.inet.tu-berlin.de/key.pem";
 
       locations = {
+        "/.well-known" = {
+          # Allow access to the .well-known path for ACME challenge validation
+        };
+
         "/" = {
           proxyPass = "http://192.168.7.101:80";
           extraConfig = ''
