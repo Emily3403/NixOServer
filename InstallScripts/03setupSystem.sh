@@ -20,7 +20,7 @@ zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/empty
 zfs snapshot "$ROOT_POOL_NAME"/nixos/empty@start
 
 for disk in "${DRIVES[@]}"; do
-    mkfs.vfat -n EFI "$disk"1
-    mkdir -p /mnt/boot/efis/"${disk##*/}"1
-    mount -t vfat "$disk"1 /mnt/boot/efis/"${disk##*/}"1
+    mkfs.vfat -n EFI "$disk"-part1
+    mkdir -p /mnt/boot/efis/"${disk##*/}"-part1
+    mount -t vfat "$disk"-part1 /mnt/boot/efis/"${disk##*/}"-part1
 done

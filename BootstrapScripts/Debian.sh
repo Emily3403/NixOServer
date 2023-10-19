@@ -19,7 +19,7 @@ set -e
 
 # Update package lists and install development dependencies
 apt-get update
-apt-get install -y git vim neovim openssh-server fish btop
+apt-get install -y git vim neovim openssh-server fish
 
 # TODO: Install local configuration
 chsh -s /usr/bin/fish "$SUDO_USER"

@@ -13,7 +13,7 @@ curl -L https://nixos.org/nix/install | sh
 source "$HOME/.nix-profile/etc/profile.d/nix.sh"
 
 # Fetch the latest NixOS channel:
-nix-channel --add https://nixos.org/channels/nixos-22.11 nixpkgs
+nix-channel --add https://nixos.org/channels/nixos-23.05 nixpkgs
 nix-channel --update
 
 # Install the install tools
@@ -31,7 +31,7 @@ nix \
     "git+file:///mnt/etc/nixos"
 
 # Install the system
-nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#exampleHost"
+nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#${HOST_TO_INSTALL}"
 
 umount -R /mnt
 zpool export -a

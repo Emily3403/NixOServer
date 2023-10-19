@@ -3,7 +3,7 @@
 
   zfs-root = {
     boot = {
-      devNodes = "/dev/";
+      devNodes = "/dev/disk/by-id/";
       bootDevices = [ "bootDevices_placeholder" ];
       immutable = false;
 
@@ -18,8 +18,6 @@
         "nvme"
         # for external usb drive
         "uas"
-        "xen_blkfront"
-        "xen_netfront"
       ];
 
       removableEfi = true;
@@ -31,7 +29,7 @@
     };
 
     networking = {
-      hostName = "nixie-vm";
+      hostName = "nixie";
       timeZone = "Europe/Berlin";
       hostId = "abcd1234";
     };

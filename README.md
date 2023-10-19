@@ -24,7 +24,7 @@ Additionally, the script will install NixOS with the configuration specified in 
 
 # Credit
 
-This installation procedure is heavily inspired by [this](https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/Root%20on%20ZFS/2-system-installation.html) guide.
+This installation procedure is heavily inspired by [this](https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/Root%20on%20ZFS.html) guide.
 
 The `NixDotfiles` are inspired by [this](https://github.com/ne9z/dotfiles-flake) repository.
 

@@ -56,5 +56,4 @@ while true; do
 done
 
 # Save the drives into an array and export it
-#export DRIVES=("${selected_drives[@]}")
-export DRIVES=("/dev/xvdb" "/dev/xvdc" "/dev/xvdd")
+export DRIVES=("${selected_drives[@]}")

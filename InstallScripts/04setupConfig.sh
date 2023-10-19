@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/utils.sh"
-check_variables DRIVES BOOT_POOL_NAME ROOT_POOL_NAME
+check_variables DRIVES BOOT_POOL_NAME ROOT_POOL_NAME HOST_TO_INSTALL
 
 mkdir -p /mnt/etc/nixos/
 cp -r "$SCRIPT_DIR"/../NixDotfiles/* /mnt/etc/nixos
@@ -10,7 +10,7 @@ cp -r "$SCRIPT_DIR"/../NixDotfiles/* /mnt/etc/nixos
 for i in "${DRIVES[@]}"; do
     sed -i \
         "s|/dev/disk/by-id/|${i%/*}/|" \
-        /mnt/etc/nixos/hosts/exampleHost/default.nix
+        "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
     break
 done
 
@@ -20,10 +20,10 @@ for i in "${DRIVES[@]}"; do
 done
 
 sed -i "s|\"bootDevices_placeholder\"|$diskNames|g" \
-    /mnt/etc/nixos/hosts/exampleHost/default.nix
+    "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
 
-sed -i "s|\"abcd1234\"|\"$(head -c4 /dev/urandom | od -A none -t x4 | sed 's| ||g')\"|g" \
-    /mnt/etc/nixos/hosts/exampleHost/default.nix
+sed -i "s|\"abcd1234\"|\"$(hostid)\"|g" \
+    "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
 
 sed -i "s|\"x86_64-linux\"|\"$(uname -m)-linux\"|g" \
     /mnt/etc/nixos/flake.nix
@@ -54,7 +54,7 @@ sed -i \
 
 # Change SSH-Key
 Emily_Key=$(curl -sL https://github.com/Emily3403.keys)
-Carsten_Key=$(curl -sL https://github.com/D-VAmpire.keys)
+#Carsten_Key=$(curl -sL https://github.com/D-VAmpire.keys)
 
 sed -i \
     "s|\"sshKey_placeholder\"|\"$Emily_Key\"|" \

@@ -53,6 +53,16 @@
 
         in mkHost (import ./hosts/nixie-vm { inherit system pkgs modules; });
 
+        nixie = let
+          system = "x86_64-linux";
+          pkgs = import nixpkgs { system = "x86_64-linux"; config.allowUnfree = true; };
+
+          modules = [
+            ./hosts/nixie/networking.nix
+          ];
+
+        in mkHost (import ./hosts/nixie { inherit system pkgs modules; });
+
         ruwusch = let
           system = "x86_64-linux";
           pkgs = import nixpkgs { system = "x86_64-linux"; config.allowUnfree = true; };

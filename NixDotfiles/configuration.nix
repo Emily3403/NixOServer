@@ -15,7 +15,7 @@
   #  Also: Setup database correctly from the get-go for the next install
 
   # "it is highly recommended to disable this option, as it bypasses some of the safeguards ZFS uses to protect your ZFS pools."
-  boot.zfs.forceImportRoot = lib.mkDefault false;
+  boot.zfs.forceImportRoot = lib.mkForce true;
 
   # Don't build man pages. This saves a *lot* of time when rebuilding
   documentation.man.generateCaches = false;

@@ -8,13 +8,7 @@ EFFECTIVE_SWAP_PER_DRIVE=$((SWAP_AMOUNT_GB / NUM_DRIVES))
 
 for disk in "${DRIVES[@]}"; do
 
-    # wipe flash-based storage device to improve
-    # performance.
-    # ALL DATA WILL BE LOST
-    # blkdiscard -f $disk
-    echo $disk
-
-    #    sgdisk --zap-all $disk
+    echo -e "\n\nPartitioning $disk\n"
 
     sgdisk -n1:1M:+1G -t1:EF00 $disk
 
@@ -28,5 +22,5 @@ for disk in "${DRIVES[@]}"; do
 
     sync && udevadm settle
 
-    mkswap "$disk"4
+    mkswap "$disk"-part4
 done
