@@ -10,7 +10,7 @@ cp -r "$SCRIPT_DIR"/../NixDotfiles/* /mnt/etc/nixos
 for i in "${DRIVES[@]}"; do
     sed -i \
         "s|/dev/disk/by-id/|${i%/*}/|" \
-        /mnt/etc/nixos/hosts/exampleHost/default.nix
+        "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
     break
 done
 
@@ -20,10 +20,10 @@ for i in "${DRIVES[@]}"; do
 done
 
 sed -i "s|\"bootDevices_placeholder\"|$diskNames|g" \
-    /mnt/etc/nixos/hosts/exampleHost/default.nix
+    "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
 
 sed -i "s|\"abcd1234\"|\"$(head -c4 /dev/urandom | od -A none -t x4 | sed 's| ||g')\"|g" \
-    /mnt/etc/nixos/hosts/exampleHost/default.nix
+    "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
 
 sed -i "s|\"x86_64-linux\"|\"$(uname -m)-linux\"|g" \
     /mnt/etc/nixos/flake.nix

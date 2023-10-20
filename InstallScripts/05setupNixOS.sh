@@ -31,7 +31,7 @@ nix \
     "git+file:///mnt/etc/nixos"
 
 # Install the system
-nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#exampleHost"
+nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#$HOST_TO_INSTALL"
 
 umount -R /mnt
 zpool export -a
