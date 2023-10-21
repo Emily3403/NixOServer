@@ -24,7 +24,7 @@
 
       removableEfi = true;
       kernelParams = [
-        "zfs.zfs_arc_max=68719476736" "zfs.zfs_arc_min=12884901888"
+        "zfs.zfs_arc_max=34359738368" "zfs.zfs_arc_min=6442450944"
         "zfs.zfs_arc_meta_limit=12884901888"
       ];
 

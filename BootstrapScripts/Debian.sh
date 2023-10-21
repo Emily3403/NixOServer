@@ -10,6 +10,8 @@ if [ "$(uname -s)" != "Linux" ]; then
     exit 1
 fi
 
+# TODO: If lsb_release is not founnd, install it
+
 if [ "$(lsb_release -is)" != "Debian" ]; then
     echo "This script is only for Debian systems."
     exit 1
@@ -29,7 +31,6 @@ su -c 'mkdir -p ~/.ssh; chmod 700 ~/.ssh' "$SUDO_USER"
 
 # Download and install SSH keys
 su -c 'curl -sL https://github.com/Emily3403.keys >> ~/.ssh/authorized_keys' "$SUDO_USER"
-su -c 'curl -sL https://github.com/D-VAmpire.keys >> ~/.ssh/authorized_keys' "$SUDO_USER"
 
 # Set permissions for the authorized_keys file
 su -c 'chmod 600 ~/.ssh/authorized_keys' "$SUDO_USER"

@@ -37,7 +37,7 @@
 
     firewall = {
       enable = true;
-      allowedTCPPorts = [ 22 25 80 443 465 587 993 ];
+      allowedTCPPorts = [ 22 80 443 ];
     };
 
     # For the containers
