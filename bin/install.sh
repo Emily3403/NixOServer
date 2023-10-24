@@ -23,7 +23,7 @@ check_dependency() {
 }
 
 # Check for required dependencies
-dependencies=("mkpasswd" "lsblk" "sgdisk" "udevadm" "mkswap" "zpool" "zfs" "mkfs.vfat")
+dependencies=("mkpasswd" "lsblk" "sgdisk" "udevadm" "mkswap" "zpool" "zfs" "mkfs.vfat" "mkpart")
 for dependency in "${dependencies[@]}"; do
     check_dependency "$dependency"
 done
