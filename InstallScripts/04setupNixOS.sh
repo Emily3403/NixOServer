@@ -27,7 +27,7 @@ nix --extra-experimental-features 'nix-command flakes' \
     "git+file:///mnt/etc/nixos"
 
 # Install the system
-nixos-install --root "\mnt" --no-root-password --flake "git+file:///mnt/etc/nixos#${HOST_TO_INSTALL}"
+nixos-install --root "/mnt" --no-root-password --flake "git+file:///mnt/etc/nixos#${HOST_TO_INSTALL}"
 
 umount -R /mnt
 zpool export -a

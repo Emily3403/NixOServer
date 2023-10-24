@@ -105,7 +105,6 @@
     tcpdump
     traceroute
     pv
-    wireguard-tools
 
   ];
 

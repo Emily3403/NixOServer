@@ -15,6 +15,8 @@ if [ "$(lsb_release -is)" != "Debian" ]; then
     exit 1
 fi
 
+# TODO: Verify the Debian version
+
 set -e
 
 # Update package lists and install development dependencies
@@ -29,7 +31,6 @@ su -c 'mkdir -p ~/.ssh; chmod 700 ~/.ssh' "$SUDO_USER"
 
 # Download and install SSH keys
 su -c 'curl -sL https://github.com/Emily3403.keys >> ~/.ssh/authorized_keys' "$SUDO_USER"
-su -c 'curl -sL https://github.com/D-VAmpire.keys >> ~/.ssh/authorized_keys' "$SUDO_USER"
 
 # Set permissions for the authorized_keys file
 su -c 'chmod 600 ~/.ssh/authorized_keys' "$SUDO_USER"
@@ -38,15 +39,21 @@ su -c 'chmod 600 ~/.ssh/authorized_keys' "$SUDO_USER"
 systemctl enable ssh
 systemctl start ssh
 
-repo_dir="/home/$SUDO_USER/NixOServer"
+if [ -z "$SUDO_USER" ] || [ "$SUDO_USER" == "root" ];
+then
+    repo_dir="/root/NixOServer"
+else
+    repo_dir="/home/$SUDO_USER/NixOServer"
+fi
+
 if [ -d "$repo_dir" ]; then
     git -C "$repo_dir" pull
 else
-    su -c "git clone https://github.com/Emily3403/NixOServer $repo_dir; git -C $repo_dir config pull.rebase false" "$SUDO_USER"
+    su -c "git clone https://github.com/inet-tub/Nix-Servers $repo_dir; git -C $repo_dir config pull.rebase false" "$SUDO_USER"
 fi
 
 # Install dependencies for installation
-apt install -y gdisk dosfstools whois
+apt install -y dosfstools whois parted
 
 # Backup the existing sources.list file
 cp /etc/apt/sources.list /etc/apt/sources.list.backup."$(date --iso)"
