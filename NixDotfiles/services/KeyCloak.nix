@@ -126,7 +126,7 @@ in
           keywind = (getThemePackage pkgs) {
             name = "keywind";
             url = "https://github.com/lukin/keywind";
-            rev = "f7d5b2d753524802481e49e0e967af39a5088de0";
+            rev = "b1c47673ae091bc1a85a04434f2929ba5b8fa8bf";
             path = "theme/keywind";
           };
         };

@@ -18,7 +18,7 @@
 
     interfaces.enX0 = {
       ipv4.addresses = [{
-        address = "130.149.220.242";
+        address = "130.149.220.241";
         prefixLength = 25;
       }];
 
