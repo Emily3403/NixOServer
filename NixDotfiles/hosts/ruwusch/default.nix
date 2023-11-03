@@ -1,12 +1,13 @@
 # Services that should exist:
 # - Jellyfin
-# - Transmission-openvpn (docker)
+# - Transmission-openvpn (docker)  (4TB – 8TB)
 # - openvpn compatible vpn
 #    - Bonus: Able to use mulvad
-# - Some form of cloud, probably Nextcloud
+# - Some form of cloud, probably Nextcloud  (4TB)
 #   - WebDAV, different Users, Calendar, Version control
 #   - Client _has_ to be able to check for metered connection
 # - No central identity management
+# - isisdl compressed videos    (2TB)
 
 
 

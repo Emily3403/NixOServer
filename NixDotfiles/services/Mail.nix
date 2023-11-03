@@ -17,6 +17,7 @@
       "465:465"
       "587:587"
       "993:993"
+      "4190:4190"
     ];
 
     volumes =
@@ -47,6 +48,7 @@
       SSL_KEY_PATH = "/var/lib/acme/new-mail.inet.tu-berlin.de/key.pem";
 
       ENABLE_QUOTAS = "0";
+      ENABLE_MANAGESIEVE = "1";
 
       # Disable legacy framework for domain legitimacy. The *new* version is with Rspamd and it integrates way better.
 #      ENABLE_RSPAMD = "1";
