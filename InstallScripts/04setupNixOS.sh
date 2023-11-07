@@ -8,30 +8,30 @@ if ! getent group nixbld > /dev/null; then
     sudo useradd -u 30000 -g nixbld -G nixbld nixbld
 fi
 
-# Get the Nix package manager
-curl -L https://nixos.org/nix/install | sh
-source "$HOME/.nix-profile/etc/profile.d/nix.sh"
+# Get the Nix package manager, if it isn't yet installed
+if [ ! $(command -v "nix") > /dev/null 2>&1 ];
+then
+    echo -e "\n\nInstalling the Nix Package Manager\n"
 
-# Fetch the latest NixOS channel:
-nix-channel --add https://nixos.org/channels/nixos-22.11 nixpkgs
-nix-channel --update
+    curl -L https://nixos.org/nix/install | sh
+    source "$HOME/.nix-profile/etc/profile.d/nix.sh"
 
-# Install the install tools
-nix-env -f '<nixpkgs>' -iA nixos-install-tools
+    # Fetch the latest NixOS channel:
+    nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
+    nix-channel --update
 
-# Initialize the git repository for NixOS
-git -C /mnt/etc/nixos init
-git -C /mnt/etc/nixos add --all
-git -C /mnt/etc/nixos commit -m "Initial Install"
+    # Install the install tools
+    nix-env -f '<nixpkgs>' -iA nixos-install-tools
+fi
 
+echo -e "\n\nInstalling the System!\n"
 # Update flake lock file
-nix \
-    --extra-experimental-features 'nix-command flakes' \
+nix --extra-experimental-features 'nix-command flakes' \
     flake update --commit-lock-file \
     "git+file:///mnt/etc/nixos"
 
 # Install the system
-nixos-install --no-root-passwd --flake "git+file:///mnt/etc/nixos#$HOST_TO_INSTALL"
+nixos-install --no-root-password --flake "git+file:///mnt/etc/nixos#${HOST_TO_INSTALL}"
 
 umount -R /mnt
 zpool export -a

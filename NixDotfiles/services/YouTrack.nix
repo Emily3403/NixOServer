@@ -1,7 +1,7 @@
 { pkgs, config, lib, ...}: {
 
   services.nginx.virtualHosts = {
-    "asktheadmins.${config.domainName}" = {
+    "ticket.${config.domainName}" = {
       forceSSL = true;
       enableACME = true;
 

@@ -10,6 +10,16 @@
       owner = "keycloak";
     };
 
+    KeyCloakSSLCert = {
+      file = ./KeyCloak/SSL_Cert.age;
+      owner = "nginx";
+    };
+
+    KeyCloakSSLKey = {
+      file = ./KeyCloak/SSL_Key.age;
+      owner = "nginx";
+    };
+
     NextcloudAdminPassword = {
       file = ./Nextcloud/AdminPassword.age;
       owner = "nextcloud";
@@ -30,6 +40,18 @@
       owner = "vaultwarden";
     };
 
+    MailManEnvironmentFile = {
+      file = ./Mail/MailManEnvironmentFile.age;
+      owner = "5000";
+      group = "5000";
+    };
+
+    MailManDatabasePassword = {
+      file = ./Mail/MailManEnvironmentFile.age;
+      owner = "5000";
+      group = "5000";
+    };
+
     MailEnvironmentFile = {
       file = ./Mail/EnvironmentFile.age;
       owner = "root";
@@ -40,18 +62,6 @@
       file = ./Mail/ssl_certs.age;
       owner = "root";
       group = "root";
-    };
-
-    SSLCert = {
-      file = ./ssl_cert.age;
-      owner = "nginx";
-      group = "nginx";
-    };
-
-    SSLKey = {
-      file = ./ssl_key.age;
-      owner = "nginx";
-      group = "nginx";
     };
 
     SSHKey = {

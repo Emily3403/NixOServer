@@ -1,7 +1,7 @@
 { pkgs, options, config, lib, ...}: {
 
   services.nginx.virtualHosts = {
-    "nextcloud.${config.domainName}" = {
+    "cloud.${config.domainName}" = {
       forceSSL = true;
       enableACME = true;
 
@@ -22,12 +22,12 @@
 
     bindMounts = {
       "/var/lib/nextcloud" = {
-        hostPath = "/data/nextcloud/nextcloud";
+        hostPath = "/data/Nextcloud/nextcloud";
         isReadOnly = false;
       };
 
       "/var/lib/postgresql" = {
-        hostPath = "/data/nextcloud/postgresql";
+        hostPath = "/data/Nextcloud/postgresql";
         isReadOnly = false;
       };
 
@@ -59,7 +59,7 @@
         enable = true;
         package = pkgs.nextcloud26;
         datadir = "/var/lib/nextcloud";
-        hostName = "nextcloud.${domainName}";
+        hostName = "cloud.${domainName}";
         https = true;
 
         secretFile = age.secrets.NexcloudKeycloakClientSecret.path;
@@ -102,10 +102,10 @@
           deck
           onlyoffice
           ;
-#          oidc = pkgs.fetchNextcloudApp rec {
-#            url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v2.5.1/oidc_login.tar.gz";
-#            sha256 = "sha256-lQaoKjPTh1RMXk2OE+ULRYKw70OCCFq1jKcUQ+c6XkA=";
-#          };
+          oidc = pkgs.fetchNextcloudApp rec {
+            url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v2.5.1/oidc_login.tar.gz";
+            sha256 = "sha256-lQaoKjPTh1RMXk2OE+ULRYKw70OCCFq1jKcUQ+c6XkA=";
+          };
         };
 
         extraOptions = {
@@ -219,7 +219,7 @@
   };
 
   systemd.tmpfiles.rules = [
-    "d /data/nextcloud/nextcloud 0755 nextcloud"
-    "d /data/nextcloud/postgresql 0755 nextcloud"
+    "d /data/Nextcloud/nextcloud 0755 nextcloud"
+    "d /data/Nextcloud/postgresql 0755 nextcloud"
   ];
 }

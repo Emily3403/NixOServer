@@ -13,18 +13,19 @@ source "$SCRIPT_DIR/utils.sh"
 check_variables GIT_EMAIL GIT_UNAME
 
 # Setup my personal fish shell
-mkdir -p "$HOME/.config/fish"
-wget https://raw.githubusercontent.com/Emily3403/configAndDotfiles/main/roles/shell/tasks/dotfiles/fish/config.fish -O "$HOME/.config/fish/config.fish"
+mkdir -p "$HOME/.config/fish" "$HOME/.config/btop"
+wget --inet4-only https://raw.githubusercontent.com/Emily3403/configAndDotfiles/main/roles/shell/tasks/dotfiles/fish/config.fish -O "$HOME/.config/fish/config.fish"
+wget --inet4-only https://raw.githubusercontent.com/Emily3403/configAndDotfiles/main/roles/shell/tasks/dotfiles/btop/btop.conf -O "$HOME/.config/btop/btop.conf"
 
 # Setup git identity
 git config --global user.email "$GIT_EMAIL"
 git config --global user.name "$GIT_UNAME"
 
 # Due to the nature of this setup the NixOS Repo will always be one commit ahead. So make rebase the default strategy.
-git config -C "$SCRIPT_DIR" pull.rebase true
+git -C "$SCRIPT_DIR" config pull.rebase true
 
 # Move and symlink the Nix directory
-# TODO: Backup the directory before it
+cp -r /etc/nixos /etc/_backup-nixos
 rm -rf /etc/nixos/.git
 rm -rf "$SCRIPT_DIR/../NixDotfiles"
 mv /etc/nixos "$SCRIPT_DIR/../NixDotfiles"
@@ -33,17 +34,5 @@ ln -s "$SCRIPT_DIR/../NixDotfiles" /etc/nixos
 # Commit the changes and rebuild nix
 git -C "$SCRIPT_DIR" add -A
 git -C "$SCRIPT_DIR" commit -m "Replace placeholders"
-
-# Setup directories needed for installation
-mkdir -p /data/postgresql
-mkdir -p /data/mysql
-mkdir -p /data/nextcloud
-mkdir -p /data/wiki
-
-chown -R postgres /data/postgresql
-chown -R mysql /data/mysql
-chown -R nextcloud /data/nextcloud
-chown -R wiki-js /data/wiki
-
 
 nixos-rebuild switch

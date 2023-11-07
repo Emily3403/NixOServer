@@ -11,7 +11,11 @@ in {
       type = types.bool;
       default = true;
     };
-
+    luks.enable = mkOption {
+      description = "Use luks encryption";
+      type = types.bool;
+      default = false;
+    };
     devNodes = mkOption {
       description = "Specify where to discover ZFS pools";
       type = types.str;
@@ -21,46 +25,31 @@ in {
         x;
       default = "/dev/disk/by-id/";
     };
-
     bootDevices = mkOption {
       description = "Specify boot devices";
       type = types.nonEmptyListOf types.str;
     };
-
-    availableKernelModules = mkOption {
-      type = types.nonEmptyListOf types.str;
-      default = [ "uas" "nvme" "ahci" ];
-    };
-
-    kernelParams = mkOption {
-      type = types.listOf types.str;
-      default = [ ];
-    };
-
     immutable = mkOption {
       description = "Enable root on ZFS immutable root support";
       type = types.bool;
       default = false;
     };
-
     removableEfi = mkOption {
       description = "install bootloader to fallback location";
       type = types.bool;
       default = true;
     };
-
     partitionScheme = mkOption {
       default = {
-        biosBoot = "5";
-        efiBoot = "1";
-        swap = "4";
-        bootPool = "2";
-        rootPool = "3";
+        biosBoot = "-part5";
+        efiBoot = "-part1";
+        swap = "-part4";
+        bootPool = "-part2";
+        rootPool = "-part3";
       };
       description = "Describe on disk partitions";
       type = types.attrsOf types.str;
     };
-
     sshUnlock = {
       enable = mkOption {
         type = types.bool;
@@ -74,6 +63,12 @@ in {
 
   };
 
+  # Custom Option: Domain Name
+  options.domainName = mkOption {
+    type = types.str;
+    description = "Domain name to be used";
+  };
+
   config = mkIf (cfg.enable) (mkMerge [
     {
       zfs-root.fileSystems.datasets = {
@@ -83,11 +78,18 @@ in {
         "bpool/nixos/root" = "/boot";
       };
     }
-
+    (mkIf cfg.luks.enable {
+      boot.initrd.luks.devices = mkMerge (map (diskName: {
+        "luks-rpool-${diskName}${cfg.partitionScheme.rootPool}" = {
+          device = (cfg.devNodes + diskName + cfg.partitionScheme.rootPool);
+          allowDiscards = true;
+          bypassWorkqueues = true;
+        };
+      }) cfg.bootDevices);
+    })
     (mkIf (!cfg.immutable) {
       zfs-root.fileSystems.datasets = { "rpool/nixos/root" = "/"; };
     })
-
     (mkIf cfg.immutable {
       zfs-root.fileSystems = {
         datasets = {
@@ -99,7 +101,6 @@ in {
           "/oldroot/etc/nixos" = "/etc/nixos";
         };
       };
-
       boot.initrd.postDeviceCommands = ''
         if ! grep -q zfs_no_rollback /proc/cmdline; then
           zpool import -N rpool
@@ -108,7 +109,6 @@ in {
         fi
       '';
     })
-
     {
       zfs-root.fileSystems = {
         efiSystemPartitions =
@@ -117,26 +117,18 @@ in {
         swapPartitions =
           (map (diskName: diskName + cfg.partitionScheme.swap) cfg.bootDevices);
       };
-
       boot = {
-        kernelPackages =
-          mkDefault config.boot.zfs.package.latestCompatibleLinuxPackages;
-        initrd.availableKernelModules = cfg.availableKernelModules;
-        kernelParams = cfg.kernelParams;
         supportedFilesystems = [ "zfs" ];
-
         zfs = {
           devNodes = cfg.devNodes;
           forceImportRoot = mkDefault false;
         };
-
         loader = {
           efi = {
             canTouchEfiVariables = (if cfg.removableEfi then false else true);
             efiSysMountPoint = ("/boot/efis/" + (head cfg.bootDevices)
               + cfg.partitionScheme.efiBoot);
           };
-
           generationsDir.copyKernels = true;
           grub = {
             enable = true;
@@ -154,12 +146,10 @@ in {
         };
       };
     }
-
     (mkIf cfg.sshUnlock.enable {
       boot.initrd = {
         network = {
           enable = true;
-
           ssh = {
             enable = true;
             hostKeys = [
@@ -168,7 +158,6 @@ in {
             ];
             authorizedKeys = cfg.sshUnlock.authorizedKeys;
           };
-
           postCommands = ''
             tee -a /root/.profile >/dev/null <<EOF
             if zfs load-key rpool/nixos; then

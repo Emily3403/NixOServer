@@ -1,12 +1,12 @@
 { pkgs, config, lib, ...}: {
 
   services.nginx.virtualHosts = {
-    "hedgedoc.${config.domainName}" = {
+    "doc.${config.domainName}" = {
       forceSSL = true;
       enableACME = true;
 
       locations."/".proxyPass = "http://192.168.7.104:3000/";
-      serverAliases = [ "hackmd.${config.domainName}" ];
+      serverAliases = [ "pad.${config.domainName}" ];
     };
   };
 
@@ -59,8 +59,8 @@
         environmentFile = age.secrets.HedgeDocEnvironmentFile.path;
 
         settings = {
-          domain = "hedgedoc.${domainName}";
-          allowOrigin = [ "localhost" "hedgedoc.inet.tu-berlin.de" ];
+          domain = "doc.${domainName}";
+          allowOrigin = [ "localhost" "doc.${domainName}" "pad.${domainName}" ];
           host = "0.0.0.0";
           protocolUseSSL = true;
 

@@ -12,6 +12,7 @@ fi
 
 # TODO: If lsb_release is not founnd, install it
 
+# TODO: Check for Debian 11
 if [ "$(lsb_release -is)" != "Debian" ]; then
     echo "This script is only for Debian systems."
     exit 1
@@ -19,11 +20,17 @@ fi
 
 set -e
 
+# Try to make the CPU faster
+echo performance | tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor || true
+
 # Update package lists and install development dependencies
 apt-get update
-apt-get install -y git vim neovim openssh-server fish btop
+apt-get install -y git vim neovim openssh-server fish
 
-# TODO: Install local configuration
+# Set up my personal config
+mkdir -p "$HOME/.config/fish" "$HOME/.config/btop"
+wget --inet4-only https://raw.githubusercontent.com/Emily3403/configAndDotfiles/main/roles/shell/tasks/dotfiles/fish/config.fish -O "$HOME/.config/fish/config.fish"
+wget --inet4-only https://raw.githubusercontent.com/Emily3403/configAndDotfiles/main/roles/shell/tasks/dotfiles/btop/btop.conf -O "$HOME/.config/btop/btop.conf"
 chsh -s /usr/bin/fish "$SUDO_USER"
 
 # Create the .ssh directory and set permissions
@@ -39,15 +46,21 @@ su -c 'chmod 600 ~/.ssh/authorized_keys' "$SUDO_USER"
 systemctl enable ssh
 systemctl start ssh
 
-repo_dir="/home/$SUDO_USER/NixOServer"
+if [ -z "$SUDO_USER" ] || [ "$SUDO_USER" == "root" ];
+then
+    repo_dir="/root/NixOServer"
+else
+    repo_dir="/home/$SUDO_USER/NixOServer"
+fi
+
 if [ -d "$repo_dir" ]; then
     git -C "$repo_dir" pull
 else
-    su -c "git clone https://github.com/Emily3403/NixOServer $repo_dir; git -C $repo_dir config pull.rebase false" "$SUDO_USER"
+    su -c "git clone https://github.com/Emily3403/NixOServer $repo_dir; git -C $repo_dir config pull.rebase true" "$SUDO_USER"
 fi
 
 # Install dependencies for installation
-apt install -y gdisk dosfstools whois
+apt install -y dosfstools whois parted
 
 # Backup the existing sources.list file
 cp /etc/apt/sources.list /etc/apt/sources.list.backup."$(date --iso)"
@@ -70,4 +83,4 @@ apt install -y -t bullseye-backports zfsutils-linux
 
 local_ip=$(hostname -I | awk '{print $1}')
 echo -e "\n\nDebian bootstrap script completed successfully!\nYou may now run the install.sh script!\n"
-echo "My current local IP address is: $local_ip"
+echo "My current IP address is: $local_ip"

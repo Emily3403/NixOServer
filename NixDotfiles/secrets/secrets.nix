@@ -1,25 +1,29 @@
 let
-  nixie = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCxZbM9HnzXSvxhCqZcnbITckbjqZJGP/BYshk7HA2EEBHJPoDuFjNgICL9iWigB7aUdbZAjOLYQjCYYtpIZsGd/Ul1LZohGBWL3zvQxeB8mOk0Y+47R7RYKieULiCLRmwJMxqmFtYGBWfqo7k/KCVZPVuFAArZk13R9beHRn6dicI8GtHubX2qGQdayUApFHz7l5ZAEWaj31Z0hquRKBzccRzAXTy1P3jthyAum86PgipA+xGxtxjXhleGChBzArUbWEOljzIsbVVpv3wS9Qqr5hJHZrMVWTXAcI8am6k2Abjxcz+vBBFjRV8Gf6zp+2zHH12C5XqqPkh+KYKaRpX6GAsLDgh/xiLfYabm09PiF72HHi1K7IUW+B0dveU/q56gYMdwZgyHCzIUxB7T/LKMHWFPQsO7erUaDT6TUQuyBiKDuCHpWej21rwAPu0iAUGy3sERNT2sOzInGX9VLL61rEW7s1aiiKBKj6821Wr2RjLI7+rUm2nc4e8LIA2reLk=";
+  ruwusch = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAAB/yrfThm1tdMr5hGiL8dRWb+OF/BOYk2NV36oKsH1lNFKuMlBLRx8NKaEUNrHuua2nJFLc5NFYpMm6czk6F5rePpkhgOypac0/zF1eJS1ebQurDWCAyOdeuCRxdvWaA9IbMP7EHzjWwkucgtF1Ke9RCKCb1WSFuAczOhMh+9SwVQzeIQXNEBV+8o3sQSEdkUTpDClOgyuPhbNwxOYbzJzdsBxyO2htB02GVvdgrZydINh63lthlBYv1819cEdZqG2bMWzvn43A0QHGrBtoQ7s3+D6GIn4pyXukrlQJqNyOi/xCkJQIKt+70IULtNrj+rWRX+GZoX9E5uD/Oz/k8NJhnaiGks7JFc2oKksKfmy2EHM2QnGV7NtYUlfXfPAhs2JYfo9VPMMY62Zy/pXIVd6NvOl34ofmXBoDfBMlhONl69OA7is/QiX0kZsMEnAe02KFW+atWdtIWBAtmb6eySHbOObpw2jDSL6hrO0bh7cQXuovfiR+EhbPcdB5RodBaphzMbPtGXKomlskmzHfYR7DZeq0IEHG/iY6OLOg/bgqMKdWqdQbMb5Ljog6SqlJJFG5GaiDgU/ZMRVaBh7up5N4YKnHiieesOJsv5VLg6JjKASmBVsTbRe/S7Wvz28Pz5bVNgsprfSH/5opdMzNALfzJnfJOhkTaKne5bpHz+Dw6s= root@ruwusch";
 
-  systems = [ nixie ];
+  systems = [ ruwusch ];
 in
 {
-  "KeyCloak/DatabasePassword.age".publicKeys = [ nixie ];
-  "KeyCloak/AdminPassword.age".publicKeys = [ nixie ];
+  "KeyCloak/DatabasePassword.age".publicKeys = [ ruwusch ];
+  "KeyCloak/AdminPassword.age".publicKeys = [ ruwusch ];
+  "KeyCloak/SSL_Key.age".publicKeys = [ ruwusch ];
+  "KeyCloak/SSL_Cert.age".publicKeys = [ ruwusch ];
 
-  "Nextcloud/AdminPassword.age".publicKeys = [ nixie ];
-  "Nextcloud/KeycloakClientSecret.age".publicKeys = [ nixie ];
+  "Nextcloud/AdminPassword.age".publicKeys = [ ruwusch ];
+  "Nextcloud/KeycloakClientSecret.age".publicKeys = [ ruwusch ];
 
-  "HedgeDoc/EnvironmentFile.age".publicKeys = [ nixie ];
-  "VaultWarden/EnvironmentFile.age".publicKeys = [ nixie ];
+  "HedgeDoc/EnvironmentFile.age".publicKeys = [ ruwusch ];
+  "VaultWarden/EnvironmentFile.age".publicKeys = [ ruwusch ];
 
-  "Mail/ssl_certs.age".publicKeys = [ nixie ];
-  "Mail/EnvironmentFile.age".publicKeys = [ nixie ];
+  "Mail/MailManEnvironmentFile.age".publicKeys = [ ruwusch ];
+  "Mail/MailManDatabasePassword.age".publicKeys = [ ruwusch ];
 
-  "ssl_cert.age".publicKeys = [ nixie ];
-  "ssl_key.age".publicKeys = [ nixie ];
+  "Mail/ssl_certs.age".publicKeys = [ ruwusch ];
+  "Mail/EnvironmentFile.age".publicKeys = [ ruwusch ];
 
-  "ssh_key.age".publicKeys = [ nixie ];
-  "ssh_key_pub.age".publicKeys = [ nixie ];
+  "ssl_cert.age".publicKeys = [ ruwusch ];
+  "ssl_key.age".publicKeys = [ ruwusch ];
 
+  "ssh_key.age".publicKeys = [ ruwusch ];
+  "ssh_key_pub.age".publicKeys = [ ruwusch ];
 }

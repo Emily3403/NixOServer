@@ -21,8 +21,6 @@ in
       forceSSL = true;
       enableACME = true;
 
-#      serverAliases = [ "keycloak-admin.inet.tu-berlin.de" ];
-
       # According to https://www.keycloak.org/server/reverseproxy#_exposed_path_recommendations
       locations = {
         "~* ^/(admin|welcome|metrics|health)(/.*)?$".return = "403";
@@ -32,34 +30,6 @@ in
             proxy_busy_buffers_size   512k;
             proxy_buffers   4 512k;
             proxy_buffer_size   256k;
-          '';
-        };
-      };
-    };
-
-    "keycloak-admin.${config.domainName}" = {
-      forceSSL = true;
-      enableACME = true;
-
-#      sslCertificate = "/var/lib/acme/keycloak.inet.tu-berlin.de/fullchain.pem";
-#      sslCertificateKey = "/var/lib/acme/keycloak.inet.tu-berlin.de/key.pem";
-
-      locations = {
-        "/.well-known" = {
-          # Allow access to the .well-known path for ACME challenge validation
-        };
-
-        "/" = {
-          proxyPass = "http://192.168.7.101:80";
-          extraConfig = ''
-          satisfy any;
-
-          allow 192.168.16.0/24;
-          allow 192.168.200.0/24;
-          allow 192.168.201.0/24;
-          allow 192.168.220.0/24;
-
-          deny all;
           '';
         };
       };
@@ -78,9 +48,14 @@ in
     hostAddress = "192.168.7.1";
     localAddress = "192.168.7.101";
 
+    forwardPorts = [{
+      containerPort = 80;
+      hostPort = 7654;
+    }];
+
     bindMounts = {
       "/var/lib/postgresql" = {
-        hostPath = "/data/keycloak/postgresql";
+        hostPath = "/data/Keycloak/postgresql";
         isReadOnly = false;
       };
 
@@ -113,14 +88,17 @@ in
 
         settings = {
           hostname = "keycloak.${domainName}";
-          hostname-admin = "keycloak-admin.${domainName}";
+          hostname-admin = "keycloak.${domainName}";
 
           hostname-strict-backchannel = true;
           proxy = "edge";
         };
 
-        database.passwordFile = age.secrets.KeyCloakDatabasePassword.path;
-        initialAdminPassword = "UwU";  # change on first login
+        database = {
+          passwordFile = age.secrets.KeyCloakDatabasePassword.path;
+        };
+
+        initialAdminPassword = "UwU";  # TODO: Change this
 
         themes =  {
           keywind = (getThemePackage pkgs) {
@@ -132,22 +110,22 @@ in
         };
       };
 
-      services.postgresql = {
-        enable = true;
-        package = pkgs.postgresql_15;
-        settings.listen_addresses = lib.mkForce "*";
-
-        ensureDatabases = [ "keycloak" ];
-        ensureUsers = [
-          {
-            name = "keycloak";
-            ensurePermissions = { "DATABASE keycloak" = "ALL PRIVILEGES"; };
-            ensureClauses = {
-              superuser = true;
-            };
-          }
-        ];
-      };
+#      services.postgresql = {
+#        enable = true;
+#        package = pkgs.postgresql_15;
+#        settings.listen_addresses = lib.mkForce "*";
+#
+#        ensureDatabases = [ "keycloak" ];
+#        ensureUsers = [
+#          {
+#            name = "keycloak";
+#            ensurePermissions = { "DATABASE keycloak" = "ALL PRIVILEGES"; };
+#            ensureClauses = {
+#              superuser = true;
+#            };
+#          }
+#        ];
+#      };
 
     };
   };
@@ -158,7 +136,7 @@ in
   };
 
   systemd.tmpfiles.rules = [
-    "d /data/keycloak/postgresql 0755 postgres"
+    "d /data/Keycloak/postgresql 0755 postgres"
   ];
 
 }

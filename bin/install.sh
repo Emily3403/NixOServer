@@ -23,7 +23,7 @@ check_dependency() {
 }
 
 # Check for required dependencies
-dependencies=("mkpasswd" "lsblk" "sgdisk" "udevadm" "mkswap" "zpool" "zfs" "mkfs.vfat")
+dependencies=("mkpasswd" "lsblk" "blkdiscard" "parted" "udevadm" "mkswap" "zpool" "zfs" "mkfs.vfat")
 for dependency in "${dependencies[@]}"; do
     check_dependency "$dependency"
 done
@@ -31,6 +31,9 @@ done
 # Get the config
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/config.sh"
+source "$SCRIPT_DIR/utils.sh"
+
+check_host_exists
 
 # The fdisk binary in located in `/sbin` ...
 export PATH="$PATH:/sbin"

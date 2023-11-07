@@ -17,12 +17,12 @@
 
     bindMounts = {
       "/var/lib/wiki-js/" = {
-        hostPath = "/data/wiki/wiki-js";
+        hostPath = "/data/Wiki/wiki-js";
         isReadOnly = false;
       };
 
       "/var/lib/postgresql" = {
-        hostPath = "/data/wiki/postgresql";
+        hostPath = "/data/Wiki/postgresql";
         isReadOnly = false;
       };
 
@@ -67,8 +67,6 @@
           host = "/run/postgresql";
           user = "wiki-js";
         };
-
-        settings.logLevel = "silly";
       };
 
       services.postgresql = {
@@ -101,8 +99,8 @@
   };
 
   systemd.tmpfiles.rules = [
-    "d /data/wiki/postgresql 0755 postgres"
-    "d /data/wiki/wiki-js 0755 wiki-js"
+    "d /data/Wiki/postgresql 0755 postgres"
+    "d /data/Wiki/wiki-js 0755 wiki-js"
   ];
 
 }
