@@ -1,3 +1,7 @@
+let
+  LETSENCRYPT_EMAIL = "noanswer98+letsencrypt@gmail.com";
+in
+
 { pkgs, config, lib, ...}: {
   services.nginx = {
     enable = true;
@@ -8,12 +12,10 @@
     recommendedTlsSettings = true;
   };
 
-
   security.acme = {
     acceptTerms = true;
-    defaults.email = "noanswer98+letsencrypt@gmail.com";
+    defaults.email = LETSENCRYPT_EMAIL;
   };
 
   users.users.nginx.extraGroups = [ "acme" ];
-
 }

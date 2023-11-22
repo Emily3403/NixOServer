@@ -1,37 +1,44 @@
+let
+
+  SUBDOMAIN = "ticket";
+  CONTAINER_IP = "10.88.1.1";
+  CONTAINER_PORT = "8080";
+  CONTAINER_VERSION = "2023.2.21228";
+  DATA_DIR = "/data/YouTrack";
+
+in
+
 { pkgs, config, lib, ...}: {
 
   services.nginx.virtualHosts = {
-    "ticket.${config.domainName}" = {
+    "${SUBDOMAIN}.${config.domainName}" = {
       forceSSL = true;
       enableACME = true;
 
-      locations."/".proxyPass = "http://0.0.0.0:3000/";
+      locations."/".proxyPass = "http://${CONTAINER_IP}:${CONTAINER_PORT}/";
     };
   };
 
-
   virtualisation.oci-containers.containers.youtrack = {
-    image = "jetbrains/youtrack:2023.2.19783";  # TODO: This needs manual updating.
-
-    ports = [
-      "127.0.0.1:3000:8080"
-    ];
+    image = "jetbrains/youtrack:${CONTAINER_VERSION}";  # TODO: This needs manual updating.
+    ports = [ "127.0.0.1::${CONTAINER_PORT}" ];
+    extraOptions = [ "--ip=${CONTAINER_IP}" "--userns=keep-id" ];
 
     volumes =
     [
-      "/data/YouTrack/data:/opt/youtrack/data"
-      "/data/YouTrack/conf:/opt/youtrack/conf"
-      "/data/YouTrack/logs:/opt/youtrack/logs"
-      "/data/YouTrack/backups:/opt/youtrack/backups"
+      "${DATA_DIR}/data:/opt/youtrack/data"
+      "${DATA_DIR}/conf:/opt/youtrack/conf"
+      "${DATA_DIR}/logs:/opt/youtrack/logs"
+      "${DATA_DIR}/backups:/opt/youtrack/backups"
     ];
 
   };
 
   systemd.tmpfiles.rules = [
-    "d /data/YouTrack/data/ 0750 13001 13001"
-    "d /data/YouTrack/conf/ 0750 13001 13001"
-    "d /data/YouTrack/logs/ 0750 13001 13001"
-    "d /data/YouTrack/backups/ 0750 13001 13001"
+    "d ${DATA_DIR}/data/ 0750 13001 13001"
+    "d ${DATA_DIR}/conf/ 0750 13001 13001"
+    "d ${DATA_DIR}/logs/ 0750 13001 13001"
+    "d ${DATA_DIR}/backups/ 0750 13001 13001"
   ];
 
 

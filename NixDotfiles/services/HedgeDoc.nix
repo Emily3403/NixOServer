@@ -1,66 +1,58 @@
+let
+
+  SUBDOMAIN = "doc";
+  CONTAINER_IP = "192.168.7.104";
+  CONTAINER_PORT = 3000;
+  DATA_DIR = "/data/Keycloak";
+
+  KEYCLOAK_CLIENT = "HedgeDoc";
+
+in
+
 { pkgs, config, lib, ...}: {
+
+  imports = [ ../users/services/hedgedoc.nix ];
 
   services.nginx.virtualHosts = {
     "doc.${config.domainName}" = {
       forceSSL = true;
       enableACME = true;
 
-      locations."/".proxyPass = "http://192.168.7.104:3000/";
+      locations."/".proxyPass = "http://${CONTAINER_IP}:${toString CONTAINER_PORT}/";
       serverAliases = [ "pad.${config.domainName}" ];
     };
   };
 
-  containers.hedgedoc =
-  let
-    domainName = config.domainName;
-    age = config.age;
-  in
-  {
+  containers.hedgedoc = let cfg = config; in {
+
     autoStart = true;
     privateNetwork = true;
-    hostAddress = "192.168.7.1";
-    localAddress = "192.168.7.104";
+    hostAddress = config.containerHostIP;
+    localAddress = "${CONTAINER_IP}";
 
     bindMounts = {
-      "/var/lib/hedgedoc/" = {
-        hostPath = "/data/HedgeDoc/hedgedoc";
-        isReadOnly = false;
-      };
-
-      "/var/lib/postgresql" = {
-        hostPath = "/data/HedgeDoc/postgresql";
-        isReadOnly = false;
-      };
-
-      "/run/agenix/HedgeDocEnvironmentFile" = {
-        hostPath = "/run/agenix/HedgeDocEnvironmentFile";
-      };
+      "/var/lib/hedgedoc/" = { hostPath = "${DATA_DIR}/hedgedoc"; isReadOnly = false; };
+      "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+      "${cfg.age.secrets.HedgeDoc_EnvironmentFile.path}" = { hostPath = cfg.age.secrets.HedgeDoc_EnvironmentFile.path; };
     };
 
     config = { pkgs, config, lib, ...}: {
-      system.stateVersion = "23.05";
-      documentation.man.generateCaches = false;
-      networking.firewall.allowedTCPPorts = [ 3000 ];
+      networking.firewall.allowedTCPPorts = [ CONTAINER_PORT ];
+      imports = [
+        ../users/root.nix
+        ../users/services/hedgedoc.nix
+        ../system.nix
+      ];
 
-      programs = {
-        neovim = {
-          enable = true;
-          viAlias = true;
-          vimAlias = true;
-        };
-
-        fish.enable = true;
-        git.enable = true;
-      };
-      users.users.root.shell = pkgs.fish;
+      services.postgresql = import ./Postgresql.nix { dbName = "hedgedoc"; dbUser = "hedgedoc"; pkgs = pkgs; };
 
       services.hedgedoc = {
         enable = true;
-        environmentFile = age.secrets.HedgeDocEnvironmentFile.path;
+        environmentFile = cfg.age.secrets.HedgeDoc_EnvironmentFile.path;
 
         settings = {
-          domain = "doc.${domainName}";
-          allowOrigin = [ "localhost" "doc.${domainName}" "pad.${domainName}" ];
+          domain = "doc.${cfg.domainName}";
+          allowOrigin = [ "localhost" "pad.${cfg.domainName}" ];
           host = "0.0.0.0";
           protocolUseSSL = true;
 
@@ -77,75 +69,30 @@
           sessionSecret = "$SESSION_SECRET";
 
           oauth2 = {
-            providerName = "Keycloak";
-            clientID = "HedgeDoc";
+            providerName = cfg.keycloak-setup.name;
+            clientID = KEYCLOAK_CLIENT;
             clientSecret = "$CLIENT_SECRET";
 
-            authorizationURL = "https://keycloak.inet.tu-berlin.de/realms/INET/protocol/openid-connect/auth";
-            tokenURL = "https://keycloak.inet.tu-berlin.de/realms/INET/protocol/openid-connect/token";
-            baseURL = "https://keycloak.inet.tu-berlin.de";
-            userProfileURL = "https://keycloak.inet.tu-berlin.de/realms/INET/protocol/openid-connect/userinfo";
+            authorizationURL = "https://${cfg.keycloak-setup.subdomain}.${cfg.keycloak-setup.domain}/realms/${cfg.keycloak-setup.realm}/protocol/openid-connect/auth";
+            tokenURL = "https://${cfg.keycloak-setup.subdomain}.${cfg.keycloak-setup.domain}/realms/${cfg.keycloak-setup.realm}/protocol/openid-connect/token";
+            baseURL = "${cfg.keycloak-setup.subdomain}.${cfg.keycloak-setup.domain}";
+            userProfileURL = "https://${cfg.keycloak-setup.subdomain}.${cfg.keycloak-setup.domain}/realms/${cfg.keycloak-setup.realm}/protocol/openid-connect/userinfo";
 
-            userProfileUsernameAttr = "name";
-            userProfileDisplayNameAttr = "preferred_username";
-            userProfileEmailAttr = "email";
-            scope = "openid email profile";
-            rolesClaim = "groups";
-            accessRole = "";
-
+            userProfileUsernameAttr = cfg.keycloak-setup.attributeMapper.username;
+            userProfileDisplayNameAttr = cfg.keycloak-setup.attributeMapper.name;
+            userProfileEmailAttr = cfg.keycloak-setup.attributeMapper.email;
+#            scope = "openid email profile";
+            rolesClaim = cfg.keycloak-setup.attributeMapper.groups;
+#            accessRole = "";
           };
-
-
-        };
-
-      };
-
-      services.postgresql = {
-        enable = true;
-        package = pkgs.postgresql_15;
-
-        ensureDatabases = [ "hedgedoc" ];
-        ensureUsers = [
-          {
-            name = "hedgedoc";
-            ensurePermissions = { "DATABASE hedgedoc" = "ALL PRIVILEGES"; };
-            ensureClauses = {
-              superuser = true;  # TODO: This is bad practice but whatever because every container has a own postgres instance
-            };
-          }
-        ];
-      };
-
-      users.users = {
-        hedgedoc = {
-          isSystemUser = true;
-          uid = 5004;
-          group = "hedgedoc";
-        };
-
-        postgres = {
-          uid = 71;
         };
       };
-    };
-  };
-
-  users.users = {
-    hedgedoc = {
-      isSystemUser = true;
-      uid = 5004;
-      group = "hedgedoc";
-    };
-
-    postgres = {
-      uid = 71;
-      group = "postgres";
     };
   };
 
   systemd.tmpfiles.rules = [
-    "d /data/HedgeDoc/postgresql 0755 postgres"
-    "d /data/HedgeDoc/hedgedoc 0755 hedgedoc"
+    "d ${DATA_DIR}/postgresql 0755 postgres"
+    "d ${DATA_DIR}/hedgedoc 0755 hedgedoc"
   ];
 
 }

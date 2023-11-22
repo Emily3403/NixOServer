@@ -1,23 +1,19 @@
 let
-  getThemePackage = pkgs: { name, url, rev, path }: pkgs.stdenv.mkDerivation rec {
-    inherit name;
 
-    src = fetchGit {
-      inherit url rev;
-    };
-
-    installPhase = ''
-      mkdir -p $out
-      cp -r $src/${path}/* $out/
-    '';
-  };
+  SUBDOMAIN = "keycloak";
+  SUBDOMAIN_ADMIN = "keycloak-admin";
+  CONTAINER_IP = "192.168.7.101";
+  CONTAINER_PORT = 80;
+  DATA_DIR = "/data/Keycloak";
 
 in
 
 { pkgs, config, lib, ...}: {
 
+  imports = [ ../users/services/keycloak.nix ];
+
   services.nginx.virtualHosts = {
-    "keycloak.${config.domainName}" = {
+    "${SUBDOMAIN}.${config.domainName}" = {
       forceSSL = true;
       enableACME = true;
 
@@ -25,7 +21,7 @@ in
       locations = {
         "~* ^/(admin|welcome|metrics|health)(/.*)?$".return = "403";
         "/" = {
-          proxyPass = "http://192.168.7.101:80";
+          proxyPass = "http://${CONTAINER_IP}:${toString CONTAINER_PORT}";
           extraConfig = ''
             proxy_busy_buffers_size   512k;
             proxy_buffers   4 512k;
@@ -34,109 +30,80 @@ in
         };
       };
     };
+
+    "${SUBDOMAIN_ADMIN}.${config.domainName}" = {
+      forceSSL = true;
+      enableACME = true;
+
+      locations = {
+        "/.well-known" = {
+          # Allow access to the .well-known path for ACME challenge validation
+        };
+
+        "/" = {
+          proxyPass = "http://192.168.7.101:80";
+          extraConfig = ''
+          satisfy any;
+            allow ::1;
+            allow 127.0.0.1;
+          deny all;
+          '';
+        };
+      };
+    };
   };
 
-  containers.keycloak =
-  let
-    domainName = config.domainName;
-    age = config.age;
-  in
-  {
+  containers.keycloak = let cfg = config; in {
 
     autoStart = true;
     privateNetwork = true;
-    hostAddress = "192.168.7.1";
-    localAddress = "192.168.7.101";
-
-    forwardPorts = [{
-      containerPort = 80;
-      hostPort = 7654;
-    }];
+    hostAddress = config.containerHostIP;
+    localAddress = "${CONTAINER_IP}";
 
     bindMounts = {
-      "/var/lib/postgresql" = {
-        hostPath = "/data/Keycloak/postgresql";
-        isReadOnly = false;
-      };
-
-      "${age.secrets.KeyCloakDatabasePassword.path}" = { hostPath = age.secrets.KeyCloakDatabasePassword.path; };
+      "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+      "${cfg.age.secrets.KeyCloak_DatabasePassword.path}" = { hostPath = cfg.age.secrets.KeyCloak_DatabasePassword.path; };
     };
 
     config = { pkgs, config, lib, ...}: {
-      system.stateVersion = "23.05";
-      documentation.man.generateCaches = false;
-      networking.firewall.allowedTCPPorts = [ 80 ];
-
-      users.users.keycloak = {
-        isNormalUser = true;
-        uid = 62384;
-      };
-
-      programs = {
-        neovim = {
-          enable = true;
-          viAlias = true;
-          vimAlias = true;
-        };
-
-        fish.enable = true;
-      };
-      users.users.root.shell = pkgs.fish;
+      networking.firewall.enable = false;
+      imports = [
+        ../users/root.nix
+        ../users/services/keycloak.nix
+        ../system.nix
+      ];
 
       services.keycloak = {
         enable = true;
 
         settings = {
-          hostname = "keycloak.${domainName}";
-          hostname-admin = "keycloak.${domainName}";
+          hostname = "${SUBDOMAIN}.${cfg.domainName}";
+          hostname-admin = "${SUBDOMAIN_ADMIN}.${cfg.domainName}";
 
           hostname-strict-backchannel = true;
           proxy = "edge";
         };
 
-        database = {
-          passwordFile = age.secrets.KeyCloakDatabasePassword.path;
-        };
+        database.passwordFile = cfg.age.secrets.KeyCloak_DatabasePassword.path;
+        initialAdminPassword = "changeme";  # TODO: Change this
 
-        initialAdminPassword = "UwU";  # TODO: Change this
-
-        themes =  {
-          keywind = (getThemePackage pkgs) {
-            name = "keywind";
+        themes.keywind = pkgs.stdenv.mkDerivation rec {
+          name = "keywind";
+          src = fetchGit {
             url = "https://github.com/lukin/keywind";
-            rev = "b1c47673ae091bc1a85a04434f2929ba5b8fa8bf";
-            path = "theme/keywind";
+            rev = "6e5ef061bfdaafd7d22a3c812104ffe42aaa55b8";
           };
+          installPhase = ''
+            mkdir -p $out
+            cp -r $src/theme/keywind/* $out/
+          '';
         };
       };
-
-#      services.postgresql = {
-#        enable = true;
-#        package = pkgs.postgresql_15;
-#        settings.listen_addresses = lib.mkForce "*";
-#
-#        ensureDatabases = [ "keycloak" ];
-#        ensureUsers = [
-#          {
-#            name = "keycloak";
-#            ensurePermissions = { "DATABASE keycloak" = "ALL PRIVILEGES"; };
-#            ensureClauses = {
-#              superuser = true;
-#            };
-#          }
-#        ];
-#      };
-
     };
   };
 
-  users.users.keycloak = {
-    isNormalUser = true;
-    uid = 62384;
-  };
-
   systemd.tmpfiles.rules = [
-    "d /data/Keycloak/postgresql 0755 postgres"
+    "d ${DATA_DIR}/postgresql 0755 postgres"
   ];
 
 }

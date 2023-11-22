@@ -63,12 +63,6 @@ in {
 
   };
 
-  # Custom Option: Domain Name
-  options.domainName = mkOption {
-    type = types.str;
-    description = "Domain name to be used";
-  };
-
   config = mkIf (cfg.enable) (mkMerge [
     {
       zfs-root.fileSystems.datasets = {

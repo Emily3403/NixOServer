@@ -1,75 +1,34 @@
 { pkgs, options, config, lib, ...}: {
   age.secrets = {
-    KeyCloakDatabasePassword = {
+    KeyCloak_DatabasePassword = {
       file = ./KeyCloak/DatabasePassword.age;
       owner = "keycloak";
     };
 
-    KeyCloakAdminPassword = {
+    KeyCloak_AdminPassword = {
       file = ./KeyCloak/AdminPassword.age;
       owner = "keycloak";
     };
 
-    KeyCloakSSLCert = {
-      file = ./KeyCloak/SSL_Cert.age;
-      owner = "nginx";
-    };
-
-    KeyCloakSSLKey = {
-      file = ./KeyCloak/SSL_Key.age;
-      owner = "nginx";
-    };
-
-    NextcloudAdminPassword = {
+    Nextcloud_AdminPassword = {
       file = ./Nextcloud/AdminPassword.age;
       owner = "nextcloud";
     };
 
-    NexcloudKeycloakClientSecret = {
+    Nexcloud_KeycloakClientSecret = {
       file = ./Nextcloud/KeycloakClientSecret.age;
       owner = "nextcloud";
     };
 
-    HedgeDocEnvironmentFile = {
+    HedgeDoc_EnvironmentFile = {
       file = ./HedgeDoc/EnvironmentFile.age;
       owner = "hedgedoc";
     };
 
-    VaultWardenEnvironmentFile = {
-      file = ./VaultWarden/EnvironmentFile.age;
-      owner = "vaultwarden";
-    };
-
-    MailManEnvironmentFile = {
-      file = ./Mail/MailManEnvironmentFile.age;
-      owner = "5000";
-      group = "5000";
-    };
-
-    MailManDatabasePassword = {
-      file = ./Mail/MailManEnvironmentFile.age;
-      owner = "5000";
-      group = "5000";
-    };
-
-    MailEnvironmentFile = {
-      file = ./Mail/EnvironmentFile.age;
-      owner = "root";
-      group = "root";
-    };
-
-    MailSSLCerts = {
-      file = ./Mail/ssl_certs.age;
-      owner = "root";
-      group = "root";
-    };
-
-    SSHKey = {
-      file = ./ssh_key.age;
+    WikiJs_SSHKey = {
+      file = ./Wiki-js/ssh_key.age;
       owner = "wiki-js";
-      path = "/etc/wiki";
     };
-
 
   };
 }

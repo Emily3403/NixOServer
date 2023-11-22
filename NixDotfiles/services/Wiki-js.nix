@@ -1,64 +1,46 @@
-{ pkgs, config, lib, ...}: {
+let
 
+  SUBDOMAIN = "wiki";
+  CONTAINER_IP = "192.168.7.102";
+  CONTAINER_PORT = 3000;
+  DATA_DIR = "/data/Wiki-js";
+
+in
+
+{ pkgs, config, lib, ...}: {
+  imports = [ ../users/services/wiki-js.nix ];
+
+  # TODO: Migrate this to a function
   services.nginx.virtualHosts = {
-    "wiki.${config.domainName}" = {
+    "${SUBDOMAIN}.${config.domainName}" = {
       forceSSL = true;
       enableACME = true;
 
-      locations."/".proxyPass = "http://192.168.7.102:3000/";
+      locations."/".proxyPass = "http://${CONTAINER_IP}:${toString CONTAINER_PORT}/";
     };
   };
 
   containers.wiki-js = {
     autoStart = true;
     privateNetwork = true;
-    hostAddress = "192.168.7.1";
-    localAddress = "192.168.7.102";
+    hostAddress = config.containerHostIP;
+    localAddress = "${CONTAINER_IP}";
 
     bindMounts = {
-      "/var/lib/wiki-js/" = {
-        hostPath = "/data/Wiki/wiki-js";
-        isReadOnly = false;
-      };
-
-      "/var/lib/postgresql" = {
-        hostPath = "/data/Wiki/postgresql";
-        isReadOnly = false;
-      };
-
-      "/run/agenix/SSHKey" = {
-        hostPath = "/run/agenix/SSHKey";
-      };
-
+      "/var/lib/wiki-js/" = { hostPath = "${DATA_DIR}/wiki-js"; isReadOnly = false; };
+      "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+      "${config.age.secrets.WikiJs_SSHKey.path}" = { hostPath = config.age.secrets.WikiJs_SSHKey.path; };
     };
 
     config = { pkgs, config, lib, ...}: {
-      system.stateVersion = "23.05";
-      documentation.man.generateCaches = false;
-      networking.firewall.allowedTCPPorts = [ 3000 ];
+      networking.firewall.allowedTCPPorts = [ CONTAINER_PORT ];
+      imports = [
+        ../users/root.nix
+        ../users/services/wiki-js.nix
+        ../system.nix
+      ];
 
-      users.users = {
-        wiki-js = {
-          isNormalUser = true;
-          uid = 5001;
-        };
-
-        postgres = {
-          uid = 71;
-        };
-      };
-
-      programs = {
-        neovim = {
-          enable = true;
-          viAlias = true;
-          vimAlias = true;
-        };
-
-        fish.enable = true;
-        git.enable = true;
-      };
-      users.users.root.shell = pkgs.fish;
+      services.postgresql = import ./Postgresql.nix { dbName = "wiki"; dbUser = "wiki-js"; pkgs = pkgs; };
 
       services.wiki-js = {
         enable = true;
@@ -69,38 +51,12 @@
         };
       };
 
-      services.postgresql = {
-        enable = true;
-        package = pkgs.postgresql_15;
-
-        ensureDatabases = [ "wiki" ];
-        ensureUsers = [
-          {
-            name = "wiki-js";
-            ensurePermissions = { "DATABASE wiki" = "ALL PRIVILEGES"; };
-            ensureClauses = {
-              superuser = true;  # TODO: This is bad practice but whatever because every container has a own postgres instance
-            };
-          }
-        ];
-      };
-    };
-  };
-
-  users.users = {
-    wiki-js = {
-      isNormalUser = true;
-      uid = 5001;
-    };
-
-    postgres = {
-      uid = 71;
     };
   };
 
   systemd.tmpfiles.rules = [
-    "d /data/Wiki/postgresql 0755 postgres"
-    "d /data/Wiki/wiki-js 0755 wiki-js"
+    "d ${DATA_DIR}/postgresql 0755 postgres"
+    "d ${DATA_DIR}/wiki-js 0755 wiki-js"
   ];
 
 }

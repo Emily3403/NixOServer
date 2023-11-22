@@ -1,87 +1,94 @@
+let
+
+  SUBDOMAIN = "cloud";
+  CONTAINER_IP = "192.168.7.103";
+  CONTAINER_PORT = 80;
+  DATA_DIR = "/data/Nextcloud";
+
+  KEYCLOAK_CLIENT = "Nextcloud";
+
+in
+
 { pkgs, options, config, lib, ...}: {
 
+  imports = [ ../users/services/nextcloud.nix ];
+
   services.nginx.virtualHosts = {
-    "cloud.${config.domainName}" = {
+    "${SUBDOMAIN}.${config.domainName}" = {
       forceSSL = true;
       enableACME = true;
 
-      locations."/".proxyPass = "http://192.168.7.103:80/";
+      locations."/".proxyPass = "http://${CONTAINER_IP}:${toString CONTAINER_PORT}/";
+      extraConfig = ''
+        client_max_body_size 200G;
+      '';
     };
   };
 
   containers.nextcloud =
   let
-    domainName = config.domainName;
-    age = config.age;
+    cfg = config;
   in
   {
     autoStart = true;
     privateNetwork = true;
-    hostAddress = "192.168.7.1";
-    localAddress = "192.168.7.103";
+    hostAddress = config.containerHostIP;
+    localAddress = CONTAINER_IP;
 
     bindMounts = {
-      "/var/lib/nextcloud" = {
-        hostPath = "/data/Nextcloud/nextcloud";
-        isReadOnly = false;
-      };
-
-      "/var/lib/postgresql" = {
-        hostPath = "/data/Nextcloud/postgresql";
-        isReadOnly = false;
-      };
-
-      "${age.secrets.NextcloudAdminPassword.path}" = { hostPath = age.secrets.NextcloudAdminPassword.path; };
-      "${age.secrets.NexcloudKeycloakClientSecret.path}" = { hostPath = age.secrets.NexcloudKeycloakClientSecret.path; };
+      "/var/lib/nextcloud" = { hostPath = "${DATA_DIR}/nextcloud"; isReadOnly = false; };
+      "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+      "${cfg.age.secrets.Nextcloud_AdminPassword.path}".hostPath = cfg.age.secrets.Nextcloud_AdminPassword.path;
+      "${cfg.age.secrets.Nexcloud_KeycloakClientSecret.path}".hostPath = cfg.age.secrets.Nexcloud_KeycloakClientSecret.path;
     };
 
     config = { pkgs, config, lib, ...}: {
-      system.stateVersion = "23.05";
-      documentation.man.generateCaches = false;
-      networking.firewall.allowedTCPPorts = [ 80 ];
+      networking.firewall.allowedTCPPorts = [ CONTAINER_PORT ];
+      imports = [
+        ../users/root.nix
+        ../users/services/nextcloud.nix
+        ../system.nix
+      ];
 
-      users.users.nextcloud = {
-        uid = 5002;
-      };
-
-      programs = {
-        neovim = {
-          enable = true;
-          viAlias = true;
-          vimAlias = true;
-        };
-
-        fish.enable = true;
-      };
-      users.users.root.shell = pkgs.fish;
+      services.postgresql = import ./Postgresql.nix { dbName = "nextcloud"; dbUser = "nextcloud"; pkgs = pkgs; };
 
       services.nextcloud = {
         enable = true;
-        package = pkgs.nextcloud26;
+        package = pkgs.nextcloud27;
         datadir = "/var/lib/nextcloud";
-        hostName = "cloud.${domainName}";
+        hostName = "${SUBDOMAIN}.${cfg.domainName}";
         https = true;
 
-        secretFile = age.secrets.NexcloudKeycloakClientSecret.path;
+        secretFile = cfg.age.secrets.Nexcloud_KeycloakClientSecret.path;
 
         config = {
           adminuser = "admin";
-          adminpassFile = age.secrets.NextcloudAdminPassword.path;
+          adminpassFile = cfg.age.secrets.Nextcloud_AdminPassword.path;
 
           dbtype = "pgsql";
           dbhost = "/run/postgresql";
           dbuser = "nextcloud";
           dbname = "nextcloud";
-          extraTrustedDomains = [ "192.168.7.1" ];
+          extraTrustedDomains = [ cfg.containerHostIP ];
 
           defaultPhoneRegion = "DE";
         };
 
         # Configure the opcache module as recommended
         phpOptions = options.services.nextcloud.phpOptions.default // {
+          # Tune Nextcloud
+          "pm" = "dynamic";
+          "pm.max_children" = "200";
+          "pm.start_servers" = "32";
+          "pm.min_spare_servers" = "6";
+          "pm.max_spare_servers" = "24";
+
+          # Tune OPCache
           "opcache.jit" = "tracing";
           "opcache.jit_buffer_size" = "100M";
           "opcache.interned_strings_buffer" = "16";
+          "opcache.max_accelerated_files" = "10000";
+          "opcache.memory_consumption" = "1280";
         };
 
         caching.redis = true;
@@ -102,6 +109,7 @@
           deck
           onlyoffice
           ;
+
           oidc = pkgs.fetchNextcloudApp rec {
             url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v2.5.1/oidc_login.tar.gz";
             sha256 = "sha256-lQaoKjPTh1RMXk2OE+ULRYKw70OCCFq1jKcUQ+c6XkA=";
@@ -110,13 +118,13 @@
 
         extraOptions = {
           # Behaviour of OpenID Connect with Keycloak
-          oidc_login_provider_url = "https://keycloak.${domainName}/realms/INET";
-          oidc_login_logout_url = "https://nextcloud.${domainName}/apps/oidc_login/oidc";
+          oidc_login_provider_url = "https://${cfg.keycloak-setup.subdomain}.${cfg.keycloak-setup.domain}/realms/${cfg.keycloak-setup.realm}";
+          oidc_login_logout_url = "https://${SUBDOMAIN}.${cfg.domainName}/apps/oidc_login/oidc";
 
-          oidc_login_client_id = "Nextcloud";
+          oidc_login_client_id = KEYCLOAK_CLIENT;
     #      oidc_login_client_secret = ...  # Set via the `secretFile` attribute
 
-          oidc_login_auto_redirect = true;  # TODO: Do we want to auto-redirect?
+          oidc_login_auto_redirect = true;
           oidc_login_end_session_redirect = true;
           oidc_login_use_id_token = false;
           oidc_login_tls_verify = true;
@@ -124,15 +132,12 @@
 
           oidc_login_attributes = {
             id = "preferred_username";
-            name = "preferred_username";
+            name = "name";
             mail = "email";
-            quota = "ownCloudQuota";  # TODO: Does not exist
-            home = "homeDirectory";  # TODO: Does not exist
             ldap_uid = "uid";
             groups = "groups";
             login_filter = "realm_access_roles";
             photoURL = "picture";
-            is_admin = "ownCloudAdmin";
           };
 
           # Keycloak time settings
@@ -140,9 +145,8 @@
           oidc_login_min_time_between_jwks_requests = 10;
           oidc_login_well_known_caching_time = 86400;
 
-
           # Appearence of OpenID Connect
-          oidc_login_button_text = "Log in with OpenID";
+          oidc_login_button_text = "Log in with Keycloak";
           oidc_login_hide_password_form = false;
 
           # Nextcloud config
@@ -151,7 +155,6 @@
           overwriteprotocol = "https";
           default_locale = "en_IE";
 
-          oidc_login_default_quota = "107374182400";
           oidc_login_default_group = "Authenticated";
           oidc_login_disable_registration = false;
           oidc_create_groups = true;
@@ -168,12 +171,16 @@
           # Calendar
           calendarSubscriptionRefreshRate = "PT1H";
 
+          # Max File size limit
+          upload_max_filesize = "200G";
+          post_max_size = "200G";
+
         };
 
       };
 
       # Caching
-      services.redis.servers."nextcloud" = {
+      services.redis.servers."${SUBDOMAIN}" = {
         enable = true;
         bind = "::1";
         port = 6379;
@@ -187,23 +194,6 @@
         nextcloud-occ config:system:set memcache.locking --value '\OC\Memcache\Redis' --type string
       '';
 
-      # Database
-      services.postgresql = {
-        enable = true;
-        package = pkgs.postgresql_15;
-
-        ensureDatabases = [ "nextcloud" ];
-        ensureUsers = [
-          {
-            name = "nextcloud";
-            ensurePermissions = { "DATABASE nextcloud" = "ALL PRIVILEGES"; };
-            ensureClauses = {
-              superuser = true;
-            };
-          }
-        ];
-      };
-
       systemd.services."nextcloud-setup" = {
         requires = [ "postgresql.service" ];
         after = [ "postgresql.service"];
@@ -213,13 +203,8 @@
 
   };
 
-  users.users.nextcloud = {
-    isNormalUser = true;
-    uid = 5002;
-  };
-
   systemd.tmpfiles.rules = [
-    "d /data/Nextcloud/nextcloud 0755 nextcloud"
-    "d /data/Nextcloud/postgresql 0755 nextcloud"
+    "d ${DATA_DIR}/nextcloud 0755 nextcloud"
+    "d ${DATA_DIR}/postgresql 0755 nextcloud"
   ];
 }

@@ -33,14 +33,14 @@ sed -i "s|\"x86_64-linux\"|\"$(uname -m)-linux\"|g" \
 rootHashPwd=$(echo "$ROOT_PASSWORD" | mkpasswd -m SHA-512 -s)
 sed -i \
     "s|rootHash_placeholder|${rootHashPwd}|" \
-    "/mnt/etc/nixos/configuration.nix"
+    "/mnt/etc/nixos/users/root.nix"
 
 # Change SSH-Key
 Emily_Key=$(curl -sL https://github.com/Emily3403.keys)
 
 sed -i \
     "s|\"sshKey_placeholder\"|\"$Emily_Key\"|" \
-   "/mnt/etc/nixos/configuration.nix"
+   "/mnt/etc/nixos/users/root.nix"
 
 SSH_KEY_LOCATION="/mnt/etc/ssh/ssh_host_rsa_key"
 if [ -n "$HOST_PRIVATE_SSH_KEY" ];

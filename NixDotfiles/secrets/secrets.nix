@@ -6,24 +6,11 @@ in
 {
   "KeyCloak/DatabasePassword.age".publicKeys = [ ruwusch ];
   "KeyCloak/AdminPassword.age".publicKeys = [ ruwusch ];
-  "KeyCloak/SSL_Key.age".publicKeys = [ ruwusch ];
-  "KeyCloak/SSL_Cert.age".publicKeys = [ ruwusch ];
 
   "Nextcloud/AdminPassword.age".publicKeys = [ ruwusch ];
   "Nextcloud/KeycloakClientSecret.age".publicKeys = [ ruwusch ];
 
   "HedgeDoc/EnvironmentFile.age".publicKeys = [ ruwusch ];
-  "VaultWarden/EnvironmentFile.age".publicKeys = [ ruwusch ];
 
-  "Mail/MailManEnvironmentFile.age".publicKeys = [ ruwusch ];
-  "Mail/MailManDatabasePassword.age".publicKeys = [ ruwusch ];
-
-  "Mail/ssl_certs.age".publicKeys = [ ruwusch ];
-  "Mail/EnvironmentFile.age".publicKeys = [ ruwusch ];
-
-  "ssl_cert.age".publicKeys = [ ruwusch ];
-  "ssl_key.age".publicKeys = [ ruwusch ];
-
-  "ssh_key.age".publicKeys = [ ruwusch ];
-  "ssh_key_pub.age".publicKeys = [ ruwusch ];
+  "Wiki-js/ssh_key.age".publicKeys = [ ruwusch ];
 }

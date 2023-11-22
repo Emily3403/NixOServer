@@ -6,11 +6,12 @@
 # - Some form of cloud, probably Nextcloud  (4TB)
 #   - WebDAV, different Users, Calendar, Version control
 #   - Client _has_ to be able to check for metered connection
-# - No central identity management
+#   - Stores the data encrypted
+# - Central identity management with Keycloak
 # - isisdl compressed videos    (2TB)
 
 
-{ config, pkgs, pkgs-unstable, lib, inputs, modulesPath, ... }: {
+{ config, modulesPath, ... }: {
   zfs-root = {
     boot = {
       devNodes = "/dev/disk/by-id/";
@@ -23,6 +24,16 @@
         enable = false;
         authorizedKeys = [ ];
       };
+    };
+  };
+
+  boot.zfs.forceImportRoot = false;
+  services.zfs = {
+    autoSnapshot = {
+      enable = true;
+      flags = "-k -p --utc";
+      weekly = 7;  # How many snapshots to keep
+      monthly = 48;
     };
   };
 
@@ -57,16 +68,15 @@
 
   networking = {
     hostName = "ruwuschOnNix";
-    hostId = "8425e349";
+    hostId = "abcd1234";
   };
+
   time.timeZone = "Europe/Berlin";
 
-  hardware.cpu.intel.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
-
-  # import preconfigured profiles
+  # import other host-specific things
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
-    # (modulesPath + "/profiles/hardened.nix")
-    # (modulesPath + "/profiles/qemu-guest.nix")
+    ./networking.nix
+    ./services.nix
   ];
 }
