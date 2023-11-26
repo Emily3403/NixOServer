@@ -30,5 +30,10 @@
       owner = "wiki-js";
     };
 
+    Transmission_EnvironmentFile = {
+      file = ./Transmission/EnvironmentFile.age;
+      owner = "5000";
+    };
+
   };
 }

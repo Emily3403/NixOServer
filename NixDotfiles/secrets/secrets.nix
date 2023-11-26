@@ -13,4 +13,6 @@ in
   "HedgeDoc/EnvironmentFile.age".publicKeys = [ ruwusch ];
 
   "Wiki-js/ssh_key.age".publicKeys = [ ruwusch ];
+
+  "Transmission/EnvironmentFile.age".publicKeys = [ ruwusch ];
 }

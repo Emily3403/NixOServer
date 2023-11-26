@@ -58,6 +58,9 @@
     # Hetzner Specific
     "ata_piix"
     "kvm-intel"
+
+    # Transmission
+    "tun"
   ];
 
   boot.kernelParams = [

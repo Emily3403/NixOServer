@@ -25,11 +25,7 @@ in
     };
   };
 
-  containers.nextcloud =
-  let
-    cfg = config;
-  in
-  {
+  containers.nextcloud = let cfg = config; in {
     autoStart = true;
     privateNetwork = true;
     hostAddress = config.containerHostIP;
@@ -38,6 +34,7 @@ in
     bindMounts = {
       "/var/lib/nextcloud" = { hostPath = "${DATA_DIR}/nextcloud"; isReadOnly = false; };
       "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+      "/var/lib/syncthing" = { hostPath = "/data/Syncthing/syncthing/"; isReadOnly = false; };
       "${cfg.age.secrets.Nextcloud_AdminPassword.path}".hostPath = cfg.age.secrets.Nextcloud_AdminPassword.path;
       "${cfg.age.secrets.Nexcloud_KeycloakClientSecret.path}".hostPath = cfg.age.secrets.Nexcloud_KeycloakClientSecret.path;
     };
@@ -48,9 +45,8 @@ in
         ../users/root.nix
         ../users/services/nextcloud.nix
         ../system.nix
+        ( import ./Container-Config/Postgresql.nix { dbName = "nextcloud"; dbUser = "nextcloud"; pkgs = pkgs; } )
       ];
-
-      services.postgresql = import ./Postgresql.nix { dbName = "nextcloud"; dbUser = "nextcloud"; pkgs = pkgs; };
 
       services.nextcloud = {
         enable = true;

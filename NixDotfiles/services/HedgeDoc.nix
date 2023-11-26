@@ -42,9 +42,8 @@ in
         ../users/root.nix
         ../users/services/hedgedoc.nix
         ../system.nix
+        ( import ./Container-Config/Postgresql.nix { dbName = "hedgedoc"; dbUser = "hedgedoc"; pkgs = pkgs; } )
       ];
-
-      services.postgresql = import ./Postgresql.nix { dbName = "hedgedoc"; dbUser = "hedgedoc"; pkgs = pkgs; };
 
       services.hedgedoc = {
         enable = true;

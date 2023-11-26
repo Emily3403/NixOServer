@@ -38,9 +38,8 @@ in
         ../users/root.nix
         ../users/services/wiki-js.nix
         ../system.nix
+        ( import ./Container-Config/Postgresql.nix { dbName = "wiki"; dbUser = "wiki-js"; pkgs = pkgs; } )
       ];
-
-      services.postgresql = import ./Postgresql.nix { dbName = "wiki"; dbUser = "wiki-js"; pkgs = pkgs; };
 
       services.wiki-js = {
         enable = true;

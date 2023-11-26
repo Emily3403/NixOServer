@@ -6,6 +6,8 @@
     "Nextcloud.nix"
     "Wiki-js.nix"
     "YouTrack.nix"
+    "Syncthing.nix"
+    "Transmission.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";
