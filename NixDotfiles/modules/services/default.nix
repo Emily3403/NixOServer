@@ -1,7 +1,7 @@
 { config, lib, pkgs, ... }:
 let
   inherit (lib) types mkOption;
-  format = pkgs.formats.json {};
+  format = pkgs.formats.json { };
 in
 {
   imports = [ ./Keycloak.nix ];

@@ -4,7 +4,8 @@ let
   cfg = config.zfs-root.boot;
   inherit (lib) mkIf types mkDefault mkOption mkMerge strings;
   inherit (builtins) head toString map tail;
-in {
+in
+{
   options.zfs-root.boot = {
     enable = mkOption {
       description = "Enable root on ZFS support";
@@ -73,13 +74,15 @@ in {
       };
     }
     (mkIf cfg.luks.enable {
-      boot.initrd.luks.devices = mkMerge (map (diskName: {
-        "luks-rpool-${diskName}${cfg.partitionScheme.rootPool}" = {
-          device = (cfg.devNodes + diskName + cfg.partitionScheme.rootPool);
-          allowDiscards = true;
-          bypassWorkqueues = true;
-        };
-      }) cfg.bootDevices);
+      boot.initrd.luks.devices = mkMerge (map
+        (diskName: {
+          "luks-rpool-${diskName}${cfg.partitionScheme.rootPool}" = {
+            device = (cfg.devNodes + diskName + cfg.partitionScheme.rootPool);
+            allowDiscards = true;
+            bypassWorkqueues = true;
+          };
+        })
+        cfg.bootDevices);
     })
     (mkIf (!cfg.immutable) {
       zfs-root.fileSystems.datasets = { "rpool/nixos/root" = "/"; };
@@ -131,11 +134,13 @@ in {
             copyKernels = true;
             efiSupport = true;
             zfsSupport = true;
-            extraInstallCommands = (toString (map (diskName: ''
-              set -x
-              ${pkgs.coreutils-full}/bin/cp -r ${config.boot.loader.efi.efiSysMountPoint}/EFI /boot/efis/${diskName}${cfg.partitionScheme.efiBoot}
-              set +x
-            '') (tail cfg.bootDevices)));
+            extraInstallCommands = (toString (map
+              (diskName: ''
+                set -x
+                ${pkgs.coreutils-full}/bin/cp -r ${config.boot.loader.efi.efiSysMountPoint}/EFI /boot/efis/${diskName}${cfg.partitionScheme.efiBoot}
+                set +x
+              '')
+              (tail cfg.bootDevices)));
           };
         };
       };

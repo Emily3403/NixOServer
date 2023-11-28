@@ -9,7 +9,7 @@ let
 
 in
 
-{ pkgs, config, lib, ...}: {
+{ pkgs, config, lib, ... }: {
 
   imports = [ ../users/services/hedgedoc.nix ];
 
@@ -22,6 +22,11 @@ in
       serverAliases = [ "pad.${config.domainName}" ];
     };
   };
+
+  systemd.tmpfiles.rules = [
+    "d ${DATA_DIR}/postgresql 0755 postgres"
+    "d ${DATA_DIR}/hedgedoc 0755 hedgedoc"
+  ];
 
   containers.hedgedoc = let cfg = config; in {
 
@@ -36,13 +41,13 @@ in
       "${cfg.age.secrets.HedgeDoc_EnvironmentFile.path}" = { hostPath = cfg.age.secrets.HedgeDoc_EnvironmentFile.path; };
     };
 
-    config = { pkgs, config, lib, ...}: {
+    config = { pkgs, config, lib, ... }: {
       networking.firewall.allowedTCPPorts = [ CONTAINER_PORT ];
       imports = [
         ../users/root.nix
         ../users/services/hedgedoc.nix
         ../system.nix
-        ( import ./Container-Config/Postgresql.nix { dbName = "hedgedoc"; dbUser = "hedgedoc"; pkgs = pkgs; } )
+        (import ./Container-Config/Postgresql.nix { dbName = "hedgedoc"; dbUser = "hedgedoc"; pkgs = pkgs; })
       ];
 
       services.hedgedoc = {
@@ -80,18 +85,12 @@ in
             userProfileUsernameAttr = cfg.keycloak-setup.attributeMapper.username;
             userProfileDisplayNameAttr = cfg.keycloak-setup.attributeMapper.name;
             userProfileEmailAttr = cfg.keycloak-setup.attributeMapper.email;
-#            scope = "openid email profile";
+            #            scope = "openid email profile";
             rolesClaim = cfg.keycloak-setup.attributeMapper.groups;
-#            accessRole = "";
+            #            accessRole = "";
           };
         };
       };
     };
   };
-
-  systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/postgresql 0755 postgres"
-    "d ${DATA_DIR}/hedgedoc 0755 hedgedoc"
-  ];
-
 }

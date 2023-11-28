@@ -1,6 +1,6 @@
 { ... }: {
   imports = [ ./postgres.nix ];
-users.groups.nextcloud.members = [ "nextcloud" ];
+  users.groups.nextcloud.members = [ "nextcloud" ];
 
   users.users = {
     nextcloud = {

@@ -2,7 +2,7 @@ let
   LETSENCRYPT_EMAIL = "noanswer98+letsencrypt@gmail.com";
 in
 
-{ pkgs, config, lib, ...}: {
+{ pkgs, config, lib, ... }: {
   services.nginx = {
     enable = true;
 

@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ...}: {
+{ pkgs, config, lib, ... }: {
   domainName = "ruwusch.de";
   containerHostIP = "192.168.7.1";
 
@@ -11,7 +11,7 @@
     # For the nixos-containers
     nat = {
       enable = true;
-      internalInterfaces = ["ve-+"];
+      internalInterfaces = [ "ve-+" ];
       externalInterface = "enp0s31f6";
     };
   };

@@ -1,25 +1,29 @@
-{ pkgs, config, lib, ...}:
-  let DATA_DIR = "/data/Transmission"; in
+{ pkgs, config, lib, ... }:
+let DATA_DIR = "/data/Transmission"; in
 {
 
-  imports = [(
-    import ./Container-Config/Oci-Container.nix {
-      inherit config;
-      name = "transmission";
-      image = "haugene/transmission-openvpn:latest";
+  imports = [
+    (
+      import ./Container-Config/Oci-Container.nix {
+        inherit config;
+        name = "transmission";
+        image = "haugene/transmission-openvpn:latest";
 
-      subdomain = "transui";
-      containerIP = "10.88.2.1";
-      containerPort = 9091;
-      additionalOptions = [ "--cap-add=NET_ADMIN,mknod" "--device=/dev/net/tun" ];
+        subdomain = "transui";
+        additionalDomains = [ "transmission" ];
+        containerIP = "10.88.2.1";
+        containerPort = 9091;
 
-      volumes = [
-        "${DATA_DIR}/data:/data"
-        "${DATA_DIR}/config:/config"
-      ];
+        additionalOptions = [ "--cap-add=NET_ADMIN" "--device=/dev/net/tun" ];
+        environmentFiles = [ config.age.secrets.Transmission_EnvironmentFile.path ];
 
-      environmentFiles = [ config.age.secrets.Transmission_EnvironmentFile.path ];
-  })];
+        volumes = [
+          "${DATA_DIR}/data:/data"
+          "${DATA_DIR}/config:/config"
+        ];
+      }
+    )
+  ];
 
   systemd.tmpfiles.rules = [
     "d ${DATA_DIR}/data/ 0750 1001 1001"

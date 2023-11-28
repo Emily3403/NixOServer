@@ -1,12 +1,12 @@
 { config, lib, pkgs, ... }:
 let
   inherit (lib) types mkOption;
-  format = pkgs.formats.json {};
+  format = pkgs.formats.json { };
 in
 {
 
   options.keycloak-setup = mkOption {
-    default = {};
+    default = { };
     type = types.submodule {
       freeformType = format.type;
       options = {
@@ -31,38 +31,41 @@ in
           default = "master";
         };
 
-        attributeMapper = let options = {
+        attributeMapper =
+          let
+            options = {
 
-            username = mkOption {
-              type = types.str;
-              default = "preferred_username";
-              description = "The attribute for the username.";
+              username = mkOption {
+                type = types.str;
+                default = "preferred_username";
+                description = "The attribute for the username.";
+              };
+
+              name = mkOption {
+                type = types.str;
+                default = "name";
+              };
+
+              email = mkOption {
+                type = types.str;
+                default = "email";
+              };
+
+              groups = mkOption {
+                type = types.str;
+                default = "groups";
+              };
+
             };
-
-            name = mkOption {
-              type = types.str;
-              default = "name";
+          in
+          mkOption
+            {
+              type = types.submodule {
+                freeformType = format.type;
+                inherit options;
+              };
+              default = { };
             };
-
-            email = mkOption {
-              type = types.str;
-              default = "email";
-            };
-
-            groups = mkOption {
-              type = types.str;
-              default = "groups";
-            };
-
-        };
-      in mkOption
-      {
-        type = types.submodule {
-          freeformType = format.type;
-          inherit options;
-        };
-        default = {};
-      };
 
       };
     };

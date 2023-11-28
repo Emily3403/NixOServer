@@ -9,7 +9,7 @@ let
 
 in
 
-{ pkgs, options, config, lib, ...}: {
+{ pkgs, options, config, lib, ... }: {
 
   imports = [ ../users/services/nextcloud.nix ];
 
@@ -25,6 +25,11 @@ in
     };
   };
 
+  systemd.tmpfiles.rules = [
+    "d ${DATA_DIR}/nextcloud 0755 nextcloud"
+    "d ${DATA_DIR}/postgresql 0755 nextcloud"
+  ];
+
   containers.nextcloud = let cfg = config; in {
     autoStart = true;
     privateNetwork = true;
@@ -39,13 +44,13 @@ in
       "${cfg.age.secrets.Nexcloud_KeycloakClientSecret.path}".hostPath = cfg.age.secrets.Nexcloud_KeycloakClientSecret.path;
     };
 
-    config = { pkgs, config, lib, ...}: {
+    config = { pkgs, config, lib, ... }: {
       networking.firewall.allowedTCPPorts = [ CONTAINER_PORT ];
       imports = [
         ../users/root.nix
         ../users/services/nextcloud.nix
         ../system.nix
-        ( import ./Container-Config/Postgresql.nix { dbName = "nextcloud"; dbUser = "nextcloud"; pkgs = pkgs; } )
+        (import ./Container-Config/Postgresql.nix { dbName = "nextcloud"; dbUser = "nextcloud"; pkgs = pkgs; })
       ];
 
       services.nextcloud = {
@@ -98,13 +103,13 @@ in
 
         extraApps = {
           inherit (pkgs.nextcloud26Packages.apps)
-          calendar
-          files_markdown
-          groupfolders
-          polls
-          deck
-          onlyoffice
-          ;
+            calendar
+            files_markdown
+            groupfolders
+            polls
+            deck
+            onlyoffice
+            ;
 
           oidc = pkgs.fetchNextcloudApp rec {
             url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v2.5.1/oidc_login.tar.gz";
@@ -118,7 +123,7 @@ in
           oidc_login_logout_url = "https://${SUBDOMAIN}.${cfg.domainName}/apps/oidc_login/oidc";
 
           oidc_login_client_id = KEYCLOAK_CLIENT;
-    #      oidc_login_client_secret = ...  # Set via the `secretFile` attribute
+          #      oidc_login_client_secret = ...  # Set via the `secretFile` attribute
 
           oidc_login_auto_redirect = true;
           oidc_login_end_session_redirect = true;
@@ -192,15 +197,10 @@ in
 
       systemd.services."nextcloud-setup" = {
         requires = [ "postgresql.service" ];
-        after = [ "postgresql.service"];
+        after = [ "postgresql.service" ];
       };
 
     };
 
   };
-
-  systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/nextcloud 0755 nextcloud"
-    "d ${DATA_DIR}/postgresql 0755 nextcloud"
-  ];
 }

@@ -1,4 +1,4 @@
-{dbName, dbUser, pkgs}: {
+{ dbName, dbUser, pkgs }: {
   services.postgresql = {
     enable = true;
     package = pkgs.postgresql_15;

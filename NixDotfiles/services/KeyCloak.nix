@@ -8,7 +8,7 @@ let
 
 in
 
-{ pkgs, config, lib, ...}: {
+{ pkgs, config, lib, ... }: {
 
   imports = [ ../users/services/keycloak.nix ];
 
@@ -43,15 +43,19 @@ in
         "/" = {
           proxyPass = "http://192.168.7.101:80";
           extraConfig = ''
-          satisfy any;
-            allow ::1;
-            allow 127.0.0.1;
-          deny all;
+            satisfy any;
+              allow ::1;
+              allow 127.0.0.1;
+            deny all;
           '';
         };
       };
     };
   };
+
+  systemd.tmpfiles.rules = [
+    "d ${DATA_DIR}/postgresql 0755 postgres"
+  ];
 
   containers.keycloak = let cfg = config; in {
 
@@ -65,7 +69,7 @@ in
       "${cfg.age.secrets.KeyCloak_DatabasePassword.path}" = { hostPath = cfg.age.secrets.KeyCloak_DatabasePassword.path; };
     };
 
-    config = { pkgs, config, lib, ...}: {
+    config = { pkgs, config, lib, ... }: {
       networking.firewall.enable = false;
       imports = [
         ../users/root.nix
@@ -85,7 +89,7 @@ in
         };
 
         database.passwordFile = cfg.age.secrets.KeyCloak_DatabasePassword.path;
-        initialAdminPassword = "changeme";  # TODO: Change this
+        initialAdminPassword = "changeme"; # TODO: Change this
 
         themes.keywind = pkgs.stdenv.mkDerivation rec {
           name = "keywind";
@@ -101,9 +105,4 @@ in
       };
     };
   };
-
-  systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/postgresql 0755 postgres"
-  ];
-
 }

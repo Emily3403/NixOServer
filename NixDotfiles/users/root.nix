@@ -1,4 +1,4 @@
-{ pkgs, config, lib, inputs, ...}: {
+{ pkgs, config, lib, inputs, ... }: {
   security.sudo.enable = true;
   services.openssh = {
     enable = true;

@@ -7,7 +7,7 @@ let
 
 in
 
-{ pkgs, config, lib, ...}: {
+{ pkgs, config, lib, ... }: {
   imports = [ ../users/services/syncthing.nix ];
 
   # TODO: Migrate this to a function
@@ -34,7 +34,7 @@ in
       "/var/lib/syncthing/" = { hostPath = "${DATA_DIR}/syncthing"; isReadOnly = false; };
     };
 
-    config = { pkgs, config, lib, ...}: {
+    config = { pkgs, config, lib, ... }: {
       networking.firewall.allowedTCPPorts = [ CONTAINER_PORT ];
       imports = [
         ../users/root.nix

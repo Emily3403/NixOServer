@@ -1,4 +1,4 @@
-{ pkgs, options, config, lib, ...}: {
+{ pkgs, options, config, lib, ... }: {
   age.secrets = {
     KeyCloak_DatabasePassword = {
       file = ./KeyCloak/DatabasePassword.age;
