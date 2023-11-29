@@ -1,17 +1,10 @@
-{ name
-, image
-, subdomain
-, containerIP
-, containerPort
-, volumes
-, environment ? { }
-, environmentFiles ? [ ]
-, additionalPorts ? [ ]
-, additionalOptions ? [ ]
-, additionalDomains ? [ ]
-, config
+{
+  name, image,
+  subdomain, containerIP, containerPort,
+  volumes, environment ? { }, environmentFiles ? [ ], additionalPorts ? [ ], additionalOptions ? [ ], additionalDomains ? [ ],
+  config
 }:
-let containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort; in
+  let containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort; in
 {
   imports = [ (import ./Nginx.nix { inherit subdomain containerIP config additionalDomains; containerPort = containerPortStr; }) ];
 

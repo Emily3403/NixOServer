@@ -1,11 +1,14 @@
 { pkgs, config, lib, inputs, ... }: {
   security.sudo.enable = true;
+
   services.openssh = {
     enable = true;
+
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
     };
+
   };
 
   programs = {

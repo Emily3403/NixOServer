@@ -1,4 +1,6 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, config, lib, ... }:
+let DATA_DIR = "/data/TODO"; in
+{
 
   imports = [
     (

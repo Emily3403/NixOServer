@@ -8,6 +8,10 @@
     "YouTrack.nix"
     "Syncthing.nix"
     "Transmission.nix"
+    "Backup/Duplicati.nix"
+    "Backup/UrBackup.nix"
+    "Backup/Borg.nix"
+    "Backup/Restic.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";

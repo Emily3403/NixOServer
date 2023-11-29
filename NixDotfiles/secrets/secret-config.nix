@@ -26,13 +26,23 @@
     };
 
     WikiJs_SSHKey = {
-      file = ./Wiki-js/ssh_key.age;
+      file = ./SSHKeys/Wiki-js/key.age;
       owner = "wiki-js";
     };
 
     Transmission_EnvironmentFile = {
       file = ./Transmission/EnvironmentFile.age;
       owner = "5000";
+    };
+
+    Duplicati_SSHKey_Nixie = {
+      file = ./SSHKeys/Duplicati/nixie.age;
+      owner = "1000";
+    };
+
+    Borg_Encrytpion_Nixie = {
+      file = ./Borg/nixie.age;
+      owner = "borg";
     };
 
   };

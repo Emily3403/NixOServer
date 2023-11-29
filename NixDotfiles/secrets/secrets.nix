@@ -11,8 +11,10 @@ in
   "Nextcloud/KeycloakClientSecret.age".publicKeys = [ ruwusch ];
 
   "HedgeDoc/EnvironmentFile.age".publicKeys = [ ruwusch ];
-
-  "Wiki-js/ssh_key.age".publicKeys = [ ruwusch ];
-
   "Transmission/EnvironmentFile.age".publicKeys = [ ruwusch ];
+
+  "SSHKeys/Wiki-js/key.age".publicKeys = [ ruwusch ];
+  "SSHKeys/Duplicati/nixie.age".publicKeys = [ ruwusch ];
+
+  "Borg/nixie.age".publicKeys = [ ruwusch ];
 }

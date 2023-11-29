@@ -15,6 +15,7 @@ let DATA_DIR = "/data/Transmission"; in
         containerPort = 9091;
 
         additionalOptions = [ "--cap-add=NET_ADMIN" "--device=/dev/net/tun" ];
+        environment = { TZ = "Europe/Berlin"; };
         environmentFiles = [ config.age.secrets.Transmission_EnvironmentFile.path ];
 
         volumes = [
