@@ -27,7 +27,7 @@ let DATA_DIR = "/data/Transmission"; in
   ];
 
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/data/ 0750 1001 1001"
-    "d ${DATA_DIR}/config/ 0750 1001 1001"
+    "d ${DATA_DIR}/data/ 0755 1001 1001"
+    "d ${DATA_DIR}/config/ 0755 1001 1001"
   ];
 }

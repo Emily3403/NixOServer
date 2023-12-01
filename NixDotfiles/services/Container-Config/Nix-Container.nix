@@ -1,6 +1,6 @@
 {
   name, subdomain, containerIP, containerPort, additionalDomains ? [ ],  # TODO: Make subdomain optional
-  bindMounts, cfg, config
+  bindMounts, forwardPorts ? [], cfg, config
 }:
   let containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort; in
 {
@@ -13,6 +13,7 @@
     localAddress = containerIP;
 
     bindMounts = bindMounts;
+    forwardPorts = forwardPorts;
 
     config = { pkgs, config, lib, ... }: {
       networking.firewall.allowedTCPPorts = [ containerPort ];

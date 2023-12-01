@@ -13,8 +13,6 @@ let DATA_DIR = "/data/Rsnapshot"; in
 
         bindMounts = {
           "/var/lib/backups" = { hostPath = "${DATA_DIR}/backups"; isReadOnly = false; };
-          "${config.age.secrets.Borg_Encrytpion_Nixie.path}" = { hostPath = config.age.secrets.Borg_Encrytpion_Nixie.path; };
-          "/root/.ssh/id_rsa" = { hostPath = config.age.secrets.Duplicati_SSHKey_Nixie.path; };
         };
 
         cfg = {

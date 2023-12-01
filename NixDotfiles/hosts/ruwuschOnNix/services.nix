@@ -8,6 +8,7 @@
     "YouTrack.nix"
     "Syncthing.nix"
     "Transmission.nix"
+    "Jellyfin.nix"
     "Backup/Duplicati.nix"
     "Backup/UrBackup.nix"
     "Backup/Borg.nix"
