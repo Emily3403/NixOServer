@@ -19,9 +19,7 @@ let DATA_DIR = "/data/Borg"; in
 
         cfg = {
           imports = [
-            ../../users/root.nix
             ../../users/services/borg.nix
-            ../../system.nix
           ];
 
           services.borgbackup.jobs.nixie = {

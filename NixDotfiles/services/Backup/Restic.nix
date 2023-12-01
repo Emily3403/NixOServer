@@ -19,8 +19,6 @@ let DATA_DIR = "/data/Restic"; in
 
         cfg = {
           imports = [
-            ../../users/root.nix
-            ../../system.nix
             ../../users/services/restic.nix
           ];
 

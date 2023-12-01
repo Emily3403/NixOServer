@@ -13,9 +13,9 @@ let DATA_DIR = "/data/Jellyfin"; in
 
         bindMounts = {
           "/var/lib/jellyfin" = { hostPath = "${DATA_DIR}/jellyfin"; isReadOnly = false; };
-          "/var/lib/data" = { hostPath = "/data/Transmission/data"; isReadOnly = false; };
-          "/var/lib/Media-Emily" = { hostPath = "${DATA_DIR}/Media-Emily"; isReadOnly = false; };
-          "/var/lib/Media-Carsten" = { hostPath = "${DATA_DIR}/Media-Carsten"; isReadOnly = false; };
+          "/var/lib/data" = { hostPath = "/data/Transmission/data"; };
+          "/var/lib/Media-Emily" = { hostPath = "${DATA_DIR}/Media-Emily"; };
+          "/var/lib/Media-Carsten" = { hostPath = "${DATA_DIR}/Media-Carsten"; };
         };
 
         forwardPorts = [
@@ -25,8 +25,6 @@ let DATA_DIR = "/data/Jellyfin"; in
 
         cfg = {
           imports = [
-            ../users/root.nix
-            ../system.nix
             ../users/services/jellyfin.nix
           ];
 

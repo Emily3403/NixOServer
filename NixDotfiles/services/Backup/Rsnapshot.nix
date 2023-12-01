@@ -16,11 +16,7 @@ let DATA_DIR = "/data/Rsnapshot"; in
         };
 
         cfg = {
-          imports = [
-            ../../users/root.nix
-            ../../system.nix
-            ../../users/services/restic.nix
-          ];
+          imports = [];
 
           services.rsnapshot = {
             enable = true;
