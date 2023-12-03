@@ -45,5 +45,10 @@
       owner = "borg";
     };
 
+    Headscale_ClientSecret = {
+      file = ./Headscale/ClientSecret.age;
+      owner = "headscale";
+    };
+
   };
 }

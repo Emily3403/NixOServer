@@ -17,4 +17,5 @@ in
   "SSHKeys/Duplicati/nixie.age".publicKeys = [ ruwusch ];
 
   "Borg/nixie.age".publicKeys = [ ruwusch ];
+  "Headscale/ClientSecret.age".publicKeys = [ ruwusch ];
 }

@@ -1,10 +1,10 @@
 {
   name, subdomain, containerIP, containerPort, additionalDomains ? [ ],  # TODO: Make subdomain optional
-  imports ? [], bindMounts, forwardPorts ? [], cfg, config
+  imports ? [], bindMounts, forwardPorts ? [], proxyWebsockets ? false, cfg, config
 }:
   let containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort; in
 {
-  imports = imports ++ [ (import ./Nginx.nix { inherit subdomain containerIP config additionalDomains; containerPort = containerPortStr; }) ];
+  imports = imports ++ [ (import ./Nginx.nix { inherit subdomain containerIP config additionalDomains proxyWebsockets; containerPort = containerPortStr; }) ];
 
   containers."${name}" = {
     autoStart = true;
