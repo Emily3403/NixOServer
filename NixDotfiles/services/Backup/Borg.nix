@@ -1,27 +1,26 @@
 { pkgs, config, lib, ... }:
 let DATA_DIR = "/data/Borg"; in
 {
-  imports = [
-    ../../users/services/borg.nix
-  (
+  systemd.tmpfiles.rules = [
+    "d ${DATA_DIR}/borg/ 0750 borg borg"
+  ];
+
+  imports = [(
       import ../Container-Config/Nix-Container.nix {
-        inherit config;
+        inherit config lib;
         name = "borg";
-        subdomain = "borg";
         containerIP = "192.168.7.106";
         containerPort = 80;
 
+        imports = [ ../../users/services/borg.nix ];
+
         bindMounts = {
-          "/var/lib/borgbackup/" = { hostPath = "${DATA_DIR}/Borg"; isReadOnly = false; };
+          "/var/lib/borgbackup/" = { hostPath = "${DATA_DIR}/borg"; isReadOnly = false; };
           "${config.age.secrets.Borg_Encrytpion_Nixie.path}" = { hostPath = config.age.secrets.Borg_Encrytpion_Nixie.path; };
           "${config.age.secrets.Duplicati_SSHKey_Nixie.path}" = { hostPath = config.age.secrets.Duplicati_SSHKey_Nixie.path; };
         };
 
         cfg = {
-          imports = [
-            ../../users/services/borg.nix
-          ];
-
           services.borgbackup.jobs.nixie = {
             repo = "root@130.149.220.242:/borg";
             paths = "/";
@@ -44,10 +43,5 @@ let DATA_DIR = "/data/Borg"; in
 
       }
     )
-  ];
-
-
-  systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/Borg/ 0750 borg borg"
   ];
 }

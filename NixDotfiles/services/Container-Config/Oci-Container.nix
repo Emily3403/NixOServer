@@ -1,20 +1,30 @@
 {
-  name, image,
-  subdomain, containerIP, containerPort,
-  volumes, environment ? { }, environmentFiles ? [ ], additionalPorts ? [ ], additionalOptions ? [ ], additionalDomains ? [ ],
-  config
+  name, image, subdomain ? null, containerIP, containerPort, volumes,
+  imports ? [], environment ? { }, environmentFiles ? [ ], additionalContainerConfig ? {}, additionalDomains ? [ ], additionalNginxConfig ? {}, additionalNginxLocationConfig ? {},
+  config, lib
 }:
-  let containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort; in
-{
-  imports = [ (import ./Nginx.nix { inherit subdomain containerIP config additionalDomains; containerPort = containerPortStr; }) ];
+let
 
-  virtualisation.oci-containers.containers."${name}" = {
+  utils = import ../../utils.nix { inherit lib; };
+  containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort;
+
+in
+{
+  imports = imports ++ [(
+    import ./Nginx.nix {
+      inherit containerIP config additionalDomains lib;
+      containerPort = containerPortStr; subdomain = if subdomain != null then subdomain else name;
+      additionalConfig = additionalNginxConfig; additionalLocationConfig = additionalNginxLocationConfig;
+    }
+  )];
+
+  virtualisation.oci-containers.containers."${name}" = utils.recursiveMerge [ additionalContainerConfig {
     image = image;
-    ports = additionalPorts ++ (if (builtins.match (".*${containerPortStr}.*" additionalPorts) != null) then [ ] else [ "127.0.0.1::${containerPortStr}" ]);
-    extraOptions = [ "--ip=${containerIP}" "--userns=keep-id" ] ++ additionalOptions;
+    ports = [ "127.0.0.1::${containerPortStr}" ];
+    extraOptions = [ "--ip=${containerIP}" "--userns=keep-id" ];
 
     volumes = volumes;
     environment = environment;
     environmentFiles = environmentFiles;
-  };
+  }];
 }

@@ -1,17 +1,20 @@
 {
   subdomain, containerIP, containerPort /* str */,
-  additionalDomains ? [ ], extraConfig ? "", proxyWebsockets ? false,
-  config
-}: {
+  additionalDomains ? [ ], additionalConfig ? {}, additionalLocationConfig ? {},
+  config, lib
+}:
+let utils = import ../../utils.nix { inherit lib; }; in
+{
   services.nginx.virtualHosts = {
-    "${subdomain}.${config.domainName}" = {
+    "${subdomain}.${config.domainName}" = utils.recursiveMerge [ additionalConfig {
       forceSSL = true;
       enableACME = true;
-
-      locations."/".proxyPass = "http://${containerIP}:${containerPort}/";
-      locations."/".proxyWebsockets = proxyWebsockets;
       serverAliases = map (it: "${it}.${config.domainName}") additionalDomains;
-      extraConfig = extraConfig;
-    };
+
+      locations."/" = utils.recursiveMerge [ additionalLocationConfig {
+        proxyPass = "http://${containerIP}:${containerPort}/";
+      }];
+
+    }];
   };
 }

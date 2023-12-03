@@ -1,16 +1,15 @@
 { pkgs, config, lib, ... }:
 let DATA_DIR = "/data/Headscale"; in
 {
-  imports = [
-    ../users/services/headscale.nix
-  (
+  imports = [(
       import ./Container-Config/Nix-Container.nix {
-        inherit config;
+        inherit config lib;
         name = "headscale";
-        subdomain = "headscale";
         containerIP = "192.168.7.110";
         containerPort = 8080;
-        proxyWebsockets = true;
+
+        imports = [ ../users/services/headscale.nix ];
+        additionalNginxLocationConfig.proxyWebsockets = true;
 
         bindMounts = {
           "/var/lib/headscale/" = { hostPath = "${DATA_DIR}/headscale"; isReadOnly = false; };
@@ -18,10 +17,7 @@ let DATA_DIR = "/data/Headscale"; in
         };
 
         cfg = {
-          imports = [
-            ../users/services/headscale.nix
-            (import ./Container-Config/Postgresql.nix { dbName = "headscale"; dbUser = "headscale"; pkgs = pkgs; })
-          ];
+          imports = [( import ./Container-Config/Postgresql.nix { dbName = "headscale"; dbUser = "headscale"; pkgs = pkgs; } )];
 
           services.headscale = {
             enable = true;
@@ -46,8 +42,7 @@ let DATA_DIR = "/data/Headscale"; in
           };
         };
       }
-    )
-  ];
+  )];
 
 
   systemd.tmpfiles.rules = [

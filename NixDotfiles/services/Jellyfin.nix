@@ -1,15 +1,24 @@
 { pkgs, config, lib, ... }:
 let DATA_DIR = "/data/Jellyfin"; in
 {
-  imports = [
-    ../users/services/jellyfin.nix
-  (
+  systemd.tmpfiles.rules = [
+    "d ${DATA_DIR}/jellyfin/ 0750 jellyfin jellyfin"
+    "d ${DATA_DIR}/Media-Emily/ 0750 jellyfin jellyfin"
+    "d ${DATA_DIR}/Media-Carsten/ 0750 jellyfin jellyfin"
+  ];
+
+  imports = [(
       import ./Container-Config/Nix-Container.nix {
-        inherit config;
+        inherit config lib;
         name = "jellyfin";
-        subdomain = "jellyfin";
         containerIP = "192.168.7.109";
         containerPort = 8096;
+
+        imports = [ ../users/services/jellyfin.nix ];
+        additionalContainerConfig.forwardPorts = [
+          { containerPort = 1900; hostPort = 1900; protocol = "udp"; }
+          { containerPort = 7359; hostPort = 7359; protocol = "udp"; }
+        ];
 
         bindMounts = {
           "/var/lib/jellyfin" = { hostPath = "${DATA_DIR}/jellyfin"; isReadOnly = false; };
@@ -18,30 +27,12 @@ let DATA_DIR = "/data/Jellyfin"; in
           "/var/lib/Media-Carsten" = { hostPath = "${DATA_DIR}/Media-Carsten"; };
         };
 
-        forwardPorts = [
-          { containerPort = 1900; hostPort = 1900; protocol = "udp"; }
-          { containerPort = 7359; hostPort = 7359; protocol = "udp"; }
-        ];
-
         cfg = {
-          imports = [
-            ../users/services/jellyfin.nix
-          ];
-
           services.jellyfin = {
             enable = true;
             openFirewall = true;
           };
-
         };
       }
-    )
-  ];
-
-
-  systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/jellyfin/ 0750 jellyfin jellyfin"
-    "d ${DATA_DIR}/Media-Emily/ 0750 jellyfin jellyfin"
-    "d ${DATA_DIR}/Media-Carsten/ 0750 jellyfin jellyfin"
-  ];
+    )];
 }

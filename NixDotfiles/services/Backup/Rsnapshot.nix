@@ -1,23 +1,19 @@
 { pkgs, config, lib, ... }:
 let DATA_DIR = "/data/Rsnapshot"; in
 {
-  imports = [
-    ../../users/services/restic.nix
-  (
+  imports = [(
       import ../Container-Config/Nix-Container.nix {
-        inherit config;
+        inherit config lib;
         name = "rsnapshot";
-        subdomain = "rsnapshot";
         containerIP = "192.168.7.108";
         containerPort = 80;
 
+        imports = [ ../../users/services/restic.nix ];
         bindMounts = {
           "/var/lib/backups" = { hostPath = "${DATA_DIR}/backups"; isReadOnly = false; };
         };
 
         cfg = {
-          imports = [];
-
           services.rsnapshot = {
             enable = true;
 

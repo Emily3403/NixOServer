@@ -5,11 +5,9 @@ let DATA_DIR = "/data/Duplicati"; in
   imports = [
     (
       import ../Container-Config/Oci-Container.nix {
-        inherit config;
+        inherit config lib;
         name = "duplicati";
         image = "linuxserver/duplicati:latest";
-
-        subdomain = "duplicati";
         containerIP = "10.88.3.1";
         containerPort = 8200;
 

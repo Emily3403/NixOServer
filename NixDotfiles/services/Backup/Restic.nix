@@ -1,16 +1,14 @@
 { pkgs, config, lib, ... }:
 let DATA_DIR = "/data/Restic"; in
 {
-  imports = [
-    ../../users/services/restic.nix
-  (
+  imports = [(
       import ../Container-Config/Nix-Container.nix {
-        inherit config;
+        inherit config lib;
         name = "restic";
-        subdomain = "restic";
         containerIP = "192.168.7.107";
         containerPort = 80;
 
+        imports = [ ../../users/services/restic.nix ];
         bindMounts = {
           "/var/lib/restic/" = { hostPath = "${DATA_DIR}/restic"; isReadOnly = false; };
           "${config.age.secrets.Borg_Encrytpion_Nixie.path}" = { hostPath = config.age.secrets.Borg_Encrytpion_Nixie.path; };
@@ -27,7 +25,7 @@ let DATA_DIR = "/data/Restic"; in
             server.extraFlags = [ "--no-auth" ];
 
 #            backups.nixie = {
-#
+#              ...
 #            };
           };
         };
