@@ -4,6 +4,7 @@
     "HedgeDoc.nix"
     "Keycloak.nix"
     "Nextcloud.nix"
+    "Next.nix"
     "Wiki-js.nix"
     "YouTrack.nix"
     "Syncthing.nix"

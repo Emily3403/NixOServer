@@ -37,7 +37,7 @@ in
       config = { pkgs, config, lib, ... }: utils.recursiveMerge [
         cfg
         {
-          networking.firewall.enable = false;
+          networking.firewall.allowedTCPPorts = [ containerPort ];
           imports = [ ../../users/root.nix ../../system.nix ] ++ imports;
         }
       ];
