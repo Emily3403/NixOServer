@@ -5,16 +5,24 @@
 }:
 let utils = import ../../utils.nix { inherit lib; }; in
 {
-  services.nginx.virtualHosts = utils.recursiveMerge [ additionalHostConfig {
-    "${subdomain}.${config.domainName}" = utils.recursiveMerge [ additionalConfig {
-      forceSSL = true;
-      enableACME = true;
-      serverAliases = map (it: "${it}.${config.domainName}") additionalDomains;
+  services.nginx.virtualHosts = utils.recursiveMerge [
+    additionalHostConfig
+    {
+      "${subdomain}.${config.domainName}" = utils.recursiveMerge [
+        additionalConfig
+        {
+          forceSSL = true;
+          enableACME = true;
+          serverAliases = map (it: "${it}.${config.domainName}") additionalDomains;
 
-      locations."/" = utils.recursiveMerge [ additionalLocationConfig {
-        proxyPass = "http://${containerIP}:${containerPort}/";
-      }];
-
-    }];
-  }];
+          locations."/" = utils.recursiveMerge [
+            additionalLocationConfig
+            {
+              proxyPass = "http://${containerIP}:${containerPort}/";
+            }
+          ];
+        }
+      ];
+    }
+  ];
 }

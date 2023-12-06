@@ -2,7 +2,8 @@
 let DATA_DIR = "/data/UrBackup"; in
 {
 
-  imports = [(
+  imports = [
+    (
       import ../Container-Config/Oci-Container.nix {
         inherit config lib;
         name = "urbackup";
@@ -23,7 +24,8 @@ let DATA_DIR = "/data/UrBackup"; in
           "${config.age.secrets.Duplicati_SSHKey_Nixie.path}:${config.age.secrets.Duplicati_SSHKey_Nixie.path}"
         ];
       }
-  )];
+    )
+  ];
 
   systemd.tmpfiles.rules = [
     "d ${DATA_DIR}/backups/ 0750 1000 1000"

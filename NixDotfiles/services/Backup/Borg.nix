@@ -5,7 +5,8 @@ let DATA_DIR = "/data/Borg"; in
     "d ${DATA_DIR}/borg/ 0750 borg borg"
   ];
 
-  imports = [(
+  imports = [
+    (
       import ../Container-Config/Nix-Container.nix {
         inherit config lib;
         name = "borg";
@@ -32,9 +33,9 @@ let DATA_DIR = "/data/Borg"; in
               passCommand = "cat ${config.age.secrets.Borg_Encrytpion_Nixie.path}";
             };
 
-#            prune.keep = {
-#              within = "7d";
-#            };
+            #            prune.keep = {
+            #              within = "7d";
+            #            };
             extraCreateArgs = "--verbose";
 
             environment = { BORG_RSH = "ssh -i ${config.age.secrets.Duplicati_SSHKey_Nixie.path}"; };

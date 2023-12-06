@@ -7,7 +7,8 @@ let DATA_DIR = "/data/Jellyfin"; in
     "d ${DATA_DIR}/Media-Carsten/ 0750 jellyfin jellyfin"
   ];
 
-  imports = [(
+  imports = [
+    (
       import ./Container-Config/Nix-Container.nix {
         inherit config lib;
         name = "jellyfin";
@@ -34,5 +35,6 @@ let DATA_DIR = "/data/Jellyfin"; in
           };
         };
       }
-    )];
+    )
+  ];
 }

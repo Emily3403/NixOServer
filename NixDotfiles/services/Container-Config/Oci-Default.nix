@@ -10,9 +10,8 @@ let DATA_DIR = "/data/TODO"; in
         image = "TODO";
 
         subdomain = "TODO";
-        containerIP = "10.88.TODO.1";
+        containerIP = "192.168.7.TODO";
         containerPort = 80;
-
         environmentFiles = [ config.age.secrets.TODO.path ];
 
         volumes = [

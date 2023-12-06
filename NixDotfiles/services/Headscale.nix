@@ -1,7 +1,8 @@
 { pkgs, config, lib, ... }:
 let DATA_DIR = "/data/Headscale"; in
 {
-  imports = [(
+  imports = [
+    (
       import ./Container-Config/Nix-Container.nix {
         inherit config lib;
         name = "headscale";
@@ -17,7 +18,7 @@ let DATA_DIR = "/data/Headscale"; in
         };
 
         cfg = {
-          imports = [( import ./Container-Config/Postgresql.nix { dbName = "headscale"; dbUser = "headscale"; pkgs = pkgs; } )];
+          imports = [ (import ./Container-Config/Postgresql.nix { dbName = "headscale"; dbUser = "headscale"; pkgs = pkgs; }) ];
 
           services.headscale = {
             enable = true;
@@ -42,7 +43,8 @@ let DATA_DIR = "/data/Headscale"; in
           };
         };
       }
-  )];
+    )
+  ];
 
 
   systemd.tmpfiles.rules = [

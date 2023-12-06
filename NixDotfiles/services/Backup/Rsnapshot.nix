@@ -1,7 +1,8 @@
 { pkgs, config, lib, ... }:
 let DATA_DIR = "/data/Rsnapshot"; in
 {
-  imports = [(
+  imports = [
+    (
       import ../Container-Config/Nix-Container.nix {
         inherit config lib;
         name = "rsnapshot";

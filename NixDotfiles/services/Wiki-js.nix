@@ -6,33 +6,35 @@ let DATA_DIR = "/data/Wiki-js"; in
     "d ${DATA_DIR}/wiki-js 0755 wiki-js"
   ];
 
-  imports = [(
-    import ./Container-Config/Nix-Container.nix {
-      inherit config lib;
-      name = "wiki-js";
-      subdomain = "wiki";
-      containerIP = "192.168.7.102";
-      containerPort = 3000;
+  imports = [
+    (
+      import ./Container-Config/Nix-Container.nix {
+        inherit config lib;
+        name = "wiki-js";
+        subdomain = "wiki";
+        containerIP = "192.168.7.102";
+        containerPort = 3000;
 
-      imports = [ ../users/services/wiki-js.nix ];
-      bindMounts = {
-        "/var/lib/wiki-js/" = { hostPath = "${DATA_DIR}/wiki-js"; isReadOnly = false; };
-        "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
-        "${config.age.secrets.WikiJs_SSHKey.path}".hostPath = config.age.secrets.WikiJs_SSHKey.path;
-      };
+        imports = [ ../users/services/wiki-js.nix ];
+        bindMounts = {
+          "/var/lib/wiki-js/" = { hostPath = "${DATA_DIR}/wiki-js"; isReadOnly = false; };
+          "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+          "${config.age.secrets.WikiJs_SSHKey.path}".hostPath = config.age.secrets.WikiJs_SSHKey.path;
+        };
 
-      cfg = {
-        imports = [ (import ./Container-Config/Postgresql.nix { dbName = "wiki"; dbUser = "wiki-js"; pkgs = pkgs; }) ];
+        cfg = {
+          imports = [ (import ./Container-Config/Postgresql.nix { dbName = "wiki"; dbUser = "wiki-js"; pkgs = pkgs; }) ];
 
-        services.wiki-js = {
-          enable = true;
+          services.wiki-js = {
+            enable = true;
 
-          settings.db = {
-            host = "/run/postgresql";
-            user = "wiki-js";
+            settings.db = {
+              host = "/run/postgresql";
+              user = "wiki-js";
+            };
           };
         };
-      };
-    }
-  )];
+      }
+    )
+  ];
 }

@@ -10,21 +10,28 @@ let
 
 in
 {
-  imports = imports ++ [(
-    import ./Nginx.nix {
-      inherit containerIP config additionalDomains lib;
-      containerPort = containerPortStr; subdomain = if subdomain != null then subdomain else name;
-      additionalConfig = additionalNginxConfig; additionalLocationConfig = additionalNginxLocationConfig;
+  imports = imports ++ [
+    (
+      import ./Nginx.nix {
+        inherit containerIP config additionalDomains lib;
+        containerPort = containerPortStr;
+        subdomain = if subdomain != null then subdomain else name;
+        additionalConfig = additionalNginxConfig;
+        additionalLocationConfig = additionalNginxLocationConfig;
+      }
+    )
+  ];
+
+  virtualisation.oci-containers.containers."${name}" = utils.recursiveMerge [
+    additionalContainerConfig
+    {
+      image = image;
+      ports = [ "127.0.0.1::${containerPortStr}" ];
+      extraOptions = [ "--ip=${containerIP}" "--userns=keep-id" ];
+
+      volumes = volumes;
+      environment = environment;
+      environmentFiles = environmentFiles;
     }
-  )];
-
-  virtualisation.oci-containers.containers."${name}" = utils.recursiveMerge [ additionalContainerConfig {
-    image = image;
-    ports = [ "127.0.0.1::${containerPortStr}" ];
-    extraOptions = [ "--ip=${containerIP}" "--userns=keep-id" ];
-
-    volumes = volumes;
-    environment = environment;
-    environmentFiles = environmentFiles;
-  }];
+  ];
 }

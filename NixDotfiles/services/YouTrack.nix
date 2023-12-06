@@ -2,7 +2,8 @@
 let DATA_DIR = "/data/YouTrack"; in
 {
 
-  imports = [(
+  imports = [
+    (
       import ./Container-Config/Oci-Container.nix {
         inherit config lib;
         name = "youtrack";
@@ -19,7 +20,8 @@ let DATA_DIR = "/data/YouTrack"; in
           "${DATA_DIR}/backups:/opt/youtrack/backups"
         ];
       }
-  )];
+    )
+  ];
 
   systemd.tmpfiles.rules = [
     "d ${DATA_DIR}/data/ 0750 13001 13001"

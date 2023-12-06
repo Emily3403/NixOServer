@@ -2,7 +2,8 @@
 let DATA_DIR = "/data/Transmission"; in
 {
 
-  imports = [(
+  imports = [
+    (
       import ./Container-Config/Oci-Container.nix {
         inherit config lib;
         name = "transmission";
@@ -21,7 +22,8 @@ let DATA_DIR = "/data/Transmission"; in
           "${DATA_DIR}/config:/config"
         ];
       }
-  )];
+    )
+  ];
 
   systemd.tmpfiles.rules = [
     "d ${DATA_DIR}/data/ 0755 1001 1001"
