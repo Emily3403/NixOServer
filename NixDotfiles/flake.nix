@@ -5,14 +5,13 @@
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-23.05";
-    nixpkgs-unstable.url = "nixpkgs/master";
     agenix = {
       url = "github:ryantm/agenix";
       inputs.darwin.follows = "";
     };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, agenix }@inputs:
+  outputs = { self, nixpkgs, agenix }@inputs:
     let
       mkHost = hostName: system:
         nixpkgs.lib.nixosSystem {
@@ -20,11 +19,6 @@
           pkgs = nixpkgs.legacyPackages.${system};
 
           specialArgs = {
-            # By default, the system will only use packages from the stable channel.
-            # You can selectively install packages from the unstable channel.
-            # You can also add more  channels to pin package version.
-            pkgs-unstable = nixpkgs-unstable.legacyPackages.${system};
-
             # make all inputs availabe in other nix files
             inherit inputs;
           };
