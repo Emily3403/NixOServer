@@ -1,62 +1,37 @@
-let
-
-  SUBDOMAIN = "doc";
-  CONTAINER_IP = "192.168.7.104";
-  CONTAINER_PORT = 3000;
-  DATA_DIR = "/data/Keycloak";
-
-  KEYCLOAK_CLIENT = "HedgeDoc";
-
-in
-
-{ pkgs, config, lib, ... }: {
-
-  imports = [ ../users/services/hedgedoc.nix ];
-
-  services.nginx.virtualHosts = {
-    "doc.${config.domainName}" = {
-      forceSSL = true;
-      enableACME = true;
-
-      locations."/".proxyPass = "http://${CONTAINER_IP}:${toString CONTAINER_PORT}/";
-      serverAliases = [ "pad.${config.domainName}" ];
-    };
-  };
-
+{ pkgs, config, lib, ... }:
+let DATA_DIR = "/data/Hedgedoc"; in
+{
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/postgresql 0755 postgres"
     "d ${DATA_DIR}/hedgedoc 0755 hedgedoc"
+    "d ${DATA_DIR}/postgresql 0755 postgres"
   ];
 
-  containers.hedgedoc = let cfg = config; in {
+  imports = [(
+    import ./Container-Config/Nix-Container.nix {
+      inherit config lib;
+      name = "hedgedoc";
+      subdomain = "doc";
+      additionalDomains = [ "pad" ];
+      containerIP = "192.168.7.104";
+      containerPort = 3000;
 
-    autoStart = true;
-    privateNetwork = true;
-    hostAddress = config.containerHostIP;
-    localAddress = "${CONTAINER_IP}";
+      imports = [ ../users/services/hedgedoc.nix ];
+      bindMounts = {
+        "/var/lib/hedgedoc/" = { hostPath = "${DATA_DIR}/hedgedoc"; isReadOnly = false; };
+        "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+        "${config.age.secrets.HedgeDoc_EnvironmentFile.path}".hostPath = config.age.secrets.HedgeDoc_EnvironmentFile.path;
+      };
 
-    bindMounts = {
-      "/var/lib/hedgedoc/" = { hostPath = "${DATA_DIR}/hedgedoc"; isReadOnly = false; };
-      "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
-      "${cfg.age.secrets.HedgeDoc_EnvironmentFile.path}" = { hostPath = cfg.age.secrets.HedgeDoc_EnvironmentFile.path; };
-    };
+      cfg = {
+        imports = [( import ./Container-Config/Postgresql.nix { dbName = "hedgedoc"; dbUser = "hedgedoc"; pkgs = pkgs; } )];
 
-    config = { pkgs, config, lib, ... }: {
-      networking.firewall.allowedTCPPorts = [ CONTAINER_PORT ];
-      imports = [
-        ../users/root.nix
-        ../users/services/hedgedoc.nix
-        ../system.nix
-        (import ./Container-Config/Postgresql.nix { dbName = "hedgedoc"; dbUser = "hedgedoc"; pkgs = pkgs; })
-      ];
-
-      services.hedgedoc = {
+        services.hedgedoc = {
         enable = true;
-        environmentFile = cfg.age.secrets.HedgeDoc_EnvironmentFile.path;
+        environmentFile = config.age.secrets.HedgeDoc_EnvironmentFile.path;
 
         settings = {
-          domain = "doc.${cfg.domainName}";
-          allowOrigin = [ "localhost" "pad.${cfg.domainName}" ];
+          domain = "doc.${config.domainName}";
+          allowOrigin = [ "localhost" "pad.${config.domainName}" ];
           host = "0.0.0.0";
           protocolUseSSL = true;
 
@@ -73,24 +48,25 @@ in
           sessionSecret = "$SESSION_SECRET";
 
           oauth2 = {
-            providerName = cfg.keycloak-setup.name;
-            clientID = KEYCLOAK_CLIENT;
+            providerName = config.keycloak-setup.name;
+            clientID = "HedgeDoc";
             clientSecret = "$CLIENT_SECRET";
 
-            authorizationURL = "https://${cfg.keycloak-setup.subdomain}.${cfg.keycloak-setup.domain}/realms/${cfg.keycloak-setup.realm}/protocol/openid-connect/auth";
-            tokenURL = "https://${cfg.keycloak-setup.subdomain}.${cfg.keycloak-setup.domain}/realms/${cfg.keycloak-setup.realm}/protocol/openid-connect/token";
-            baseURL = "${cfg.keycloak-setup.subdomain}.${cfg.keycloak-setup.domain}";
-            userProfileURL = "https://${cfg.keycloak-setup.subdomain}.${cfg.keycloak-setup.domain}/realms/${cfg.keycloak-setup.realm}/protocol/openid-connect/userinfo";
+            authorizationURL = "https://${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}/realms/${config.keycloak-setup.realm}/protocol/openid-connect/auth";
+            tokenURL = "https://${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}/realms/${config.keycloak-setup.realm}/protocol/openid-connect/token";
+            baseURL = "${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}";
+            userProfileURL = "https://${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}/realms/${config.keycloak-setup.realm}/protocol/openid-connect/userinfo";
 
-            userProfileUsernameAttr = cfg.keycloak-setup.attributeMapper.username;
-            userProfileDisplayNameAttr = cfg.keycloak-setup.attributeMapper.name;
-            userProfileEmailAttr = cfg.keycloak-setup.attributeMapper.email;
-            #            scope = "openid email profile";
-            rolesClaim = cfg.keycloak-setup.attributeMapper.groups;
-            #            accessRole = "";
+            userProfileUsernameAttr = config.keycloak-setup.attributeMapper.username;
+            userProfileDisplayNameAttr = config.keycloak-setup.attributeMapper.name;
+            userProfileEmailAttr = config.keycloak-setup.attributeMapper.email;
+            # scope = "openid email profile";
+            rolesClaim = config.keycloak-setup.attributeMapper.groups;
+            # accessRole = "";
           };
         };
       };
-    };
-  };
+      };
+    }
+  )];
 }

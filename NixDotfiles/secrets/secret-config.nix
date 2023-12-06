@@ -1,12 +1,12 @@
 { pkgs, options, config, lib, ... }: {
   age.secrets = {
-    KeyCloak_DatabasePassword = {
-      file = ./KeyCloak/DatabasePassword.age;
+    Keycloak_DatabasePassword = {
+      file = ./Keycloak/DatabasePassword.age;
       owner = "keycloak";
     };
 
-    KeyCloak_AdminPassword = {
-      file = ./KeyCloak/AdminPassword.age;
+    Keycloak_AdminPassword = {
+      file = ./Keycloak/AdminPassword.age;
       owner = "keycloak";
     };
 

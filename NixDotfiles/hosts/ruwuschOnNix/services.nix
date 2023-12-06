@@ -2,7 +2,7 @@
   imports = map (it: ../../services/${it}) [
     "Nginx.nix"
     "HedgeDoc.nix"
-    "KeyCloak.nix"
+    "Keycloak.nix"
     "Nextcloud.nix"
     "Wiki-js.nix"
     "YouTrack.nix"

@@ -1,6 +1,7 @@
 {
   name, subdomain ? null, containerIP, containerPort, bindMounts,
-  imports ? [], additionalDomains ? [ ], additionalContainerConfig ? {}, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {},
+  imports ? [], additionalDomains ? [ ], additionalContainerConfig ? {},
+  additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
   cfg, lib, config
 }:
 let
@@ -14,7 +15,7 @@ in
     import ./Nginx.nix {
       inherit containerIP config additionalDomains lib;
       containerPort = containerPortStr; subdomain = if subdomain != null then subdomain else name;
-      additionalConfig = additionalNginxConfig; additionalLocationConfig = additionalNginxLocationConfig;
+      additionalConfig = additionalNginxConfig; additionalLocationConfig = additionalNginxLocationConfig; additionalHostConfig = additionalNginxHostConfig;
     }
   )];
 

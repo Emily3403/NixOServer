@@ -1,11 +1,11 @@
 {
   subdomain, containerIP, containerPort /* str */,
-  additionalDomains ? [ ], additionalConfig ? {}, additionalLocationConfig ? {},
+  additionalDomains ? [ ], additionalConfig ? {}, additionalLocationConfig ? {}, additionalHostConfig ? {},
   config, lib
 }:
 let utils = import ../../utils.nix { inherit lib; }; in
 {
-  services.nginx.virtualHosts = {
+  services.nginx.virtualHosts = utils.recursiveMerge [ additionalHostConfig {
     "${subdomain}.${config.domainName}" = utils.recursiveMerge [ additionalConfig {
       forceSSL = true;
       enableACME = true;
@@ -16,5 +16,5 @@ let utils = import ../../utils.nix { inherit lib; }; in
       }];
 
     }];
-  };
+  }];
 }
