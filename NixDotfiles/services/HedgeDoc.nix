@@ -11,8 +11,7 @@ let DATA_DIR = "/data/Hedgedoc"; in
       import ./Container-Config/Nix-Container.nix {
         inherit config lib;
         name = "hedgedoc";
-        subdomain = "doc";
-        additionalDomains = [ "pad" ];
+        subdomain = "pad";
         containerIP = "192.168.7.104";
         containerPort = 3000;
 
@@ -31,7 +30,7 @@ let DATA_DIR = "/data/Hedgedoc"; in
             environmentFile = config.age.secrets.HedgeDoc_EnvironmentFile.path;
 
             settings = {
-              domain = "doc.${config.domainName}";
+              domain = "pad.${config.domainName}";
               allowOrigin = [ "localhost" "pad.${config.domainName}" ];
               host = "0.0.0.0";
               protocolUseSSL = true;
@@ -61,7 +60,7 @@ let DATA_DIR = "/data/Hedgedoc"; in
                 userProfileUsernameAttr = config.keycloak-setup.attributeMapper.username;
                 userProfileDisplayNameAttr = config.keycloak-setup.attributeMapper.name;
                 userProfileEmailAttr = config.keycloak-setup.attributeMapper.email;
-                # scope = "openid email profile";
+                scope = "openid email profile";
                 rolesClaim = config.keycloak-setup.attributeMapper.groups;
                 # accessRole = "";
               };

@@ -29,7 +29,7 @@ let DATA_DIR = "/data/Wiki-js"; in
             enable = true;
 
             settings.db = {
-#              db = "wiki-js";
+              db = "wiki-js";
               host = "/run/postgresql";
               user = "wiki-js";
             };

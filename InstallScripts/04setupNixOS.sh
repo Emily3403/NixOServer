@@ -25,13 +25,7 @@ then
 fi
 
 echo -e "\n\nInstalling the System!\n"
-# Update flake lock file
-nix --extra-experimental-features 'nix-command flakes' \
-    flake update --commit-lock-file \
-    "git+file:///mnt/etc/nixos"
-
-# Install the system
-nixos-install --no-root-password --flake "git+file:///mnt/etc/nixos#${HOST_TO_INSTALL}"
+nixos-install --no-root-password --flake "git+file:///mnt/etc/nixos#${HOST_TO_INSTALL}" --cores 32
 
 umount -R /mnt
 zpool export -a

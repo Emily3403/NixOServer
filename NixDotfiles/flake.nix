@@ -4,8 +4,8 @@
   description = "NixOS Server on ZFS";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-23.11";
-    nixpkgs-unstable.url = "nixpkgs/master";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs-unstable.url = "github:NixOS/nixpkgs/master";
     agenix = {
       url = "github:ryantm/agenix";
       inputs.darwin.follows = "";
@@ -17,7 +17,7 @@
       mkHost = hostName: system:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs { inherit system; config.packageOverrides = pkgs: { vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; }; }; };
 
           specialArgs = {
             # By default, the system will only use packages from the stable channel.

@@ -17,12 +17,19 @@ mkdir -p "$HOME/.config/fish" "$HOME/.config/btop"
 wget --inet4-only https://raw.githubusercontent.com/Emily3403/configAndDotfiles/main/roles/shell/tasks/dotfiles/fish/config.fish -O "$HOME/.config/fish/config.fish"
 wget --inet4-only https://raw.githubusercontent.com/Emily3403/configAndDotfiles/main/roles/shell/tasks/dotfiles/btop/btop.conf -O "$HOME/.config/btop/btop.conf"
 
+mkdir -p /root/.ssh
+ln -s /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
+
 # Setup git identity
 git config --global user.email "$GIT_EMAIL"
 git config --global user.name "$GIT_UNAME"
 
 # Due to the nature of this setup the NixOS Repo will always be one commit ahead. So make rebase the default strategy.
 git -C "$SCRIPT_DIR" config pull.rebase true
+
+# Setup NixOS config
+mkdir -p /root/.config/nix
+echo "experimental-features = nix-command flakes" > /root/.config/nix/nix.conf
 
 # Move and symlink the Nix directory
 cp -r /etc/nixos /etc/_backup-nixos

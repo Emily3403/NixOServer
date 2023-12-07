@@ -45,6 +45,8 @@
     rsync
     nmap
     inetutils
+    util-linux
+    parted
     python3
     groff
     openssl

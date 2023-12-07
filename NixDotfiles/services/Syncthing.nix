@@ -11,6 +11,7 @@ let DATA_DIR = "/data/Syncthing"; in
         inherit config lib;
 
         name = "syncthing";
+        subdomain = "sync";
         containerIP = "192.168.7.105";
         containerPort = 8080;
 

@@ -11,7 +11,7 @@
 # - isisdl compressed videos    (2TB)
 
 
-{ config, modulesPath, ... }: {
+{ config, modulesPath, pkgs, ... }: {
   zfs-root = {
     boot = {
       devNodes = "/dev/disk/by-id/";
@@ -35,6 +35,17 @@
       weekly = 7; # How many snapshots to keep
       monthly = 48;
     };
+  };
+
+  # Hardware accelleration
+  hardware.opengl = {
+    enable = true;
+    extraPackages = with pkgs; [
+      intel-media-driver # LIBVA_DRIVER_NAME=iHD
+      vaapiIntel         # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+      vaapiVdpau
+      libvdpau-va-gl
+    ];
   };
 
   boot.initrd.availableKernelModules = [
@@ -64,9 +75,9 @@
   ];
 
   boot.kernelParams = [
-    "zfs.zfs_arc_max=68719476736"
+    "zfs.zfs_arc_max=103079215104"
     "zfs.zfs_arc_min=12884901888"
-    "zfs.zfs_arc_meta_limit=12884901888"
+    "zfs.zfs_arc_meta_limit=51539607552"
   ];
 
   networking = {

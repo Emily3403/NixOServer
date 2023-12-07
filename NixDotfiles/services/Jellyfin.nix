@@ -22,6 +22,7 @@ let DATA_DIR = "/data/Jellyfin"; in
         ];
 
         bindMounts = {
+          "/dev/dri/" = { hostPath = "/dev/dri/"; isReadOnly = false; };
           "/var/lib/jellyfin" = { hostPath = "${DATA_DIR}/jellyfin"; isReadOnly = false; };
           "/var/lib/data" = { hostPath = "/data/Transmission/data"; };
           "/var/lib/Media-Emily" = { hostPath = "${DATA_DIR}/Media-Emily"; };
