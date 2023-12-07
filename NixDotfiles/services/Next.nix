@@ -26,7 +26,7 @@ let DATA_DIR = "/data/Nextcloud"; in
         };
 
         cfg = {
-          imports = [ (import ./Container-Config/Postgresql.nix { dbName = "nextcloud"; dbUser = "nextcloud"; pkgs = pkgs; }) ];
+          imports = [ (import ./Container-Config/Postgresql.nix { name = "nextcloud"; pkgs = pkgs; }) ];
 
           services.nextcloud = {
             enable = true;

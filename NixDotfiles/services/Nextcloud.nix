@@ -50,7 +50,7 @@ in
         ../users/root.nix
         ../users/services/nextcloud.nix
         ../system.nix
-        (import ./Container-Config/Postgresql.nix { dbName = "nextcloud"; dbUser = "nextcloud"; pkgs = pkgs; })
+        (import ./Container-Config/Postgresql.nix { name = "nextcloud"; pkgs = pkgs; })
       ];
 
       services.nextcloud = {
@@ -76,7 +76,7 @@ in
         };
 
         # Configure the opcache module as recommended
-        phpOptions = options.services.nextcloud.phpOptions.default // {
+        phpOptions = {
           # Tune Nextcloud
           "pm" = "dynamic";
           "pm.max_children" = "200";
@@ -114,6 +114,7 @@ in
           oidc = pkgs.fetchNextcloudApp rec {
             url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v2.5.1/oidc_login.tar.gz";
             sha256 = "sha256-lQaoKjPTh1RMXk2OE+ULRYKw70OCCFq1jKcUQ+c6XkA=";
+            license = "agpl3Only";
           };
         };
 

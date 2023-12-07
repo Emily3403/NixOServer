@@ -18,7 +18,7 @@ let DATA_DIR = "/data/Headscale"; in
         };
 
         cfg = {
-          imports = [ (import ./Container-Config/Postgresql.nix { dbName = "headscale"; dbUser = "headscale"; pkgs = pkgs; }) ];
+          imports = [ (import ./Container-Config/Postgresql.nix { name = "headscale"; pkgs = pkgs; }) ];
 
           services.headscale = {
             enable = true;

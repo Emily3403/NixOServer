@@ -24,7 +24,7 @@ let DATA_DIR = "/data/Hedgedoc"; in
         };
 
         cfg = {
-          imports = [ (import ./Container-Config/Postgresql.nix { dbName = "hedgedoc"; dbUser = "hedgedoc"; pkgs = pkgs; }) ];
+          imports = [ (import ./Container-Config/Postgresql.nix { name = "hedgedoc"; pkgs = pkgs; }) ];
 
           services.hedgedoc = {
             enable = true;

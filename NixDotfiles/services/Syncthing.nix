@@ -26,7 +26,7 @@ let DATA_DIR = "/data/Syncthing"; in
             guiAddress = "0.0.0.0:8080";
             openDefaultPorts = true;
 
-            devices =
+            settings.devices =
               let
                 defconfig = {
                   introducer = true;

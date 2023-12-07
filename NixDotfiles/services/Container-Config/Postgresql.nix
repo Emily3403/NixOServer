@@ -1,12 +1,12 @@
-{ dbName, dbUser, pkgs }: {
+{ name, pkgs }: {
   services.postgresql = {
     enable = true;
     package = pkgs.postgresql_15;
 
-    ensureDatabases = [ dbName ];
+    ensureDatabases = [ name ];
     ensureUsers = [{
-      name = dbUser;
-      ensurePermissions."DATABASE ${dbName}" = "ALL PRIVILEGES";
+      name = name;
+      ensureDBOwnership = true;
       ensureClauses.superuser = true;
     }];
   };

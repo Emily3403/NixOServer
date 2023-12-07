@@ -38,7 +38,7 @@
     zsh
     neofetch
     btop
-    exa
+    eza
     cowsay
     direnv
     htop

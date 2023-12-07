@@ -23,12 +23,13 @@ let DATA_DIR = "/data/Wiki-js"; in
         };
 
         cfg = {
-          imports = [ (import ./Container-Config/Postgresql.nix { dbName = "wiki"; dbUser = "wiki-js"; pkgs = pkgs; }) ];
+          imports = [ (import ./Container-Config/Postgresql.nix { name = "wiki-js"; pkgs = pkgs; }) ];
 
           services.wiki-js = {
             enable = true;
 
             settings.db = {
+#              db = "wiki-js";
               host = "/run/postgresql";
               user = "wiki-js";
             };
