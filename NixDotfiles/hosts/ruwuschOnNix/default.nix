@@ -47,6 +47,7 @@
       libvdpau-va-gl
     ];
   };
+  system.stateVersion = "23.11";
 
   boot.initrd.availableKernelModules = [
     # "Normal" disk Support

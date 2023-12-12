@@ -24,6 +24,8 @@ ln -s /etc/ssh/ssh_host_rsa_key /root/.ssh/id_rsa
 git config --global user.email "$GIT_EMAIL"
 git config --global user.name "$GIT_UNAME"
 
+ln -s /etc/ssh/id_host_rsa_key /root/.ssh/id_rsa
+
 # Due to the nature of this setup the NixOS Repo will always be one commit ahead. So make rebase the default strategy.
 git -C "$SCRIPT_DIR" config pull.rebase true
 
