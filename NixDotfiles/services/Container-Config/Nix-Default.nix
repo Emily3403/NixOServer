@@ -9,7 +9,7 @@ let DATA_DIR = "/data/TODO"; in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "TODO";
         subdomain = "TODO";
         containerIP = "192.168.7.TODO";

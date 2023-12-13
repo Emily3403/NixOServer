@@ -8,7 +8,7 @@ let DATA_DIR = "/data/Borg"; in
   imports = [
     (
       import ../Container-Config/Nix-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "borg";
         containerIP = "192.168.7.106";
         containerPort = 80;

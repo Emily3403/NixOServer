@@ -10,7 +10,7 @@ let DATA_DIR = "/data/Jellyfin"; in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "jellyfin";
         containerIP = "192.168.7.109";
         containerPort = 8096;

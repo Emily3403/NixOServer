@@ -14,7 +14,7 @@
 
   outputs = { self, nixpkgs, nixpkgs-unstable, agenix }@inputs:
     let
-      mkHost = hostName: system:
+      mkHost = hostName: stateVersion: system:
         nixpkgs.lib.nixosSystem {
           inherit system;
           pkgs = import nixpkgs { inherit system; config.packageOverrides = pkgs: { vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; }; }; };
@@ -42,13 +42,13 @@
 
             # Configuration per host
             ./hosts/${hostName}
-          ];
+          ] ++ [ { system.stateVersion = stateVersion; } ];
         };
 
     in
     {
       nixosConfigurations = {
-        ruwuschOnNix = mkHost "ruwuschOnNix" "x86_64-linux";
+        ruwuschOnNix = mkHost "ruwuschOnNix" "23.11" "x86_64-linux";
       };
 
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;

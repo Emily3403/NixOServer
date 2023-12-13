@@ -9,12 +9,13 @@ let DATA_DIR = "/data/Wiki-js"; in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "wiki-js";
         subdomain = "wiki";
         containerIP = "192.168.7.102";
         containerPort = 3000;
 
+        postgresqlName = "wiki-js";
         imports = [ ../users/services/wiki-js.nix ];
         bindMounts = {
           "/var/lib/wiki-js/" = { hostPath = "${DATA_DIR}/wiki-js"; isReadOnly = false; };
@@ -23,8 +24,6 @@ let DATA_DIR = "/data/Wiki-js"; in
         };
 
         cfg = {
-          imports = [ (import ./Container-Config/Postgresql.nix { name = "wiki-js"; pkgs = pkgs; }) ];
-
           services.wiki-js = {
             enable = true;
 

@@ -4,7 +4,7 @@ let DATA_DIR = "/data/Rsnapshot"; in
   imports = [
     (
       import ../Container-Config/Nix-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "rsnapshot";
         containerIP = "192.168.7.108";
         containerPort = 80;

@@ -8,7 +8,7 @@ let DATA_DIR = "/data/Syncthing"; in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
 
         name = "syncthing";
         subdomain = "sync";

@@ -8,7 +8,7 @@ let DATA_DIR = "/data/Keycloak"; in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "keycloak";
         containerIP = "192.168.7.101";
         containerPort = 80;

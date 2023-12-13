@@ -8,6 +8,6 @@ export SWAP_AMOUNT_GB=32
 # Host Setup
 export HOST_TO_INSTALL="ruwuschOnNix"
 export ROOT_PASSWORD="root"
-export GIT_EMAIL="uwu@owo.com"
+export GIT_EMAIL="seebeckemily3403@gmail.com"
 export GIT_UNAME="Emily3403"
 export HOST_PRIVATE_SSH_KEY=""  # You may set the private key used for agenix decryption

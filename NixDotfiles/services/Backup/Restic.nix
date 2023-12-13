@@ -4,7 +4,7 @@ let DATA_DIR = "/data/Restic"; in
   imports = [
     (
       import ../Container-Config/Nix-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "restic";
         containerIP = "192.168.7.107";
         containerPort = 80;
