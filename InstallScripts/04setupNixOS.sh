@@ -9,7 +9,7 @@ if ! getent group nixbld > /dev/null; then
 fi
 
 # Get the Nix package manager, if it isn't yet installed
-if [ ! $(command -v "nix") > /dev/null 2>&1 ];
+if [ ! "$(command -v "nix")" ];
 then
     echo -e "\n\nInstalling the Nix Package Manager\n"
 

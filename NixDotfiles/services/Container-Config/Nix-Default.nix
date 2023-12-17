@@ -2,6 +2,7 @@
 let DATA_DIR = "/data/TODO"; in
 {
   systemd.tmpfiles.rules = [
+    "d ${DATA_DIR} 0755 TODO"
     "d ${DATA_DIR}/TODO 0755 TODO"
     "d ${DATA_DIR}/postgresql 0755 postgres"
   ];
@@ -14,6 +15,7 @@ let DATA_DIR = "/data/TODO"; in
         subdomain = "TODO";
         containerIP = "192.168.7.TODO";
         containerPort = 80;
+        postgresqlName = "TODO";
 
         imports = [ ../users/services/TODO.nix ];
         bindMounts = {

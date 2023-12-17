@@ -40,6 +40,10 @@
             ./secrets/secret-config.nix
             agenix.nixosModules.default
 
+            # Users
+            ./users/emily.nix
+            ./users/nana.nix
+
             # Configuration per host
             ./hosts/${hostName}
           ] ++ [ { system.stateVersion = stateVersion; } ];

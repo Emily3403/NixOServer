@@ -24,7 +24,7 @@
 
   users.users = {
     root = {
-      initialHashedPassword = "rootHash_placeholder";
+      initialHashedPassword = "!";
       openssh.authorizedKeys.keys = [ "sshKey_placeholder" ];
 
       shell = pkgs.fish;

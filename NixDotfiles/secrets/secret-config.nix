@@ -35,20 +35,5 @@
       owner = "5000";
     };
 
-    Duplicati_SSHKey_Nixie = {
-      file = ./SSHKeys/Duplicati/nixie.age;
-      owner = "1000";
-    };
-
-    Borg_Encrytpion_Nixie = {
-      file = ./Borg/nixie.age;
-      owner = "borg";
-    };
-
-    Headscale_ClientSecret = {
-      file = ./Headscale/ClientSecret.age;
-      owner = "headscale";
-    };
-
   };
 }

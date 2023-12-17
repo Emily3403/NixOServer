@@ -32,5 +32,6 @@ for disk in "${DRIVES[@]}"; do
     partition_disk "${disk}"
     sync && udevadm settle
 
+    mkfs.vfat -n EFI "$disk"-part1
     mkswap "$disk"-part4
 done

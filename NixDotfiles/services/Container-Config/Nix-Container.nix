@@ -1,7 +1,7 @@
 {
   name, subdomain ? null, containerIP, containerPort, bindMounts,
   imports ? [], postgresqlName ? null, additionalDomains ? [ ], additionalContainerConfig ? {},
-  additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
+  makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
   cfg, lib, config, pkgs
 }:
 let
@@ -9,6 +9,7 @@ let
   utils = import ../../utils.nix { inherit lib; };
   containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort;
   stateVersion = config.system.stateVersion;
+
   pgImport = if postgresqlName == null then [] else [
     (
       import ./Postgresql.nix {
@@ -18,9 +19,7 @@ let
     )
   ];
 
-in
-{
-  imports = imports ++ [
+  nginxImport = if makeNginxConfig == false then [] else [
     (
       import ./Nginx.nix {
         inherit containerIP config additionalDomains lib;
@@ -32,6 +31,10 @@ in
       }
     )
   ];
+
+in
+{
+  imports = imports ++ nginxImport;
 
   containers."${name}" = utils.recursiveMerge [
     additionalContainerConfig

@@ -7,7 +7,6 @@
     ensureUsers = [{
       name = name;
       ensureDBOwnership = true;
-      ensureClauses.superuser = true;
     }];
   };
 }

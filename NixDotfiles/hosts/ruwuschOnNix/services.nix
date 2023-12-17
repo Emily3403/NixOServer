@@ -9,11 +9,6 @@
     "Syncthing.nix"
     "Transmission.nix"
     "Jellyfin.nix"
-    "Backup/Duplicati.nix"
-    "Backup/UrBackup.nix"
-    "Backup/Borg.nix"
-    "Backup/Restic.nix"
-    "Backup/Rsnapshot.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";
