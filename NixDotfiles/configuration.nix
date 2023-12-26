@@ -17,6 +17,13 @@ in
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
 
+  # Podman
+  virtualisation.podman = {
+    enable = true;
+    defaultNetwork.settings = { dns_enabled = true; };
+    dockerCompat = true;
+  };
+
   environment.defaultPackages = with pkgs; [
     inputs.agenix.packages.x86_64-linux.default
   ];
