@@ -29,6 +29,7 @@ zpool create \
     -O normalization=formD \
     -O relatime=on \
     -O xattr=sa \
+    -O com.sun:auto-snapshot=true \
     -O mountpoint=/boot \
     -R /mnt \
     "$BOOT_POOL_NAME" \
@@ -47,6 +48,7 @@ zpool create \
     -O normalization=formD \
     -O relatime=on \
     -O xattr=sa \
+    -O com.sun:auto-snapshot=true \
     -O mountpoint=/ \
     -R /mnt \
     "$ROOT_POOL_NAME" \

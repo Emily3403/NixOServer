@@ -29,7 +29,7 @@ in
       ports = [ "127.0.0.1::${containerPortStr}" ];
       extraOptions = [ "--ip=${containerIP}" "--userns=keep-id" ];
 
-      volumes = volumes;
+      volumes = volumes ++ [ "/etc/resolv.conf:/etc/resolv.conf:ro" ];
       environment = environment;
       environmentFiles = environmentFiles;
     }

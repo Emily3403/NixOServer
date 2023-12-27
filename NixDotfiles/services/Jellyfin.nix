@@ -27,9 +27,23 @@ let DATA_DIR = "/data/Jellyfin"; in
           "/var/lib/data" = { hostPath = "/data/Transmission/data"; };
           "/var/lib/Media-Emily" = { hostPath = "${DATA_DIR}/Media-Emily"; };
           "/var/lib/Media-Carsten" = { hostPath = "${DATA_DIR}/Media-Carsten"; };
+          "/var/lib/Media-Shared" = { hostPath = "${DATA_DIR}/Media-Shared"; };
         };
 
         cfg = {
+          hardware.opengl = {
+            enable = true;
+            driSupport = true;
+            extraPackages = with pkgs; [
+              intel-media-driver # LIBVA_DRIVER_NAME=iHD
+              vaapiIntel         # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+              vaapiVdpau
+              libvdpau-va-gl
+            ];
+          };
+
+          environment.sessionVariables.LIBVA_DRIVER_NAME = "iHD";
+
           services.jellyfin = {
             enable = true;
             openFirewall = true;

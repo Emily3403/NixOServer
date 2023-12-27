@@ -8,8 +8,9 @@
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
     };
-
   };
+
+  services.locate.enable = true;
 
   programs = {
     neovim = {
