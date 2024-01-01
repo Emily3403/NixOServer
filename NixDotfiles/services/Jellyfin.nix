@@ -5,6 +5,7 @@ let DATA_DIR = "/data/Jellyfin"; in
     "d ${DATA_DIR}/jellyfin/ 0750 jellyfin jellyfin"
     "d ${DATA_DIR}/Media-Emily/ 0750 jellyfin jellyfin"
     "d ${DATA_DIR}/Media-Carsten/ 0750 jellyfin jellyfin"
+    "d ${DATA_DIR}/Media-Shared/ 0750 jellyfin jellyfin"
   ];
 
   imports = [
