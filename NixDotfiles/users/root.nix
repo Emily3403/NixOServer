@@ -57,5 +57,7 @@
     pv
     du-dust
     ripgrep
+    unzip
+    unzrip
   ];
 }
