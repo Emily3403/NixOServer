@@ -1,13 +1,13 @@
 { pkgs, config, lib, ... }: {
   users.users.emily = {
     isNormalUser = true;
-    home = "/home/emily";
-    description = "Emily Seebeck";
+    home = "/home/backup";
+    description = "Backup";
 
     shell = pkgs.fish;
     createHome = true;
-    uid = 1042;
-    extraGroups = [ "wheel" ];
+    uid = 1044;
+    extraGroups = [ ];
 
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"

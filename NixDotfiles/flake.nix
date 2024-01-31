@@ -17,13 +17,18 @@
       mkHost = hostName: stateVersion: system:
         nixpkgs.lib.nixosSystem {
           inherit system;
-          pkgs = import nixpkgs { inherit system; config.packageOverrides = pkgs: { vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; }; }; };
 
           specialArgs = {
             # By default, the system will only use packages from the stable channel.
             # You can selectively install packages from the unstable channel.
             # You can also add more  channels to pin package version.
+            pkgs = import nixpkgs {
+              inherit system;
+              config.packageOverrides = pkgs: { vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; }; };
+            };
+
             pkgs-unstable = import nixpkgs-unstable { inherit system; };
+            pkgs-unfree = import nixpkgs { inherit system; config = { allowUnfree = true; }; };
 
             # make all inputs availabe in other nix files
             inherit inputs;

@@ -100,8 +100,6 @@ zfs create -o mountpoint=none "$BOOT_POOL_NAME"/nixos
 zfs create -o mountpoint=legacy "$BOOT_POOL_NAME"/nixos/root
 zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/empty
 
-echo "Making dirs"
-
 mount -t zfs "$ROOT_POOL_NAME"/nixos/root /mnt/
 mkdir /mnt/home
 mkdir /mnt/boot

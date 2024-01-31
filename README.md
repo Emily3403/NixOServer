@@ -41,6 +41,9 @@ curl -L https://github.com/nix-community/nixos-images/releases/download/nixos-<v
 ### Installation Procedure
 
 ```shell
+nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
+nix-channel --update
+nix-shell -p git util-linux vim wget cryptsetup
 git clone https://github.com/Emily3403/NixOServer
 cd NixOServer/bin
 ```
@@ -51,7 +54,7 @@ It is recommended to clean the drives before the installation procedure:
 sudo ./clean.sh
 ```
 
-Next, edit the config to your liking. You might want to edit things like `NUM_DRIVES`, `RAID_LEVEL` or `ROOT_PASSWORD`.
+Next, edit the config to your liking. You might want to edit things like `NUM_DRIVES`, `RAID_LEVEL`, `SWAP_AMOUNT_GB` or `LUKS_PASSWORD`.
 
 ```shell
 $EDITOR ./config.sh

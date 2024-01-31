@@ -26,17 +26,9 @@ sed -i "s|\"bootDevices_placeholder\"|$diskNames|g" \
 sed -i "s|\"abcd1234\"|\"$(head -c4 /dev/urandom | od -A none -t x4| sed 's| ||g' || true)\"|g" \
     "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
 
-# Set the root password
-rootHashPwd=$(echo "$ROOT_PASSWORD" | mkpasswd -m SHA-512 -s)
-sed -i "s|rootHash_placeholder|${rootHashPwd}|" "/mnt/etc/nixos/users/root.nix"
-
-# Setup ssh keys
-Emily_Key=$(curl -sL https://github.com/Emily3403.keys)
-sed -i "s|\"sshKey_placeholder\"|\"$Emily_Key\"|" "/mnt/etc/nixos/users/root.nix"
-
 SSH_HOST_KEY_LOCATION="/mnt/etc/ssh/ssh_host_ed25519_key"
 SSH_ROOT_DIR="/root/.ssh/"
-SSH_ROOT_ID="$SSH_ROOT_DIR/id_rsa"
+SSH_ROOT_ID="$SSH_ROOT_DIR/id_ed25519"
 
 if [ -n "$HOST_PRIVATE_SSH_KEY" ];
 then

@@ -9,6 +9,7 @@
     "Syncthing.nix"
     "Transmission.nix"
     "Jellyfin.nix"
+    "Luk-Docs.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";

@@ -21,17 +21,22 @@
     };
 
     HedgeDoc_EnvironmentFile = {
-      file = ../../secrets/HedgeDoc/EnvironmentFile.age;
+      file = ../../secrets/HedgeDoc.age;
       owner = "hedgedoc";
     };
 
+    LukDocs_EnvironmentFile = {
+      file = ../../secrets/Luk-Docs.age;
+      owner = "root";
+    };
+
     WikiJs_SSHKey = {
-      file = ../../secrets/SSHKeys/Wiki-js/key.age;
+      file = ../../secrets/SSHKeys/wiki-js.age;
       owner = "wiki-js";
     };
 
     Transmission_EnvironmentFile = {
-      file = ../../secrets/Transmission/EnvironmentFile.age;
+      file = ../../secrets/Transmission.age;
       owner = "5000";
     };
 

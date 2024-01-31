@@ -26,7 +26,10 @@
   users.users = {
     root = {
       initialHashedPassword = "!";
-      openssh.authorizedKeys.keys = [ "sshKey_placeholder" ];
+      openssh.authorizedKeys.keys = [
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj"
+      ];
 
       shell = pkgs.fish;
     };
@@ -36,6 +39,7 @@
     sudo
     jq
     wget
+    fish
     zsh
     neofetch
     btop
@@ -49,10 +53,12 @@
     util-linux
     parted
     python3
+    python311Packages.pip
     groff
     openssl
     tcpdump
     traceroute
+    dig
     sysstat
     pv
     du-dust

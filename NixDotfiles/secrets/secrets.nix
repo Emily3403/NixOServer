@@ -5,14 +5,15 @@ let
   systems = [ ruwusch ];
 in
 {
-  "KeyCloak/DatabasePassword.age".publicKeys = [ ruwusch ];
-  "KeyCloak/AdminPassword.age".publicKeys = [ ruwusch ];
+  "Keycloak/DatabasePassword.age".publicKeys = [ ruwusch ];
+  "Keycloak/AdminPassword.age".publicKeys = [ ruwusch ];
 
   "Nextcloud/AdminPassword.age".publicKeys = [ ruwusch ];
   "Nextcloud/KeycloakClientSecret.age".publicKeys = [ ruwusch ];
 
   "HedgeDoc.age".publicKeys = [ ruwusch ];
   "Transmission.age".publicKeys = [ ruwusch ];
+  "Luk-Docs.age".publicKeys = [ ruwusch ];
 
   "SSHKeys/wiki-js.age".publicKeys = [ ruwusch ];
 }

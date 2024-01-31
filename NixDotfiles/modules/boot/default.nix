@@ -96,13 +96,15 @@ in
           devNodes = cfg.devNodes;
           forceImportRoot = mkDefault false;
         };
+
         loader = {
+          generationsDir.copyKernels = true;
           efi = {
             canTouchEfiVariables = (if cfg.removableEfi then false else true);
             efiSysMountPoint = ("/boot/efis/" + (head cfg.bootDevices)
               + cfg.partitionScheme.efiBoot);
           };
-          generationsDir.copyKernels = true;
+
           grub = {
             enable = true;
             devices = (map (diskName: cfg.devNodes + diskName) cfg.bootDevices);
@@ -123,24 +125,33 @@ in
     }
 
     (mkIf cfg.sshUnlock.enable {
-      boot.initrd = {
-        network = {
-          enable = true;
-          ssh = {
+
+      boot = {
+        kernelParams = [ "ip=dhcp" ];
+        initrd = {
+          availableKernelModules = [ "e1000e" ];
+
+          network = {
             enable = true;
-            hostKeys = [
-              "/etc/ssh/ssh_host_ed25519_key"
-            ];
-            authorizedKeys = cfg.sshUnlock.authorizedKeys;
-            shell = "/bin/cryptsetup-askpass";
+            udhcpc.enable = true;
+
+            ssh = {
+              enable = true;
+              hostKeys = [
+                "/etc/ssh/ssh_host_ed25519_key"
+              ];
+              authorizedKeys = cfg.sshUnlock.authorizedKeys;
+              shell = "/bin/cryptsetup-askpass";
+            };
+
+            postCommands = ''
+              tee -a /root/.profile >/dev/null <<EOF
+              if zfs load-key rpool/nixos; then
+                 pkill zfs
+              fi
+              exit
+              EOF'';
           };
-          postCommands = ''
-            tee -a /root/.profile >/dev/null <<EOF
-            if zfs load-key rpool/nixos; then
-               pkill zfs
-            fi
-            exit
-            EOF'';
         };
       };
     })
