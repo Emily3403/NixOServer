@@ -26,10 +26,17 @@ partition_disk () {
     udevadm settle
 }
 
-for disk in "${DRIVES[@]}"; do
+for disk in "${DRIVES[@]}" "${HOT_SPARES[@]}"; do
     echo -e "\n\nPartitioning $disk\n"
 
     partition_disk "${disk}"
+    # If using LUKS_PASSWORD, setup cryptsetup
+    if [[ -n "$LUKS_PASSWORD" ]]; then
+        echo -e "\n\nSetting up LUKS on $disk\n"
+        printf "%s" "$LUKS_PASSWORD" | cryptsetup luksFormat --type luks2 "${disk}-part3" -
+        printf "%s" "$LUKS_PASSWORD" | cryptsetup luksOpen "${disk}-part3" "luks-rpool-${disk##*/}-part3" -
+    fi
+
     sync && udevadm settle
 
     mkfs.vfat -n EFI "$disk"-part1

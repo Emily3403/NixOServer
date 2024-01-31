@@ -36,7 +36,7 @@ source "$SCRIPT_DIR/utils.sh"
 check_host_exists
 
 # The fdisk binary in located in `/sbin` ...
-export PATH="$PATH:/sbin"
+export PATH="$PATH:/sbin:/usr/sbin"
 
 # Execute the other scripts
 for script in "$SCRIPT_DIR"/../InstallScripts/*; do

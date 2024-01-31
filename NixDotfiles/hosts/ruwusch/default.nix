@@ -16,18 +16,19 @@
     boot = {
       devNodes = "/dev/disk/by-id/";
       bootDevices = [ "bootDevices_placeholder" ];
-      immutable = false;
       removableEfi = true;
-      luks.enable = false;
+      luks.enable = true;
 
       sshUnlock = {
-        enable = false;
-        authorizedKeys = [ ];
+        enable = true;
+        authorizedKeys = [
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"
+          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj"
+        ];
       };
     };
   };
 
-  boot.zfs.forceImportRoot = false;
   services.zfs = {
     autoSnapshot = {
       enable = true;
@@ -81,7 +82,7 @@
   ];
 
   networking = {
-    hostName = "ruwuschOnNix";
+    hostName = "ruwusch";
     hostId = "abcd1234";
   };
 
@@ -92,5 +93,6 @@
     (modulesPath + "/installer/scan/not-detected.nix")
     ./networking.nix
     ./services.nix
+    ./secrets.nix
   ];
 }

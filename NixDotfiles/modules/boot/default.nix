@@ -30,11 +30,6 @@ in
       description = "Specify boot devices";
       type = types.nonEmptyListOf types.str;
     };
-    immutable = mkOption {
-      description = "Enable root on ZFS immutable root support";
-      type = types.bool;
-      default = false;
-    };
     removableEfi = mkOption {
       description = "install bootloader to fallback location";
       type = types.bool;
@@ -67,12 +62,14 @@ in
   config = mkIf (cfg.enable) (mkMerge [
     {
       zfs-root.fileSystems.datasets = {
+        "bpool/nixos/root" = "/boot";
+        "rpool/nixos/root" = "/";
         "rpool/nixos/home" = mkDefault "/home";
         "rpool/nixos/var/lib" = mkDefault "/var/lib";
         "rpool/nixos/var/log" = mkDefault "/var/log";
-        "bpool/nixos/root" = "/boot";
       };
     }
+
     (mkIf cfg.luks.enable {
       boot.initrd.luks.devices = mkMerge (map
         (diskName: {
@@ -84,28 +81,7 @@ in
         })
         cfg.bootDevices);
     })
-    (mkIf (!cfg.immutable) {
-      zfs-root.fileSystems.datasets = { "rpool/nixos/root" = "/"; };
-    })
-    (mkIf cfg.immutable {
-      zfs-root.fileSystems = {
-        datasets = {
-          "rpool/nixos/empty" = "/";
-          "rpool/nixos/root" = "/oldroot";
-        };
-        bindmounts = {
-          "/oldroot/nix" = "/nix";
-          "/oldroot/etc/nixos" = "/etc/nixos";
-        };
-      };
-      boot.initrd.postDeviceCommands = ''
-        if ! grep -q zfs_no_rollback /proc/cmdline; then
-          zpool import -N rpool
-          zfs rollback -r rpool/nixos/empty@start
-          zpool export -a
-        fi
-      '';
-    })
+
     {
       zfs-root.fileSystems = {
         efiSystemPartitions =
@@ -145,6 +121,7 @@ in
         };
       };
     }
+
     (mkIf cfg.sshUnlock.enable {
       boot.initrd = {
         network = {
@@ -152,10 +129,10 @@ in
           ssh = {
             enable = true;
             hostKeys = [
-              "/var/lib/ssh_unlock_zfs_ed25519_key"
-              "/var/lib/ssh_unlock_zfs_rsa_key"
+              "/etc/ssh/ssh_host_ed25519_key"
             ];
             authorizedKeys = cfg.sshUnlock.authorizedKeys;
+            shell = "/bin/cryptsetup-askpass";
           };
           postCommands = ''
             tee -a /root/.profile >/dev/null <<EOF

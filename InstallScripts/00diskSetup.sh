@@ -23,11 +23,16 @@ fi
 
 # Sort drives by size and select the $NUM_DRIVES biggest drives
 selected_drives=()
+selected_hot_spares=()
 for device in $(lsblk -lnbdo NAME,SIZE | sort -k2,2nr | awk '{print "/dev/"$1}' | head -n "$NUM_DRIVES"); do
     for drive_id in "${unmounted_drives[@]}"; do
         device_path=$(readlink -f "$drive_id")
         if [ "$device_path" == "$device" ]; then
-            selected_drives+=("$drive_id")
+            if [ "${#selected_drives[@]}" -lt $(("$NUM_DRIVES" - "$NUM_HOT_SPARES")) ]; then
+                selected_drives+=("$drive_id")
+            else
+                selected_hot_spares+=("$drive_id")
+            fi
             break
         fi
     done
@@ -40,6 +45,14 @@ for drive_id in "${selected_drives[@]}"; do
     capacity=$(lsblk -bndo SIZE "$device_path" | numfmt --to=iec)
     echo "$drive_id -> $device_path (Capacity: $capacity)"
 done
+if [ "$NUM_HOT_SPARES" -gt 0 ]; then
+    echo -e "\nHot spares:"
+    for drive_id in "${selected_hot_spares[@]}"; do
+        device_path=$(readlink -f "$drive_id")
+        capacity=$(lsblk -bndo SIZE "$device_path" | numfmt --to=iec)
+        echo "$drive_id -> $device_path (Capacity: $capacity)"
+    done
+fi
 echo
 
 # Prompt the user for verification
@@ -57,3 +70,4 @@ done
 
 # Save the drives into an array and export it
 export DRIVES=("${selected_drives[@]}")
+export HOT_SPARES=("${selected_hot_spares[@]}")

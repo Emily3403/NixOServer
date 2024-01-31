@@ -37,7 +37,6 @@
             ./configuration.nix
             ./system.nix
             ./users/root.nix
-            ./secrets/secret-config.nix
             agenix.nixosModules.default
 
             # Users
@@ -52,7 +51,7 @@
     in
     {
       nixosConfigurations = {
-        ruwuschOnNix = mkHost "ruwuschOnNix" "23.11" "x86_64-linux";
+        ruwusch = mkHost "ruwusch" "23.11" "x86_64-linux";
       };
 
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;

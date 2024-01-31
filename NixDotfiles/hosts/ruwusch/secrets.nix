@@ -1,42 +1,42 @@
 { pkgs, options, config, lib, ... }: {
   age.secrets = {
     Keycloak_DatabasePassword = {
-      file = ./Keycloak/DatabasePassword.age;
+      file = ../../secrets/Keycloak/DatabasePassword.age;
       owner = "keycloak";
     };
 
     Keycloak_AdminPassword = {
-      file = ./Keycloak/AdminPassword.age;
+      file = ../../secrets/Keycloak/AdminPassword.age;
       owner = "keycloak";
     };
 
     Nextcloud_AdminPassword = {
-      file = ./Nextcloud/AdminPassword.age;
+      file = ../../secrets/Nextcloud/AdminPassword.age;
       owner = "nextcloud";
     };
 
     Nexcloud_KeycloakClientSecret = {
-      file = ./Nextcloud/KeycloakClientSecret.age;
+      file = ../../secrets/Nextcloud/KeycloakClientSecret.age;
       owner = "nextcloud";
     };
 
     HedgeDoc_EnvironmentFile = {
-      file = ./HedgeDoc/EnvironmentFile.age;
+      file = ../../secrets/HedgeDoc/EnvironmentFile.age;
       owner = "hedgedoc";
     };
 
     WikiJs_SSHKey = {
-      file = ./SSHKeys/Wiki-js/key.age;
+      file = ../../secrets/SSHKeys/Wiki-js/key.age;
       owner = "wiki-js";
     };
 
     Transmission_EnvironmentFile = {
-      file = ./Transmission/EnvironmentFile.age;
+      file = ../../secrets/Transmission/EnvironmentFile.age;
       owner = "5000";
     };
 
 #    Wireguard = {
-#      file = ./Wireguard/Wireguard.age;
+#      file = ../../secrets/Wireguard/Wireguard.age;
 #      owner = "root";
 #    };
 
