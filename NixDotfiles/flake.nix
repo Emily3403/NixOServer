@@ -41,12 +41,10 @@
             # Configuration shared by all hosts
             ./configuration.nix
             ./system.nix
-            ./users/root.nix
             agenix.nixosModules.default
 
             # Users
-            ./users/emily.nix
-            ./users/nana.nix
+            ./users/default.nix
 
             # Configuration per host
             ./hosts/${hostName}
