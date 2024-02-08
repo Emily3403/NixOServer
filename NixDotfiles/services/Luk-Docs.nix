@@ -32,6 +32,7 @@ let DATA_DIR = "/data/Luk-Docs"; in
 
   systemd.timers.podman-auto-update = {
       enable = true;
+      wantedBy = [ "timers.target" ];
 
       timerConfig = {
         OnCalendar = "*:0/10";
