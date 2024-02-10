@@ -10,6 +10,7 @@
     "Transmission.nix"
     "Jellyfin.nix"
     "Luk-Docs.nix"
+    "Backup.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";

@@ -23,7 +23,9 @@ for dir in "$BASE_DIR"/*/"postgresql"; do
 
     # Secure the backup
     chown postgres:postgres "$backup_path"
-    chmod 600 "$backup_path"
+
+    # Here, instead of using `chmod 600`, we remove the rwx for and the group. This is to prevent the ACLs from being overwritten.
+    chmod o-rwx "$backup_path"
 
     # Remove old backups
     find "$dir/backups" -type f -mtime +3 -name '*.sql' -delete
