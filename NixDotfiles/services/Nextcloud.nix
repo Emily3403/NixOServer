@@ -64,6 +64,7 @@ let DATA_DIR = "/data/Nextcloud"; in
               "opcache.interned_strings_buffer" = "16";
               "opcache.max_accelerated_files" = "10000";
               "opcache.memory_consumption" = "1280";
+
             };
 
             caching.redis = true;
@@ -148,7 +149,7 @@ let DATA_DIR = "/data/Nextcloud"; in
               # Max File size limit
               upload_max_filesize = "200G";
               post_max_size = "200G";
-
+              chunk_size = "512MB";
             };
           };
 

@@ -20,6 +20,18 @@ MAX_WEEKLY_BACKUPS=6
 MAX_MONTHLY_BACKUPS=24
 MAX_YEARLY_BACKUPS=5
 
+# Set up error handling
+set -eE
+trap 'handle_error $LINENO' ERR
+
+handle_error() {
+    echo "Error occurred in script at line: ${1}"
+    if [ -x "$(command -v telegram-send)" ]; then
+        echo "Telegram send TODO"
+    fi
+    exit 1
+}
+
 do_daily_backup() {
     backup_dir="${BACKUP_DIR}/daily"
     backup_path="${backup_dir}/$(date +%Y-%m-%d)"
