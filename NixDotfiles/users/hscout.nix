@@ -3,6 +3,7 @@
     isNormalUser = true;
     home = "/home/hscout";
     description = "Hetzner Server Scouter";
+    linger = true;
 
     shell = pkgs.fish;
     createHome = true;
