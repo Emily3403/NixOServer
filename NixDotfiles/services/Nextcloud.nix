@@ -1,7 +1,18 @@
 { pkgs, config, options, lib, ... }:
-let DATA_DIR = "/data/Nextcloud"; in
+let
+  DATA_DIR = "/data/Nextcloud";
+  nginxConfig = ''
+    client_body_buffer_size 400M;
+    proxy_max_temp_file_size 10024m;
+    fastcgi_read_timeout 3600s;
+    fastcgi_send_timeout 3600s;
+    fastcgi_connect_timeout 3600s;
+    proxy_read_timeout 3600s;
+  '';
+in
 {
   systemd.tmpfiles.rules = [
+    "d ${DATA_DIR} 0755 nextcloud"
     "d ${DATA_DIR}/nextcloud 0755 nextcloud"
     "d ${DATA_DIR}/postgresql 0755 postgres"
   ];
@@ -14,7 +25,7 @@ let DATA_DIR = "/data/Nextcloud"; in
         subdomain = "cloud";
         containerIP = "192.168.7.103";
         containerPort = 80;
-        additionalNginxConfig.extraConfig = "client_max_body_size 200G;";
+        additionalNginxConfig.extraConfig = "client_max_body_size 200G;" + nginxConfig;
 
         postgresqlName = "nextcloud";
         imports = [ ../users/services/nextcloud.nix ];
@@ -27,12 +38,18 @@ let DATA_DIR = "/data/Nextcloud"; in
         };
 
         cfg = {
+          services.nginx.virtualHosts."cloud.${config.domainName}".extraConfig = nginxConfig;
+
           services.nextcloud = {
             enable = true;
-            package = pkgs.nextcloud27;
+            package = pkgs.nextcloud28;
             datadir = "/var/lib/nextcloud";
             hostName = "cloud.${config.domainName}";
             https = true;
+
+            maxUploadSize = "200G";
+            logType = "file";
+            logLevel = 1;
 
             secretFile = config.age.secrets.Nexcloud_KeycloakClientSecret.path;
 
@@ -44,7 +61,7 @@ let DATA_DIR = "/data/Nextcloud"; in
               dbhost = "/run/postgresql";
               dbuser = "nextcloud";
               dbname = "nextcloud";
-              extraTrustedDomains = [ config.containerHostIP ];
+              trustedProxies = [ config.containerHostIP ];
 
               defaultPhoneRegion = "DE";
             };
@@ -64,7 +81,6 @@ let DATA_DIR = "/data/Nextcloud"; in
               "opcache.interned_strings_buffer" = "16";
               "opcache.max_accelerated_files" = "10000";
               "opcache.memory_consumption" = "1280";
-
             };
 
             caching.redis = true;
@@ -136,20 +152,15 @@ let DATA_DIR = "/data/Nextcloud"; in
               oidc_login_webdav_enabled = true;
               oidc_login_password_authentication = false;
 
-              # Defaults to acknowledge I have understood them
-              oidc_login_use_external_storage = false;
-              oidc_login_proxy_ldap = false;
-              oidc_login_redir_fallback = false;
-              oidc_login_update_avatar = false;
-              oidc_login_skip_proxy = false;
+              # Max File size limit
+              chunk_size = "512MB";
+              max_input_time = "3600";
+              max_execution_time = "3600";
+              output_buffering = "0";
 
               # Calendar
               calendarSubscriptionRefreshRate = "PT1H";
-
-              # Max File size limit
-              upload_max_filesize = "200G";
-              post_max_size = "200G";
-              chunk_size = "512MB";
+              maintenance_window_start = "1";
             };
           };
 
