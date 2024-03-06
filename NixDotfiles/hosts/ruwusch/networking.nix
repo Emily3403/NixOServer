@@ -11,7 +11,7 @@
     # For the nixos-containers
     nat = {
       enable = true;
-      internalInterfaces = [ "ve-+" ];
+      internalInterfaces = [ "ve-+" "wg0" ];
       externalInterface = "eno1";
     };
   };

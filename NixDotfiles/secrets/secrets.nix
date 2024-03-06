@@ -14,6 +14,7 @@ in
   "HedgeDoc.age".publicKeys = [ ruwusch ];
   "Transmission.age".publicKeys = [ ruwusch ];
   "Luk-Docs.age".publicKeys = [ ruwusch ];
+  "Wireguard.age".publicKeys = [ ruwusch ];
 
   "SSHKeys/wiki-js.age".publicKeys = [ ruwusch ];
 }

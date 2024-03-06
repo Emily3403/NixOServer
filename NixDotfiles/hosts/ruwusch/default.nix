@@ -11,7 +11,7 @@
 # - isisdl compressed videos    (2TB)
 
 
-{ config, modulesPath, pkgs, ... }: {
+{ config, modulesPath, pkgs, lib, ... }: {
   zfs-root = {
     boot = {
       devNodes = "/dev/disk/by-id/";
@@ -28,6 +28,10 @@
       };
     };
   };
+
+  # This option is discouraged, however in all scenarios we want to import the root anymays as there is no other way of solving the problem
+  boot.zfs.forceImportRoot = lib.mkForce true;
+
 
   services.zfs = {
     autoSnapshot = {

@@ -65,5 +65,6 @@
     ripgrep
     unzip
     unzrip
+#    wireguard-tools
   ];
 }

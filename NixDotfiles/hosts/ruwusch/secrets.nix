@@ -40,10 +40,10 @@
       owner = "5000";
     };
 
-#    Wireguard = {
-#      file = ../../secrets/Wireguard/Wireguard.age;
-#      owner = "root";
-#    };
+    Wireguard = {
+      file = ../../secrets/Wireguard.age;
+      owner = "root";
+    };
 
   };
 }

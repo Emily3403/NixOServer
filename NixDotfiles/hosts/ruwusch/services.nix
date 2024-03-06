@@ -11,6 +11,7 @@
     "Jellyfin.nix"
     "Luk-Docs.nix"
     "Backup.nix"
+#    "Wireguard.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";
