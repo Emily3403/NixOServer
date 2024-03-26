@@ -45,5 +45,10 @@
       owner = "root";
     };
 
+    PhotoPrism = {
+      file = ../../secrets/PhotoPrism.age;
+      owner = "photoprism";
+    };
+
   };
 }

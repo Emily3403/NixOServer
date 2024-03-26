@@ -12,6 +12,7 @@
     "Luk-Docs.nix"
     "Backup.nix"
 #    "Wireguard.nix"
+    "PhotoManagement/PhotoPrism.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";
