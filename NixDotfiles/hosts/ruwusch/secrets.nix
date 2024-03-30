@@ -50,5 +50,10 @@
       owner = "photoprism";
     };
 
+    Tandoor = {
+      file = ../../secrets/Tandoor.age;
+      owner = "tandoor_recipes";
+    };
+
   };
 }

@@ -16,6 +16,7 @@ in
   "Luk-Docs.age".publicKeys = [ ruwusch ];
   "Wireguard.age".publicKeys = [ ruwusch ];
   "PhotoPrism.age".publicKeys = [ ruwusch ];
+  "Tandoor.age".publicKeys = [ ruwusch ];
 
   "SSHKeys/wiki-js.age".publicKeys = [ ruwusch ];
 }

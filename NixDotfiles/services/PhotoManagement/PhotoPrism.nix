@@ -40,7 +40,7 @@ let DATA_DIR = "/data/PhotoPrism"; in
               PHOTOPRISM_DATABASE_NAME = "photoprism";
               PHOTOPRISM_DATABASE_SERVER = "/run/mysqld/mysqld.sock";
               PHOTOPRISM_DATABASE_USER = "photoprism";
-              PHOTOPRISM_SITE_URL = "https://photoprism.ruwusch.de";
+              PHOTOPRISM_SITE_URL = "https://photoprism.${config.domainName}";
               PHOTOPRISM_SITE_TITLE = "PhotoPrism";
             };
 

@@ -13,6 +13,7 @@
     "Backup.nix"
 #    "Wireguard.nix"
     "PhotoManagement/PhotoPrism.nix"
+    "Recipies/Tandoor.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";
