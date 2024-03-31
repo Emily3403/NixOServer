@@ -9,7 +9,7 @@ let DATA_DIR = "/data/Tandoor"; in
 
   imports = [
     (
-      import ../Container-Config/Nix-Container.nix {
+      import ./Container-Config/Nix-Container.nix {
         inherit config lib pkgs;
         name = "tandoor";
         subdomain = "tandoor";
@@ -17,7 +17,7 @@ let DATA_DIR = "/data/Tandoor"; in
         containerPort = 8080;
         postgresqlName = "tandoor_recipes";
 
-        imports = [ ../../users/services/tandoor_recipes.nix ];
+        imports = [ ../users/services/tandoor_recipes.nix ];
         bindMounts = {
           "/var/lib/tandoor-recipes/" = { hostPath = "${DATA_DIR}/tandoor-recipes"; isReadOnly = false; };
           "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
@@ -40,8 +40,6 @@ let DATA_DIR = "/data/Tandoor"; in
 
               ENABLE_METRICS = 0;  # Once Prometheus is set up, this can be enabled
               TZ = "Europe/Berlin";
-
-              # ENABLE_PDF_EXPORT = 1;  TODO: Test this
             };
           };
         };
