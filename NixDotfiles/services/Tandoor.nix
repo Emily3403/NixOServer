@@ -13,6 +13,7 @@ let DATA_DIR = "/data/Tandoor"; in
         inherit config lib pkgs;
         name = "tandoor";
         subdomain = "tandoor";
+        additionalDomains = [ "recipes" ];
         containerIP = "192.168.7.111";
         containerPort = 8080;
         postgresqlName = "tandoor_recipes";
@@ -31,7 +32,7 @@ let DATA_DIR = "/data/Tandoor"; in
 
             extraConfig = {
               SECRET_KEY_FILE = config.age.secrets.Tandoor.path;
-              ALLOWED_HOSTS = "tandoor.${config.domainName}";
+              ALLOWED_HOSTS = "tandoor.${config.domainName},recipes.${config.domainName}";
 
               DB_ENGINE = "django.db.backends.postgresql";
               POSTGRES_HOST = "/run/postgresql/";
