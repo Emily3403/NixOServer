@@ -16,6 +16,7 @@ let DATA_DIR = "/data/Jellyfin"; in
         name = "jellyfin";
         containerIP = "192.168.7.109";
         containerPort = 8096;
+        additionalNginxLocationConfig.proxyWebsockets = true;
 
         imports = [ ../users/services/jellyfin.nix ];
         additionalContainerConfig.forwardPorts = [
