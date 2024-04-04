@@ -17,6 +17,7 @@ in
   "Wireguard.age".publicKeys = [ ruwusch ];
   "PhotoPrism.age".publicKeys = [ ruwusch ];
   "Tandoor.age".publicKeys = [ ruwusch ];
+  "Piwigo-Mariadb.age".publicKeys = [ ruwusch ];
 
   "SSHKeys/wiki-js.age".publicKeys = [ ruwusch ];
 }

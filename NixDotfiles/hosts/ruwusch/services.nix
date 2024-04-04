@@ -13,6 +13,7 @@
     "Backup.nix"
 #    "Wireguard.nix"
     "PhotoManagement/PhotoPrism.nix"
+    "PhotoManagement/Piwigo.nix"
     "Tandoor.nix"
   ];
 

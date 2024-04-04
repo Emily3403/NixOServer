@@ -55,5 +55,10 @@
       owner = "tandoor_recipes";
     };
 
+    Piwigo_Mariadb = {
+      file = ../../secrets/Piwigo-Mariadb.age;
+      owner = "5015";
+    };
+
   };
 }
