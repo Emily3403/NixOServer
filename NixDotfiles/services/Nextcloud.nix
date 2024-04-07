@@ -35,10 +35,33 @@ in
           "/var/lib/syncthing" = { hostPath = "/data/Syncthing/syncthing/"; isReadOnly = false; };
           "${config.age.secrets.Nextcloud_AdminPassword.path}".hostPath = config.age.secrets.Nextcloud_AdminPassword.path;
           "${config.age.secrets.Nexcloud_KeycloakClientSecret.path}".hostPath = config.age.secrets.Nexcloud_KeycloakClientSecret.path;
+
+          # Hardware transcoding
+          "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; };
         };
 
         cfg = {
           services.nginx.virtualHosts."cloud.${config.domainName}".extraConfig = nginxConfig;
+
+          # Memories app
+          environment.systemPackages = with pkgs; [ exiftool jellyfin-ffmpeg perl ];
+          systemd.services.nextcloud-cron = {
+            path = [ pkgs.perl pkgs.exiftool pkgs.ffmpeg ];
+          };
+          systemd.services."phpfpm-nextcloud".serviceConfig = {
+            PrivateDevices = lib.mkForce false;
+            SupplementaryGroups = [ "render" "video" ];
+          };
+          hardware.opengl = {
+            enable = true;
+            driSupport = true;
+            extraPackages = with pkgs; [
+              intel-media-driver # LIBVA_DRIVER_NAME=iHD
+              vaapiIntel         # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
+              vaapiVdpau
+              libvdpau-va-gl
+            ];
+          };
 
           services.nextcloud = {
             enable = true;
@@ -161,7 +184,16 @@ in
               # Calendar
               calendarSubscriptionRefreshRate = "PT1H";
               maintenance_window_start = "1";
+
             };
+
+            # Memories. This has to be done like this because otherwise, an array would be created which the config does not like
+            extraOptions."memories.exiftool" = "${lib.getExe pkgs.exiftool}";
+            extraOptions."memories.exiftool_no_local" = true;
+            extraOptions."memories.vod.path" = "/var/lib/nextcloud/store-apps/memories/bin-ext/go-vod-amd64";
+            extraOptions."memories.vod.ffmpeg" = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
+            extraOptions."memories.vod.ffprobe" = "${pkgs.jellyfin-ffmpeg}/bin/ffprobe";
+
           };
 
           # Caching
