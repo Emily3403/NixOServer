@@ -65,6 +65,7 @@
     ripgrep
     unzip
     unzrip
+    intel-gpu-tools
 #    wireguard-tools
   ];
 }

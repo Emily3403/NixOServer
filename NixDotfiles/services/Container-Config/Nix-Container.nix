@@ -2,10 +2,12 @@
   name, subdomain ? null, containerIP, containerPort, bindMounts,
   imports ? [], postgresqlName ? null, additionalDomains ? [ ], additionalContainerConfig ? {},
   makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
+  enableHardwareTranscoding ? false,
   cfg, lib, config, pkgs
 }:
 let
 
+  inherit (lib) mkIf optional optionals mkMerge;
   utils = import ../../utils.nix { inherit lib; };
   containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort;
   stateVersion = config.system.stateVersion;
@@ -32,9 +34,16 @@ let
     )
   ];
 
+
 in
 {
   imports = imports ++ nginxImport;
+
+  hardware.opengl = mkIf enableHardwareTranscoding {
+    enable = true;
+    driSupport = true;
+    extraPackages = [ pkgs.intel-media-driver ];
+  };
 
   containers."${name}" = utils.recursiveMerge [
     additionalContainerConfig
@@ -44,7 +53,8 @@ in
       hostAddress = config.containerHostIP;
       localAddress = containerIP;
 
-      bindMounts = bindMounts;
+      bindMounts = mkMerge [ bindMounts (mkIf enableHardwareTranscoding { "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; };}) ];
+      allowedDevices = optionals (enableHardwareTranscoding) [ { node = "/dev/dri/renderD128"; modifier = "rw"; } { node = "/dev/dri/card0"; modifier = "rw"; } ];
 
       config = { pkgs, config, lib, ... }: utils.recursiveMerge [
         cfg
@@ -52,6 +62,12 @@ in
           system.stateVersion = stateVersion;
           networking.firewall.allowedTCPPorts = [ containerPort ];
           imports = [ ../../users/root.nix ../../system.nix ] ++ imports ++ pgImport;
+
+          hardware.opengl = mkIf enableHardwareTranscoding {
+            enable = true;
+            driSupport = true;
+            extraPackages = [ pkgs.intel-media-driver ];
+          };
         }
       ];
     }

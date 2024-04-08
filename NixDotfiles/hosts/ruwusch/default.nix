@@ -11,7 +11,7 @@
 # - isisdl compressed videos    (2TB)
 
 
-{ config, modulesPath, pkgs, lib, ... }: {
+{ config, modulesPath, pkgs, pkgs-unfree, lib, ... }: {
   zfs-root = {
     boot = {
       devNodes = "/dev/disk/by-id/";
@@ -32,7 +32,6 @@
   # This option is discouraged, however in all scenarios we want to import the root anymays as there is no other way of solving the problem
   boot.zfs.forceImportRoot = lib.mkForce true;
 
-
   services.zfs = {
     autoSnapshot = {
       enable = true;
@@ -45,12 +44,8 @@
   # Hardware accelleration
   hardware.opengl = {
     enable = true;
-    extraPackages = with pkgs; [
-      intel-media-driver # LIBVA_DRIVER_NAME=iHD
-      vaapiIntel         # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
-      vaapiVdpau
-      libvdpau-va-gl
-    ];
+    driSupport = true;
+    extraPackages = [ pkgs.intel-media-driver ];
   };
 
   boot.initrd.availableKernelModules = [

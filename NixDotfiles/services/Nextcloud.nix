@@ -25,42 +25,38 @@ in
         subdomain = "cloud";
         containerIP = "192.168.7.103";
         containerPort = 80;
-        additionalNginxConfig.extraConfig = "client_max_body_size 200G;" + nginxConfig;
 
         postgresqlName = "nextcloud";
         imports = [ ../users/services/nextcloud.nix ];
+
+        additionalNginxConfig.extraConfig = "client_max_body_size 200G;" + nginxConfig;
+        enableHardwareTranscoding = true;
+
         bindMounts = {
           "/var/lib/nextcloud" = { hostPath = "${DATA_DIR}/nextcloud"; isReadOnly = false; };
           "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
           "/var/lib/syncthing" = { hostPath = "/data/Syncthing/syncthing/"; isReadOnly = false; };
           "${config.age.secrets.Nextcloud_AdminPassword.path}".hostPath = config.age.secrets.Nextcloud_AdminPassword.path;
           "${config.age.secrets.Nexcloud_KeycloakClientSecret.path}".hostPath = config.age.secrets.Nexcloud_KeycloakClientSecret.path;
-
-          # Hardware transcoding
-          "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; };
         };
 
         cfg = {
           services.nginx.virtualHosts."cloud.${config.domainName}".extraConfig = nginxConfig;
 
           # Memories app
-          environment.systemPackages = with pkgs; [ exiftool jellyfin-ffmpeg perl ];
+          environment.systemPackages = with pkgs; [ exiftool jellyfin-ffmpeg perl nodejs ];
           systemd.services.nextcloud-cron = {
-            path = [ pkgs.perl pkgs.exiftool pkgs.ffmpeg ];
+            path = [ pkgs.perl pkgs.exiftool pkgs.jellyfin-ffmpeg ];
           };
+
           systemd.services."phpfpm-nextcloud".serviceConfig = {
             PrivateDevices = lib.mkForce false;
             SupplementaryGroups = [ "render" "video" ];
           };
-          hardware.opengl = {
+
+          services.imaginary = {
             enable = true;
-            driSupport = true;
-            extraPackages = with pkgs; [
-              intel-media-driver # LIBVA_DRIVER_NAME=iHD
-              vaapiIntel         # LIBVA_DRIVER_NAME=i965 (older but works better for Firefox/Chromium)
-              vaapiVdpau
-              libvdpau-va-gl
-            ];
+            settings.return-size = true;
           };
 
           services.nextcloud = {
@@ -185,9 +181,19 @@ in
               calendarSubscriptionRefreshRate = "PT1H";
               maintenance_window_start = "1";
 
+              preview_imaginary_url = "http://localhost:8088";
+              enabledPreviewProviders = [
+                "OC\\Preview\\BMP"
+                "OC\\Preview\\GIF"
+                "OC\\Preview\\JPEG"
+                "OC\\Preview\\PNG"
+                "OC\\Preview\\Movie"
+                "OC\\Preview\\Imaginary"
+              ];
+
             };
 
-            # Memories. This has to be done like this because otherwise, an array would be created which the config does not like
+            # Memories – This has to be done like this because otherwise, an array would be created which the config does not like
             extraOptions."memories.exiftool" = "${lib.getExe pkgs.exiftool}";
             extraOptions."memories.exiftool_no_local" = true;
             extraOptions."memories.vod.path" = "/var/lib/nextcloud/store-apps/memories/bin-ext/go-vod-amd64";
