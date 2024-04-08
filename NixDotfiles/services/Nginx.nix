@@ -17,5 +17,11 @@ in
     defaults.email = LETSENCRYPT_EMAIL;
   };
 
+  services.nginx.virtualHosts."_" = {
+    default = true;
+    rejectSSL = true;
+    locations."/".return = "426";
+  };
+
   users.users.nginx.extraGroups = [ "acme" ];
 }
