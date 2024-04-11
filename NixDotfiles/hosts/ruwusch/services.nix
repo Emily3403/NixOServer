@@ -11,7 +11,7 @@
     "Jellyfin.nix"
     "Luk-Docs.nix"
     "Backup.nix"
-#    "Wireguard.nix"
+    "Wireguard.nix"
     "PhotoManagement/PhotoPrism.nix"
     "PhotoManagement/Piwigo.nix"
     "Tandoor.nix"
