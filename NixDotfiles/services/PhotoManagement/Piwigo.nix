@@ -27,7 +27,7 @@ let DATA_DIR = "/data/Piwigo"; in
       import ../Container-Config/Oci-Container.nix {
         inherit config lib;
         name = "piwigo-mariadb";
-        image = "mariadb:10.11.6";
+        image = "linuxserver/mariadb:10.11.6";
 
         containerIP = "10.88.4.2";
         containerPort = 3306;

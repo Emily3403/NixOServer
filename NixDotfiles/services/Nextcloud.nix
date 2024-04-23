@@ -164,6 +164,7 @@ in
               lost_password_link = "disabled";
               overwriteprotocol = "https";
               default_locale = "en_IE";
+              upgrade.disable-web = false;
 
               oidc_login_default_group = "Authenticated";
               oidc_login_disable_registration = false;

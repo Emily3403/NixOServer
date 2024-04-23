@@ -6,14 +6,6 @@
       listenPort = 51820;
       privateKeyFile = config.age.secrets.Wireguard.path;
 
-      postSetup = ''
-        ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 192.168.42.0/25 -o eno1 -j MASQUERADE
-      '';
-
-      postShutdown = ''
-        ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 192.168.42.0/25 -o eno1 -j MASQUERADE
-      '';
-
       peers = [
         {
           name = "emily";
@@ -22,6 +14,13 @@
           persistentKeepalive = 30;
           allowedIPs = [ "192.168.42.1/32" ];
         }
+#        {
+#          name = "carsten";
+#          publicKey = "";
+#
+#          persistentKeepalive = 30;
+#          allowedIPs = [ "192.168.42.113/32" ];
+#        }
       ];
     };
   };
