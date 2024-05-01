@@ -1,8 +1,22 @@
 { pkgs, config, lib, ... }:
 {
   networking = {
+    # Some networks don't allow the default wireguard port, so add two alternatives. Also, some networks block udp, so add a tcp alternative using tcp2udp (requires client setup).
+    nat.forwardPorts = [
+      { sourcePort = 53; destination = "0.0.0.0:51820"; proto = "udp"; }
+      { sourcePort = 124; destination = "0.0.0.0:51820"; proto = "udp"; }
+
+      { sourcePort = 20; destination = "0.0.0.0:51820"; proto = "tcp"; }
+      { sourcePort = 23; destination = "0.0.0.0:51820"; proto = "tcp"; }
+    ];
+
+    firewall = {
+      allowedTCPPorts = [ 20 23 51820 ];
+      allowedUDPPorts = [ 53 124 51820 ];
+    };
+
     wireguard.interfaces.wg0 = {
-      ips = [ "192.168.42.0/25" ];
+      ips = [ "192.168.42.0/24" ];
       listenPort = 51820;
       privateKeyFile = config.age.secrets.Wireguard.path;
 

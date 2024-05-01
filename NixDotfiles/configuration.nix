@@ -20,7 +20,7 @@ in
   # Podman
   virtualisation.podman = {
     enable = true;
-    defaultNetwork.settings = { dns_enabled = true; };
+    defaultNetwork.settings = { dns_enabled = false; };
     dockerCompat = true;
   };
 

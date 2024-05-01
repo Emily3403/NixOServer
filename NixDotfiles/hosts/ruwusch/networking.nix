@@ -6,7 +6,7 @@
     useDHCP = true;
     nameservers = [ "1.1.1.1" "8.8.8.8" ];
     firewall.allowedTCPPorts = [ 22 80 443 22000 ];
-    firewall.allowedUDPPorts = [ 21027 22000 51820 ];
+    firewall.allowedUDPPorts = [ 21027 22000 ];
 
     # For the nixos-containers
     nat = {
