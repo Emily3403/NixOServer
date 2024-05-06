@@ -13,6 +13,8 @@
     firewall = {
       allowedTCPPorts = [ 20 23 51820 ];
       allowedUDPPorts = [ 53 124 51820 ];
+
+#      extraCommands = "iptables -t nat -A POSTROUTING -d 192.168.171.5 -p udp -m udp --dport 1194 -j MASQUERADE";
     };
 
     wireguard.interfaces.wg0 = {
