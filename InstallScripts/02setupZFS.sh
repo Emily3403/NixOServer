@@ -92,10 +92,12 @@ check_zpool_status "$ROOT_POOL_NAME"
 
 zfs create -o canmount=off -o mountpoint=none "$ROOT_POOL_NAME"/nixos
 zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/root
-zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/home
 zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/var
 zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/var/lib
 zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/var/log
+zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/home -O \
+    com.sun:auto-snapshot=false  # Disable auto-snapshotting of user-data as my home directories contain backups and they do their own versioning
+
 zfs create -o mountpoint=none "$BOOT_POOL_NAME"/nixos
 zfs create -o mountpoint=legacy "$BOOT_POOL_NAME"/nixos/root
 zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/empty
