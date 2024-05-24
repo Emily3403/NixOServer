@@ -5,9 +5,12 @@ let DATA_DIR = "/data/Luk-Docs"; in
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "luk-docs";
         image = "index.docker.io/lukburchard/docs";
+        dataDir = DATA_DIR;
+
+
         additionalContainerConfig = {
           extraOptions = [ "--label=io.containers.autoupdate=registry" ];
 

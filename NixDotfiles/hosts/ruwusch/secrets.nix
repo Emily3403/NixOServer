@@ -60,5 +60,20 @@
       owner = "5015";
     };
 
+    Affine_AdminPassword = {
+      file = ../../secrets/Affine/Environment.age;
+      owner = "root";
+    };
+
+    Affine_Postgres = {
+      file = ../../secrets/Affine/Postgres.age;
+      owner = "root";
+    };
+
+    Affine_Redis = {
+      file = ../../secrets/Affine/Redis.age;
+      owner = "root";
+    };
+
   };
 }

@@ -5,9 +5,10 @@ let DATA_DIR = "/data/YouTrack"; in
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "youtrack";
         image = "jetbrains/youtrack:2023.2.21228";
+        dataDir = DATA_DIR;
 
         subdomain = "ticket";
         containerIP = "10.88.1.1";

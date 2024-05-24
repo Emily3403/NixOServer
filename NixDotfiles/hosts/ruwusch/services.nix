@@ -15,6 +15,7 @@
     "PhotoManagement/PhotoPrism.nix"
     "PhotoManagement/Piwigo.nix"
     "Tandoor.nix"
+#    "Affine.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";

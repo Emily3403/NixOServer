@@ -1,15 +1,19 @@
 {
-  name, image, subdomain ? null, containerIP, containerPort, volumes,
-  imports ? [], environment ? { }, environmentFiles ? [ ], additionalContainerConfig ? {}, additionalDomains ? [ ],
+  name, image, dataDir, subdomain ? null, containerIP, containerPort, volumes, makeLocaltimeVolume ? true,
+  imports ? [], environment ? { }, environmentFiles ? [ ], postgresEnvFile ? null, redisEnvFile ? null, additionalContainerConfig ? {}, additionalDomains ? [ ],
   makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
-  config, lib
+  config, lib, pkgs
 }:
 let
 
+  inherit (lib) mkIf optional optionals;
   utils = import ../../utils.nix { inherit lib; };
   containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort;
+  defVolumes = [ "/etc/resolv.conf:/etc/resolv.conf:ro" ] ++ optional makeLocaltimeVolume "/etc/localtime:/etc/localtime:ro";
 
-  nginxImport = if makeNginxConfig == false then [] else [
+  podName = "pod-${name}";
+
+  nginxImport = if makeNginxConfig == false then [ ] else [
     (
       import ./Nginx.nix {
         inherit containerIP config additionalDomains lib;
@@ -26,16 +30,53 @@ in
 {
   imports = imports ++ nginxImport;
 
-  virtualisation.oci-containers.containers."${name}" = utils.recursiveMerge [
-    additionalContainerConfig
-    {
-      image = image;
-      ports = [ "127.0.0.1::${containerPortStr}" ];
-      extraOptions = [ "--ip=${containerIP}" "--userns=keep-id" ];
+  systemd.services."create-pod-${name}" = {
+    serviceConfig.Type = "oneshot";
+    wantedBy = [ "${config.virtualisation.oci-containers.backend}-${name}.service" ];
+    script = ''
+      ${pkgs.podman}/bin/podman pod exists ${podName} || \
+      ${pkgs.podman}/bin/podman pod create --name=${podName} --ip=${containerIP} --userns=keep-id \
+        -p 127.0.0.1::${containerPortStr} -p 127.0.0.1::5432 -p 127.0.0.1::6379
+    '';
+  };
 
-      volumes = volumes ++ [ "/etc/resolv.conf:/etc/resolv.conf:ro" ];
-      environment = environment;
-      environmentFiles = environmentFiles;
-    }
+  virtualisation.oci-containers.containers = {
+    "${name}" = utils.recursiveMerge [
+      additionalContainerConfig
+      {
+        image = image;
+        extraOptions = [ "--pod=${podName}" ];
+
+        volumes = volumes ++ defVolumes;
+        environment = { TZ = "Europe/Berlin"; } // environment;
+        environmentFiles = environmentFiles;
+      }
+    ];
+
+     "${name}-postgres" = mkIf (postgresEnvFile != null) {
+      image = "postgres:15-alpine";
+      extraOptions = [ "--pod=${podName}" ];
+
+      environment = { POSTGRES_DB = name; };
+      environmentFiles = [ postgresEnvFile ];
+      volumes = [ "${dataDir}/postgresql/15:/var/lib/postgresql/data" ] ++ defVolumes;
+      cmd = [ "-h" "127.0.0.1" ];
+    };
+
+    "${name}-redis" = mkIf (redisEnvFile != null) {
+      image = "redis:7.2.4-alpine";
+      extraOptions = [ "--pod=${podName}" ];
+
+      environmentFiles = [ redisEnvFile ];
+      volumes = [ "${dataDir}/redis:/data" ] ++ defVolumes;
+      cmd = [ "--bind" "127.0.0.1" ];
+    };
+  };
+
+  systemd.tmpfiles.rules = optionals (postgresEnvFile != null) [
+    "d ${dataDir}/postgresql/ 0750 70 70"
+    "d ${dataDir}/postgresql/15/ 0750 70 70"
+  ] ++ optionals (redisEnvFile != null) [
+    "d ${dataDir}/redis/ 0750 999 999"
   ];
 }

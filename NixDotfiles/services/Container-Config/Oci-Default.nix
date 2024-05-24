@@ -5,7 +5,7 @@ let DATA_DIR = "/data/TODO"; in
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "TODO";
         image = "TODO";
 

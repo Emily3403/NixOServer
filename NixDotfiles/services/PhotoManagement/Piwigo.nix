@@ -5,9 +5,10 @@ let DATA_DIR = "/data/Piwigo"; in
   imports = [
     (
       import ../Container-Config/Oci-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "piwigo";
         image = "linuxserver/piwigo:14.3.0";
+        dataDir = DATA_DIR;
 
         containerIP = "10.88.4.1";
         containerPort = 80;
@@ -25,9 +26,10 @@ let DATA_DIR = "/data/Piwigo"; in
     )
     (
       import ../Container-Config/Oci-Container.nix {
-        inherit config lib;
+        inherit config lib pkgs;
         name = "piwigo-mariadb";
         image = "linuxserver/mariadb:10.11.6";
+        dataDir = DATA_DIR;
 
         containerIP = "10.88.4.2";
         containerPort = 3306;
