@@ -12,9 +12,9 @@ let
 in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0755 nextcloud"
-    "d ${DATA_DIR}/nextcloud 0755 nextcloud"
-    "d ${DATA_DIR}/postgresql 0755 postgres"
+    "d ${DATA_DIR} 0750 nextcloud"
+    "d ${DATA_DIR}/nextcloud 0750 nextcloud"
+    "d ${DATA_DIR}/postgresql 0750 postgres"
   ];
 
   imports = [

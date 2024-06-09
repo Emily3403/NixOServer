@@ -2,7 +2,7 @@
 let DATA_DIR = "/data/Keycloak"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/postgresql 0755 postgres"
+    "d ${DATA_DIR}/postgresql 0750 postgres"
   ];
 
   imports = [

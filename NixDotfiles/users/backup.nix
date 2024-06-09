@@ -7,6 +7,7 @@
     shell = pkgs.fish;
     createHome = true;
     uid = 1044;
+    group = "backup";
     extraGroups = [ ];
 
     openssh.authorizedKeys.keys = [
@@ -15,5 +16,9 @@
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIF0BUkvDDSSS0AQB4wTdwcCSE4tBrtiaTJv7EUxvlJgD backup@data-vault"
     ];
 
+  };
+  users.groups.backup = {
+    name = "backup";
+    members = [ "backup" ];
   };
 }

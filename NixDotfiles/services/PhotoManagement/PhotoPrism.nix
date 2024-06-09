@@ -2,9 +2,9 @@
 let DATA_DIR = "/data/PhotoPrism"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0755 photoprism"
-    "d ${DATA_DIR}/photoprism 0755 photoprism"
-    "d ${DATA_DIR}/mysql 0755 postgres"
+    "d ${DATA_DIR} 0750 photoprism"
+    "d ${DATA_DIR}/photoprism 0750 photoprism"
+    "d ${DATA_DIR}/mysql 0750 postgres"
   ];
 
   imports = [

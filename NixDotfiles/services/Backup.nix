@@ -1,6 +1,6 @@
 { pkgs, config, lib, ... }: {
   systemd.tmpfiles.rules = [
-    "d /data 0755 root root"
+    "d /data 0750 root root"
     "a /data - - - - d:u:backup:rX"
     "a /data - - - - u:backup:rX"
   ];
@@ -27,4 +27,13 @@
       RandomizedDelaySec = 10;
     };
   };
+
+#  security.wrappers = {
+#    "rsync" = {
+#      owner = "backup";
+#      group = "backup";
+#      capabilities = "cap_dac_read_search+ep";
+#      source = "${pkgs.rsync.out}/bin/rsync";
+#    };
+#  };
 }

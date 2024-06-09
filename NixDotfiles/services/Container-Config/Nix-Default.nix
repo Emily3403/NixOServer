@@ -2,9 +2,9 @@
 let DATA_DIR = "/data/TODO"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0755 TODO"
-    "d ${DATA_DIR}/TODO 0755 TODO"
-    "d ${DATA_DIR}/postgresql 0755 postgres"
+    "d ${DATA_DIR} 0750 TODO"
+    "d ${DATA_DIR}/TODO 0750 TODO"
+    "d ${DATA_DIR}/postgresql 0750 postgres"
   ];
 
   imports = [
