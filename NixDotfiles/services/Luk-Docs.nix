@@ -10,7 +10,6 @@ let DATA_DIR = "/data/Luk-Docs"; in
         image = "index.docker.io/lukburchard/docs";
         dataDir = DATA_DIR;
 
-
         additionalContainerConfig = {
           extraOptions = [ "--label=io.containers.autoupdate=registry" ];
 

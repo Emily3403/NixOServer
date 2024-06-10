@@ -29,19 +29,19 @@ in
         postgresqlName = "nextcloud";
         imports = [ ../users/services/nextcloud.nix ];
 
-        additionalNginxConfig.extraConfig = "client_max_body_size 200G;" + nginxConfig;
+        additionalNginxConfig.extraConfig = ''client_max_body_size 200G;
+        '' + nginxConfig;
         enableHardwareTranscoding = true;
 
         bindMounts = {
           "/var/lib/nextcloud" = { hostPath = "${DATA_DIR}/nextcloud"; isReadOnly = false; };
           "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
-          "/var/lib/syncthing" = { hostPath = "/data/Syncthing/syncthing/"; isReadOnly = false; };
           "${config.age.secrets.Nextcloud_AdminPassword.path}".hostPath = config.age.secrets.Nextcloud_AdminPassword.path;
           "${config.age.secrets.Nexcloud_KeycloakClientSecret.path}".hostPath = config.age.secrets.Nexcloud_KeycloakClientSecret.path;
         };
 
         cfg = {
-          services.nginx.virtualHosts."cloud.${config.domainName}".extraConfig = nginxConfig;
+#          services.nginx.virtualHosts."cloud.${config.domainName}".extraConfig = nginxConfig;
 
           # Memories app
           environment.systemPackages = with pkgs; [ exiftool jellyfin-ffmpeg perl nodejs ];
@@ -61,15 +61,11 @@ in
 
           services.nextcloud = {
             enable = true;
-            package = pkgs.nextcloud28;
+            package = pkgs.nextcloud29;
             datadir = "/var/lib/nextcloud";
             hostName = "cloud.${config.domainName}";
             https = true;
-
             maxUploadSize = "200G";
-            logType = "file";
-            logLevel = 1;
-
             secretFile = config.age.secrets.Nexcloud_KeycloakClientSecret.path;
 
             config = {
@@ -80,9 +76,6 @@ in
               dbhost = "/run/postgresql";
               dbuser = "nextcloud";
               dbname = "nextcloud";
-              trustedProxies = [ config.containerHostIP ];
-
-              defaultPhoneRegion = "DE";
             };
 
             # Configure the opcache module as recommended
@@ -103,6 +96,7 @@ in
             };
 
             caching.redis = true;
+            configureRedis = true;
 
             # App config
             appstoreEnable = true;
@@ -112,29 +106,37 @@ in
             autoUpdateApps.startAt = "05:00:00";
 
             extraApps = {
-              inherit (pkgs.nextcloud26Packages.apps)
+              inherit (pkgs.nextcloud29Packages.apps)
                 calendar
-                files_markdown
-                groupfolders
-                polls
+                contacts
                 deck
+#                files_markdown  # Not supported: https://github.com/icewind1991/files_markdown/issues/218
+                groupfolders
+                memories
+                notes
                 onlyoffice
                 ;
 
               oidc = pkgs.fetchNextcloudApp rec {
-                url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v2.5.1/oidc_login.tar.gz";
-                sha256 = "sha256-lQaoKjPTh1RMXk2OE+ULRYKw70OCCFq1jKcUQ+c6XkA=";
+                url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v3.1.1/oidc_login.tar.gz";
+                sha256 = "sha256-EVHDDFtz92lZviuTqr+St7agfBWok83HpfuL6DFCoTE=";
                 license = "agpl3Only";
               };
             };
 
-            extraOptions = {
+            settings = {
+              log_type = "file";
+              loglevel = 1;
+              overwriteprotocol = "https";
+              default_phone_region = "DE";
+              trusted_proxies = [ config.containerHostIP ];
+
               # Behaviour of OpenID Connect with Keycloak
               oidc_login_provider_url = "https://${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}/realms/${config.keycloak-setup.realm}";
               oidc_login_logout_url = "https://cloud.${config.domainName}/apps/oidc_login/oidc";
               oidc_login_client_id = "Nextcloud";
 
-              oidc_login_auto_redirect = true;
+              oidc_login_auto_redirect = false;
               oidc_login_end_session_redirect = true;
               oidc_login_use_id_token = false;
               oidc_login_tls_verify = true;
@@ -162,7 +164,6 @@ in
               # Nextcloud config
               allow_user_to_change_display_name = true;
               lost_password_link = "disabled";
-              overwriteprotocol = "https";
               default_locale = "en_IE";
               upgrade.disable-web = false;
 
@@ -195,28 +196,13 @@ in
             };
 
             # Memories – This has to be done like this because otherwise, an array would be created which the config does not like
-            extraOptions."memories.exiftool" = "${lib.getExe pkgs.exiftool}";
-            extraOptions."memories.exiftool_no_local" = true;
-            extraOptions."memories.vod.path" = "/var/lib/nextcloud/store-apps/memories/bin-ext/go-vod-amd64";
-            extraOptions."memories.vod.ffmpeg" = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
-            extraOptions."memories.vod.ffprobe" = "${pkgs.jellyfin-ffmpeg}/bin/ffprobe";
+            settings."memories.exiftool" = "${lib.getExe pkgs.exiftool}";
+            settings."memories.exiftool_no_local" = true;
+            settings."memories.vod.path" = "/var/lib/nextcloud/store-apps/memories/bin-ext/go-vod-amd64";
+            settings."memories.vod.ffmpeg" = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
+            settings."memories.vod.ffprobe" = "${pkgs.jellyfin-ffmpeg}/bin/ffprobe";
 
           };
-
-          # Caching
-          services.redis.servers."nextcloud" = {
-            enable = true;
-            bind = "::1";
-            port = 6379;
-          };
-
-          systemd.services.nextcloud-setup.serviceConfig.ExecStartPost = pkgs.writeScript "nextcloud-redis.sh" ''
-            #!${pkgs.runtimeShell}
-            nextcloud-occ config:system:set redis 'host' --value '::1' --type string
-            nextcloud-occ config:system:set redis 'port' --value 6379 --type integer
-            nextcloud-occ config:system:set memcache.local --value '\OC\Memcache\Redis' --type string
-            nextcloud-occ config:system:set memcache.locking --value '\OC\Memcache\Redis' --type string
-          '';
 
           systemd.services."nextcloud-setup" = {
             requires = [ "postgresql.service" ];

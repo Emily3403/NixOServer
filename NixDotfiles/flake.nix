@@ -4,7 +4,7 @@
   description = "NixOS Server on ZFS";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/master";
     agenix = {
       url = "github:ryantm/agenix";

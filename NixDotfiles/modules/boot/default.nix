@@ -91,7 +91,7 @@ in
           (map (diskName: diskName + cfg.partitionScheme.swap) cfg.bootDevices);
       };
       boot = {
-        supportedFilesystems = [ "zfs" ];
+        supportedFilesystems = { zfs = true; };
         zfs = {
           devNodes = cfg.devNodes;
           forceImportRoot = mkDefault false;
