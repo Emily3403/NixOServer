@@ -2,11 +2,14 @@
 let DATA_DIR = "/data/Jellyfin"; in
 {
   systemd.tmpfiles.rules = [
+    "d ${DATA_DIR} 0750 jellyfin jellyfin"
     "d ${DATA_DIR}/jellyfin/ 0750 jellyfin jellyfin"
     "d ${DATA_DIR}/Media-Emily/ 0750 jellyfin jellyfin"
     "d ${DATA_DIR}/Media-Carsten/ 0750 jellyfin jellyfin"
-    "d ${DATA_DIR}/Media-Shalin/ 0750 jellyfin jellyfin"
     "d ${DATA_DIR}/Media-Shared/ 0750 jellyfin jellyfin"
+
+    "d ${DATA_DIR}/Media-Shalin/ 0750 jellyfin jellyfin"
+    "d ${DATA_DIR}/Media-Martin/ 0750 jellyfin jellyfin"
   ];
 
   imports = [
@@ -31,8 +34,10 @@ let DATA_DIR = "/data/Jellyfin"; in
 
           "/var/lib/Media-Emily" = { hostPath = "${DATA_DIR}/Media-Emily"; };
           "/var/lib/Media-Carsten" = { hostPath = "${DATA_DIR}/Media-Carsten"; };
-          "/var/lib/Media-Shalin" = { hostPath = "${DATA_DIR}/Media-Shalin"; };
           "/var/lib/Media-Shared" = { hostPath = "${DATA_DIR}/Media-Shared"; };
+
+          "/var/lib/Media-Shalin" = { hostPath = "${DATA_DIR}/Media-Shalin"; };
+          "/var/lib/Media-Martin" = { hostPath = "${DATA_DIR}/Media-Martin"; };
         };
 
         cfg.services.jellyfin = {

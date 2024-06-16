@@ -2,6 +2,7 @@
 let DATA_DIR = "/data/Hedgedoc"; in
 {
   systemd.tmpfiles.rules = [
+    "d ${DATA_DIR} 0750 hedgedoc"
     "d ${DATA_DIR}/hedgedoc 0750 hedgedoc"
     "d ${DATA_DIR}/postgresql 0750 postgres"
   ];

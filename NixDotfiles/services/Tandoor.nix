@@ -2,8 +2,8 @@
 let DATA_DIR = "/data/Tandoor"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0755 tandoor_recipes"
-    "d ${DATA_DIR}/tandoor-recipes 0755 tandoor_recipes"  # Nginx has to be able to serve the images
+    "d ${DATA_DIR} 0750 tandoor_recipes nginx"
+    "d ${DATA_DIR}/tandoor-recipes 0750 tandoor_recipes nginx"  # Nginx has to be able to serve the images
     "d ${DATA_DIR}/postgresql 0750 postgres"
   ];
 

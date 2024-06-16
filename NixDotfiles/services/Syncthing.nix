@@ -2,6 +2,7 @@
 let DATA_DIR = "/data/Syncthing"; in
 {
   systemd.tmpfiles.rules = [
+    "d ${DATA_DIR} 0750 syncthing"
     "d ${DATA_DIR}/syncthing 0750 syncthing"
   ];
 

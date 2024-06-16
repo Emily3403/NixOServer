@@ -25,6 +25,7 @@ let DATA_DIR = "/data/YouTrack"; in
   ];
 
   systemd.tmpfiles.rules = [
+    "d ${DATA_DIR} 0750 13001 13001"
     "d ${DATA_DIR}/data/ 0750 13001 13001"
     "d ${DATA_DIR}/conf/ 0750 13001 13001"
     "d ${DATA_DIR}/logs/ 0750 13001 13001"

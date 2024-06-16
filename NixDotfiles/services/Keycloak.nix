@@ -2,6 +2,7 @@
 let DATA_DIR = "/data/Keycloak"; in
 {
   systemd.tmpfiles.rules = [
+    "d ${DATA_DIR} 0750 keycloak"
     "d ${DATA_DIR}/postgresql 0750 postgres"
   ];
 
