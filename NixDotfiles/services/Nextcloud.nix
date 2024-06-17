@@ -41,7 +41,7 @@ in
         };
 
         cfg = {
-#          services.nginx.virtualHosts."cloud.${config.domainName}".extraConfig = nginxConfig;
+          services.nginx.virtualHosts."cloud.${config.domainName}".extraConfig = nginxConfig;
 
           # Memories app
           environment.systemPackages = with pkgs; [ exiftool jellyfin-ffmpeg perl nodejs ];
@@ -117,7 +117,7 @@ in
                 onlyoffice
                 ;
 
-              oidc = pkgs.fetchNextcloudApp rec {
+              oidc_login = pkgs.fetchNextcloudApp rec {
                 url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v3.1.1/oidc_login.tar.gz";
                 sha256 = "sha256-EVHDDFtz92lZviuTqr+St7agfBWok83HpfuL6DFCoTE=";
                 license = "agpl3Only";
@@ -136,7 +136,7 @@ in
               oidc_login_logout_url = "https://cloud.${config.domainName}/apps/oidc_login/oidc";
               oidc_login_client_id = "Nextcloud";
 
-              oidc_login_auto_redirect = false;
+              oidc_login_auto_redirect = true;
               oidc_login_end_session_redirect = true;
               oidc_login_use_id_token = false;
               oidc_login_tls_verify = true;
