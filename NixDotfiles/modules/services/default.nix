@@ -4,7 +4,7 @@ let
   format = pkgs.formats.json { };
 in
 {
-  imports = [ ./Keycloak.nix ];
+  imports = [ ./Keycloak.nix ./Monitoring.nix ];
 
   options.domainName = mkOption {
     type = types.str;

@@ -16,6 +16,8 @@
     "PhotoManagement/Piwigo.nix"
     "Tandoor.nix"
 #    "Affine.nix"
+
+    "Monitoring"
   ];
 
   keycloak-setup.realm = "Super-Realm";

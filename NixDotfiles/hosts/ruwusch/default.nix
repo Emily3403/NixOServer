@@ -94,4 +94,9 @@
     ./services.nix
     ./secrets.nix
   ];
+
+  monitoredServices = {
+    prometheus.enable = true;
+    transmission.enable = true;
+  };
 }

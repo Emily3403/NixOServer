@@ -14,6 +14,7 @@ in
 
   "HedgeDoc.age".publicKeys = [ ruwusch ];
   "Transmission.age".publicKeys = [ ruwusch ];
+  "Transmission-exporter.age".publicKeys = [ ruwusch ];
   "Luk-Docs.age".publicKeys = [ ruwusch ];
   "Wireguard.age".publicKeys = [ ruwusch ];
   "PhotoPrism.age".publicKeys = [ ruwusch ];
@@ -21,4 +22,10 @@ in
   "Piwigo-Mariadb.age".publicKeys = [ ruwusch ];
 
   "SSHKeys/wiki-js.age".publicKeys = [ ruwusch ];
+
+  "Monitoring/Grafana/admin-pw.age".publicKeys = [ ruwusch ];
+  "Monitoring/Grafana/secret-key.age".publicKeys = [ ruwusch ];
+
+  "Monitoring/Prometheus/ruwusch-pw.age".publicKeys = [ ruwusch ];
+  "Monitoring/Nginx/ruwusch-htpasswd.age".publicKeys = [ ruwusch ];
 }
