@@ -96,7 +96,8 @@
   ];
 
   monitoredServices = {
-    prometheus.enable = true;
-    transmission.enable = true;
+    prometheus = true;
+    transmission = true;
+    syncthing = true;
   };
 }

@@ -20,9 +20,10 @@ let DATA_DIR = "/data/Jellyfin"; in
         containerIP = "192.168.7.109";
         containerPort = 8096;
         imports = [ ../users/services/jellyfin.nix ];
-
         enableHardwareTranscoding = true;
+
         additionalNginxLocationConfig.proxyWebsockets = true;
+        additionalNginxConfig.locations."/metrics".return = "403";
         additionalContainerConfig.forwardPorts = [
           { containerPort = 1900; hostPort = 1900; protocol = "udp"; }
           { containerPort = 7359; hostPort = 7359; protocol = "udp"; }

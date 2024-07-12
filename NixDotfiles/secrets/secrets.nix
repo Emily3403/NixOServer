@@ -14,7 +14,6 @@ in
 
   "HedgeDoc.age".publicKeys = [ ruwusch ];
   "Transmission.age".publicKeys = [ ruwusch ];
-  "Transmission-exporter.age".publicKeys = [ ruwusch ];
   "Luk-Docs.age".publicKeys = [ ruwusch ];
   "Wireguard.age".publicKeys = [ ruwusch ];
   "PhotoPrism.age".publicKeys = [ ruwusch ];
@@ -28,4 +27,8 @@ in
 
   "Monitoring/Prometheus/ruwusch-pw.age".publicKeys = [ ruwusch ];
   "Monitoring/Nginx/ruwusch-htpasswd.age".publicKeys = [ ruwusch ];
+
+  "Monitoring/Exporters/Transmission.age".publicKeys = [ ruwusch ];
+  "Monitoring/Exporters/Syncthing.age".publicKeys = [ ruwusch ];
+  "Monitoring/Exporters/Syncthing-API-Key.age".publicKeys = [ ruwusch ];
 }

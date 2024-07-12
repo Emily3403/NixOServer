@@ -12,6 +12,7 @@ let
       scheme = "https";
       basic_auth = mkBasicAuth "Prometheus_${hostname}-pw";
       scrape_interval = if metric == "transmission" then "5s" else "30s";  # TODO: Make this configurable from the callee
+      scrape_timeout = "5s";
       static_configs = [{ targets = [ "${hostname}.status.${config.domainName}" ]; }];
     }] ++ acc)) [ ]
       metrics;
@@ -38,11 +39,13 @@ in
         bindMounts = {
           "/var/lib/prometheus2/" = { hostPath = "${DATA_DIR}/prometheus2"; isReadOnly = false; };
           "${config.age.secrets.Prometheus_ruwusch-pw.path}".hostPath = config.age.secrets.Prometheus_ruwusch-pw.path;
+          "${config.age.secrets.Syncthing_API-key.path}".hostPath = config.age.secrets.Syncthing_API-key.path;
         };
 
         cfg = {
           services.prometheus = {
             enable = true;
+            checkConfig = "syntax-only";  # "If you use credentials stored in external files they will not be visible to promtool and it will report errors"
             webExternalUrl = "https://prometheus.${config.domainName}";
 
             # Needed for htpasswd with basic_auth_users (https://prometheus.io/docs/prometheus/latest/configuration/https/)
@@ -53,7 +56,16 @@ in
                 def = [ ];
               in
               # This can easily be extended to include more hosts
-              (mkScrapers "ruwusch" ([ "prometheus" "transmission" ] ++ def))
+              (mkScrapers "ruwusch" ([ "prometheus" "transmission" "syncthing-exporter" "jellyfin" ] ++ def)) ++ [{
+                # TODO: Move this to mkScrapers
+                job_name = "ruwusch-syncthing";
+                metrics_path = "/syncthing-metrics";
+                scheme = "https";
+                bearer_token_file = config.age.secrets.Syncthing_API-key.path;
+                scrape_interval = "5s";
+                static_configs = [{ targets = [ "ruwusch.status.${config.domainName}" ]; }];
+
+              }]
             ;
 
           };

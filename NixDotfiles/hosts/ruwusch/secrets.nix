@@ -63,8 +63,18 @@
     };
 
     Transmission_Exporter-environment = {
-      file = ../../secrets/Transmission-exporter.age;
+      file = ../../secrets/Monitoring/Exporters/Transmission.age;
       owner = "root";
+    };
+
+    Syncthing_Exporter-environment = {
+      file = ../../secrets/Monitoring/Exporters/Syncthing.age;
+      owner = "root";
+    };
+
+    Syncthing_API-key = {
+      file = ../../secrets/Monitoring/Exporters/Syncthing-API-Key.age;
+      owner = "prometheus";
     };
 
     Wireguard = {
