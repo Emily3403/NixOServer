@@ -1,5 +1,8 @@
 { pkgs, config, options, lib, ... }:
 let
+  inherit (lib) mkIf;
+  cfg = config;
+
   DATA_DIR = "/data/Nextcloud";
   nginxConfig = ''
     client_body_buffer_size 400M;
@@ -38,6 +41,7 @@ in
           "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.Nextcloud_AdminPassword.path}".hostPath = config.age.secrets.Nextcloud_AdminPassword.path;
           "${config.age.secrets.Nexcloud_KeycloakClientSecret.path}".hostPath = config.age.secrets.Nexcloud_KeycloakClientSecret.path;
+          "${config.age.secrets.Nextcloud_Exporter-tokenfile.path}".hostPath = config.age.secrets.Nextcloud_Exporter-tokenfile.path;
         };
 
         cfg = {
@@ -207,6 +211,14 @@ in
           systemd.services."nextcloud-setup" = {
             requires = [ "postgresql.service" ];
             after = [ "postgresql.service" ];
+          };
+
+
+          services.prometheus.exporters.nextcloud = mkIf config.monitoredServices.nextcloud {
+            enable = true;
+            url = "https://cloud.${config.domainName}";
+            tokenFile = config.age.secrets.Nextcloud_Exporter-tokenfile.path;
+            openFirewall = true;
           };
         };
       }

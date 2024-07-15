@@ -99,5 +99,6 @@
     prometheus = true;
     transmission = true;
     syncthing = true;
+    nextcloud = true;
   };
 }

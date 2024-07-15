@@ -56,7 +56,7 @@ in
                 def = [ ];
               in
               # This can easily be extended to include more hosts
-              (mkScrapers "ruwusch" ([ "prometheus" "transmission" "syncthing-exporter" "jellyfin" ] ++ def)) ++ [{
+              (mkScrapers "ruwusch" ([ "prometheus" "transmission" "syncthing-exporter" "jellyfin" "nextcloud" "hedgedoc" ] ++ def)) ++ [{
                 # TODO: Move this to mkScrapers
                 job_name = "ruwusch-syncthing";
                 metrics_path = "/syncthing-metrics";

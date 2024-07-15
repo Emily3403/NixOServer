@@ -31,4 +31,5 @@ in
   "Monitoring/Exporters/Transmission.age".publicKeys = [ ruwusch ];
   "Monitoring/Exporters/Syncthing.age".publicKeys = [ ruwusch ];
   "Monitoring/Exporters/Syncthing-API-Key.age".publicKeys = [ ruwusch ];
+  "Monitoring/Exporters/Nextcloud-Token.age".publicKeys = [ ruwusch ];
 }

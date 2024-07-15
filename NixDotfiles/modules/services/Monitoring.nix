@@ -20,6 +20,8 @@ in
         prometheus = mkOpt "Prometheus";
         transmission = mkOpt "Transmission";
         syncthing = mkOpt "Syncthing";
+        nextcloud = mkOpt "Nextcloud";
+        hedgedoc = mkOpt "HedgeDoc";
       };
     };
 
@@ -60,8 +62,6 @@ in
       environmentFiles = [ config.age.secrets.Syncthing_Exporter-environment.path ];
     };
 
-
-
     services.nginx.virtualHosts = mkIf (config.monitoredServices != [ ]) {
       "${config.networking.hostName}.status.${config.domainName}" = {
         forceSSL = true;
@@ -74,6 +74,8 @@ in
           "/prometheus-metrics".proxyPass = "http://192.168.7.112:9090/metrics";
           "/transmission-metrics".proxyPass = "http://10.88.2.2:19091/metrics";
           "/jellyfin-metrics".proxyPass = "http://192.168.7.109:8096/metrics";
+          "/nextcloud-metrics".proxyPass = "http://192.168.7.103:9205/metrics";
+          "/hedgedoc-metrics".proxyPass = "http://192.168.7.104:3000/metrics";
           "/syncthing-metrics" = {
             proxyPass = "http://192.168.7.105:8080/metrics";
             extraConfig = "auth_basic off;";  # Authentication is handled by a Bearer API Token, not plainauth

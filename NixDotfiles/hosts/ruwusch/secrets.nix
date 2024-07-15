@@ -77,6 +77,11 @@
       owner = "prometheus";
     };
 
+    Nextcloud_Exporter-tokenfile = {
+      file = ../../secrets/Monitoring/Exporters/Nextcloud-Token.age;
+      owner = "nextcloud-exporter";
+    };
+
     Wireguard = {
       file = ../../secrets/Wireguard.age;
       owner = "root";
