@@ -5,6 +5,7 @@ let
   DATA_DIR = "/data/Prometheus";
   mkBasicAuth = secretName: { username = "admin"; password_file = config.age.secrets.${secretName}.path; };
 
+  # TODO: Refactor this
   mkScrapers = hostname: metrics:
     (foldl' (acc: metric: [{
       job_name = "${hostname}-${metric}";
@@ -13,6 +14,17 @@ let
       basic_auth = mkBasicAuth "Prometheus_${hostname}-pw";
       scrape_interval = if metric == "transmission" then "5s" else "30s";  # TODO: Make this configurable from the callee
       scrape_timeout = "5s";
+      static_configs = [{ targets = [ "${hostname}.status.${config.domainName}" ]; }];
+    }] ++ acc)) [ ]
+      metrics;
+
+   mkBearerScrapers = hostname: metrics:
+    (foldl' (acc: metric: [{
+      job_name = "${hostname}-${metric}";
+      metrics_path = "/${metric}-metrics";
+      scheme = "https";
+      bearer_token_file = config.age.secrets."Prometheus_${metric}-API-key".path;
+      scrape_interval = "5s";
       static_configs = [{ targets = [ "${hostname}.status.${config.domainName}" ]; }];
     }] ++ acc)) [ ]
       metrics;
@@ -39,7 +51,8 @@ in
         bindMounts = {
           "/var/lib/prometheus2/" = { hostPath = "${DATA_DIR}/prometheus2"; isReadOnly = false; };
           "${config.age.secrets.Prometheus_ruwusch-pw.path}".hostPath = config.age.secrets.Prometheus_ruwusch-pw.path;
-          "${config.age.secrets.Syncthing_API-key.path}".hostPath = config.age.secrets.Syncthing_API-key.path;
+          "${config.age.secrets.Prometheus_syncthing-API-key.path}".hostPath = config.age.secrets.Prometheus_syncthing-API-key.path;
+          "${config.age.secrets.Prometheus_photoprism-API-key.path}".hostPath = config.age.secrets.Prometheus_photoprism-API-key.path;
         };
 
         cfg = {
@@ -56,16 +69,8 @@ in
                 def = [ ];
               in
               # This can easily be extended to include more hosts
-              (mkScrapers "ruwusch" ([ "prometheus" "transmission" "syncthing-exporter" "jellyfin" "nextcloud" "hedgedoc" ] ++ def)) ++ [{
-                # TODO: Move this to mkScrapers
-                job_name = "ruwusch-syncthing";
-                metrics_path = "/syncthing-metrics";
-                scheme = "https";
-                bearer_token_file = config.age.secrets.Syncthing_API-key.path;
-                scrape_interval = "5s";
-                static_configs = [{ targets = [ "ruwusch.status.${config.domainName}" ]; }];
-
-              }]
+              (mkScrapers "ruwusch" ([ "prometheus" "transmission" "syncthing-exporter" "jellyfin" "nextcloud" "hedgedoc" ] ++ def)) ++
+              (mkBearerScrapers "ruwusch" ([ "syncthing" "photoprism" ]))
             ;
 
           };

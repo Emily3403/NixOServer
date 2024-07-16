@@ -67,13 +67,18 @@
       owner = "root";
     };
 
-    Syncthing_Exporter-environment = {
-      file = ../../secrets/Monitoring/Exporters/Syncthing.age;
+    Prometheus_SyncthingExporter-environment = {
+      file = ../../secrets/Monitoring/Exporters/Syncthing-Exporter.age;
       owner = "root";
     };
 
-    Syncthing_API-key = {
-      file = ../../secrets/Monitoring/Exporters/Syncthing-API-Key.age;
+    Prometheus_syncthing-API-key = {
+      file = ../../secrets/Monitoring/Exporters/Syncthing-Token.age;
+      owner = "prometheus";
+    };
+
+    Prometheus_photoprism-API-key = {
+      file = ../../secrets/Monitoring/Exporters/PhotoPrism-Token.age;
       owner = "prometheus";
     };
 
