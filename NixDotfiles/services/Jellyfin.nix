@@ -10,6 +10,7 @@ let DATA_DIR = "/data/Jellyfin"; in
 
     "d ${DATA_DIR}/Media-Shalin/ 0750 jellyfin jellyfin"
     "d ${DATA_DIR}/Media-Martin/ 0750 jellyfin jellyfin"
+    "d ${DATA_DIR}/Media-Jannes/ 0750 jellyfin jellyfin"
   ];
 
   imports = [
@@ -22,8 +23,10 @@ let DATA_DIR = "/data/Jellyfin"; in
         imports = [ ../users/services/jellyfin.nix ];
         enableHardwareTranscoding = true;
 
+        additionalDomains = [ "kino" ];
         additionalNginxLocationConfig.proxyWebsockets = true;
         additionalNginxConfig.locations."/metrics".return = "403";
+
         additionalContainerConfig.forwardPorts = [
           { containerPort = 1900; hostPort = 1900; protocol = "udp"; }
           { containerPort = 7359; hostPort = 7359; protocol = "udp"; }
@@ -39,7 +42,8 @@ let DATA_DIR = "/data/Jellyfin"; in
 
           "/var/lib/Media-Shalin" = { hostPath = "${DATA_DIR}/Media-Shalin"; };
           "/var/lib/Media-Martin" = { hostPath = "${DATA_DIR}/Media-Martin"; };
-        };
+          "/var/lib/Media-Jannes" = { hostPath = "${DATA_DIR}/Media-Jannes"; };
+        };  # TODO: Factor people out into a for-lopp
 
         cfg.services.jellyfin = {
           enable = true;

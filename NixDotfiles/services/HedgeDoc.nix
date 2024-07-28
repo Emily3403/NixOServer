@@ -16,7 +16,10 @@ let DATA_DIR = "/data/Hedgedoc"; in
         containerIP = "192.168.7.104";
         containerPort = 3000;
 
-        additionalNginxConfig.locations."/metrics".return = "403";
+        additionalNginxConfig.locations = {
+          "/metrics".return = "403";
+          "/status".return = "403";
+        };
 
         postgresqlName = "hedgedoc";
         imports = [ ../users/services/hedgedoc.nix ];
