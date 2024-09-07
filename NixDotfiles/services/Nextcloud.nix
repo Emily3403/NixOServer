@@ -32,8 +32,13 @@ in
         postgresqlName = "nextcloud";
         imports = [ ../users/services/nextcloud.nix ];
 
-        additionalNginxConfig.extraConfig = ''client_max_body_size 200G;
-        '' + nginxConfig;
+        additionalNginxConfig.extraConfig = "client_max_body_size 200G;" + nginxConfig;
+        additionalNginxHostConfig."pics.${config.domainName}" = {
+          forceSSL = true;
+          enableACME = true;
+          globalRedirect = "cloud.${config.domainName}/apps/memories";
+        };
+
         enableHardwareTranscoding = true;
 
         bindMounts = {

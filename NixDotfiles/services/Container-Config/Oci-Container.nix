@@ -1,5 +1,5 @@
 {
-  name, image, dataDir, subdomain ? null, containerIP, containerPort, volumes, makeLocaltimeVolume ? true,
+  name, image, dataDir, subdomain ? null, containerIP, containerPort, volumes, makeLocaltimeVolume ? true, additionalContainers ? {},
   imports ? [], environment ? { }, environmentFiles ? [ ], postgresEnvFile ? null, redisEnvFile ? null, additionalContainerConfig ? {}, additionalDomains ? [ ],
   makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
   config, lib, pkgs
@@ -36,7 +36,7 @@ in
     script = ''
       ${pkgs.podman}/bin/podman pod exists ${podName} || \
       ${pkgs.podman}/bin/podman pod create --name=${podName} --ip=${containerIP} --userns=keep-id \
-        -p 127.0.0.1::${containerPortStr} -p 127.0.0.1::5432 -p 127.0.0.1::6379
+        -p 127.0.0.1::${containerPortStr} -p 127.0.0.1::5432 -p 127.0.0.1::6379 -p 127.0.0.1::3200
     '';
   };
 
@@ -71,7 +71,7 @@ in
       volumes = [ "${dataDir}/redis:/data" ] ++ defVolumes;
       cmd = [ "--bind" "127.0.0.1" ];
     };
-  };
+  } // additionalContainers;
 
   systemd.tmpfiles.rules = optionals (postgresEnvFile != null) [
     "d ${dataDir}/postgresql/ 0750 70 70"

@@ -15,7 +15,10 @@ let DATA_DIR = "/data/Transmission"; in
         additionalDomains = [ "transui" ];
 
         additionalContainerConfig.extraOptions = [ "--cap-add=NET_ADMIN" "--device=/dev/net/tun" ];
-        environment.TZ = "Europe/Berlin";
+        environment = {
+          PUID = toString config.users.users.jellyfin.uid;
+          PGID = toString config.users.groups.jellyfin.gid;
+        };
         environmentFiles = [ config.age.secrets.Transmission_EnvironmentFile.path ];
 
         volumes = [
@@ -27,7 +30,8 @@ let DATA_DIR = "/data/Transmission"; in
   ];
 
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/data/ 0755 root root"
-    "d ${DATA_DIR}/config/ 0750 root root"
+    "d ${DATA_DIR}/ 0750 jellyfin jellyfin"
+    "d ${DATA_DIR}/data/ 0750 jellyfin jellyfin"
+    "d ${DATA_DIR}/config/ 0750 jellyfin jellyfin"
   ];
 }

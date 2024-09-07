@@ -1,7 +1,8 @@
 { pkgs, config, lib, ... }:
 {
   networking = {
-    # Some networks don't allow the default wireguard port, so add two alternatives. Also, some networks block udp, so add a tcp alternative using tcp2udp (requires client setup).
+    # Some networks don't allow the default wireguard port, so add two alternatives. 
+    # Also, some networks block udp, so add a tcp alternative using tcp2udp (requires client setup).
     nat.forwardPorts = [
       { sourcePort = 53; destination = "0.0.0.0:51820"; proto = "udp"; }
       { sourcePort = 124; destination = "0.0.0.0:51820"; proto = "udp"; }
@@ -14,6 +15,7 @@
       allowedTCPPorts = [ 20 23 51820 ];
       allowedUDPPorts = [ 53 124 51820 ];
 
+# TODO: Add this in, it won't work well otherwise
 #      extraCommands = "iptables -t nat -A POSTROUTING -d 192.168.171.5 -p udp -m udp --dport 1194 -j MASQUERADE";
     };
 
