@@ -3,26 +3,36 @@
   networking = {
     # Some networks don't allow the default wireguard port, so add two alternatives. 
     # Also, some networks block udp, so add a tcp alternative using tcp2udp (requires client setup).
-    nat.forwardPorts = [
-      { sourcePort = 53; destination = "0.0.0.0:51820"; proto = "udp"; }
-      { sourcePort = 124; destination = "0.0.0.0:51820"; proto = "udp"; }
+    nat = {
+      enable = true;
+      internalInterfaces = [ "wg0" ];
 
-      { sourcePort = 20; destination = "0.0.0.0:51820"; proto = "tcp"; }
-      { sourcePort = 23; destination = "0.0.0.0:51820"; proto = "tcp"; }
-    ];
+      forwardPorts = [
+        { sourcePort = 53; destination = "0.0.0.0:51820"; proto = "udp"; }
+        { sourcePort = 124; destination = "0.0.0.0:51820"; proto = "udp"; }
+
+        { sourcePort = 20; destination = "0.0.0.0:51820"; proto = "tcp"; }
+        { sourcePort = 23; destination = "0.0.0.0:51820"; proto = "tcp"; }
+      ];
+    };
 
     firewall = {
       allowedTCPPorts = [ 20 23 51820 ];
       allowedUDPPorts = [ 53 124 51820 ];
-
-# TODO: Add this in, it won't work well otherwise
-#      extraCommands = "iptables -t nat -A POSTROUTING -d 192.168.171.5 -p udp -m udp --dport 1194 -j MASQUERADE";
     };
 
     wireguard.interfaces.wg0 = {
       ips = [ "192.168.42.0/24" ];
       listenPort = 51820;
       privateKeyFile = config.age.secrets.Wireguard.path;
+
+      postSetup = ''
+        ${pkgs.iptables}/bin/iptables -t nat -A POSTROUTING -s 192.168.42.0/25 -o ${config.networking.nat.externalInterface} -j MASQUERADE
+      '';
+
+      postShutdown = ''
+        ${pkgs.iptables}/bin/iptables -t nat -D POSTROUTING -s 192.168.42.0/25 -o ${config.networking.nat.externalInterface} -j MASQUERADE
+      '';
 
       peers = [
         {
@@ -32,6 +42,15 @@
           persistentKeepalive = 30;
           allowedIPs = [ "192.168.42.1/32" ];
         }
+
+        {
+          name = "bernd";
+          publicKey = "V2LyESuAgojOK8eOOj767Ybvei+WXvcpzVMk2shX0xc=";
+
+          persistentKeepalive = 30;
+          allowedIPs = [ "192.168.42.2/32" ];
+        }
+
 #        {
 #          name = "carsten";
 #          publicKey = "";
