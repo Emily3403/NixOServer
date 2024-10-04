@@ -20,7 +20,9 @@ let DATA_DIR = "/data/Keycloak"; in
           "${config.age.secrets.Keycloak_DatabasePassword.path}".hostPath = config.age.secrets.Keycloak_DatabasePassword.path;
         };
 
-        additionalNginxConfig.locations."~* ^/(admin|welcome|metrics|health)(/.*)?$".return = "403";
+        additionalNginxConfig.locations = {
+          "~* ^/(admin|welcome|metrics|health)(/.*)?$".return = "403";
+        };
         additionalNginxLocationConfig.extraConfig = ''
           proxy_busy_buffers_size   512k;
           proxy_buffers   4 512k;

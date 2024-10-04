@@ -18,6 +18,7 @@
 #    "Affine.nix"
 
     "Monitoring"
+    "Get.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";

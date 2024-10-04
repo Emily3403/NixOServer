@@ -67,5 +67,8 @@
     unzrip
     intel-gpu-tools
 #    wireguard-tools
+    mediainfo
+    termshark
+    trippy
   ];
 }

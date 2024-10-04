@@ -57,7 +57,7 @@ in
       environment = {
         TZ = "Europe/Berlin";
         SYNCTHING_URI = "https://sync.${config.domainName}";
-        SYNCTHING_FOLDERSID = "azh4c-aq7pu,ffue9-gmezi,sgict-7ax3q,k1clh-49g30,fawqz-qrwh9,ccnor-nqwwx,rxr7g-6d9sj,pixel_8_pro_cbv4-photos,19a8v-x1nqh,nemob-qvlak,ejzzq-xsisq,8f158-ftdx5,oihrs-rmamj,dhwha-w9hst,xdwjc-lrumz";
+        SYNCTHING_FOLDERSID = "azh4c-aq7pu,ffue9-gmezi,sgict-7ax3q,k1clh-49g30,fawqz-qrwh9,xzn9v-cdks5,ccnor-nqwwx,rxr7g-6d9sj,pixel_8_pro_cbv4-photos,nemob-qvlak,ejzzq-xsisq,8f158-ftdx5,oihrs-rmamj,dhwha-w9hst,xdwjc-lrumz";
       };
       environmentFiles = [ config.age.secrets.Prometheus_SyncthingExporter-environment.path ];
     };
