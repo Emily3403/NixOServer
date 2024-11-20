@@ -7,6 +7,8 @@
     settings = {
       PasswordAuthentication = false;
       KbdInteractiveAuthentication = false;
+      ClientAliveInterval = 30;
+      ClientAliveCountMax = 6;
     };
   };
 
