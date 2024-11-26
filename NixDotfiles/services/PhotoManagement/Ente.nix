@@ -4,7 +4,7 @@ let DATA_DIR = "/data/Ente"; in
 
   imports = [
     (
-      import ./Container-Config/Oci-Container.nix {
+      import ../Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
         name = "ente";
         image = "ente-io/server";
@@ -16,7 +16,10 @@ let DATA_DIR = "/data/Ente"; in
         postgresEnvFile = config.age.secrets.EntePostgres.path;
 
         volumes = [
-          "${DATA_DIR}/TODO:/TODO"
+          "${DATA_DIR}/logs:/var/logs"
+          "${DATA_DIR}/data:/data:ro"
+          "${DATA_DIR}/museum.yaml:/museum.yaml:ro"
+          "${DATA_DIR}/credentials.yaml:/credentials.yaml:ro"
 
           "${config.age.secrets.Ente.path}:${config.age.secrets.Ente.path}"
         ];

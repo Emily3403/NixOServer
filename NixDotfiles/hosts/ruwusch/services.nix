@@ -1,24 +1,31 @@
 { ... }: {
   imports = map (it: ../../services/${it}) [
+    # System
     "Nginx.nix"
-    "HedgeDoc.nix"
-    "Keycloak.nix"
-    "Nextcloud.nix"
-    "Wiki-js.nix"
-    "YouTrack.nix"
-    "Syncthing.nix"
+    "Backup.nix"
+    "Monitoring"
+    "Wireguard.nix"
+
+    # Core Services
     "Transmission.nix"
     "Jellyfin.nix"
-    "Luk-Docs.nix"
-    "Backup.nix"
-    "Wireguard.nix"
+    "Keycloak.nix"
+    "Nextcloud.nix"
+    "HedgeDoc.nix"
+    "Wiki-js.nix"
+
+    # Emily
+    "Syncthing.nix"
+    "YouTrack.nix"
+    "Tandoor.nix"
+    "Get.nix"
+
     "PhotoManagement/PhotoPrism.nix"
     "PhotoManagement/Piwigo.nix"
-    "Tandoor.nix"
-#    "Affine.nix"
+    "PhotoManagement/Ente.nix"
 
-    "Monitoring"
-    "Get.nix"
+    # Others
+    "Luk-Docs.nix"
   ];
 
   keycloak-setup.realm = "Super-Realm";
