@@ -12,6 +12,10 @@ in
   "Affine/Postgres.age".publicKeys = [ ruwusch ];
   "Affine/Redis.age".publicKeys = [ ruwusch ];
 
+  "Ente/Env.age".publicKeys = [ ruwusch ];
+  "Ente/Postgres.age".publicKeys = [ ruwusch ];
+  "Ente/Minio.age".publicKeys = [ ruwusch ];
+
   "HedgeDoc.age".publicKeys = [ ruwusch ];
   "Transmission.age".publicKeys = [ ruwusch ];
   "Luk-Docs.age".publicKeys = [ ruwusch ];

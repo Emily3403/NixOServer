@@ -13,7 +13,7 @@ let
       scheme = "https";
       basic_auth = mkBasicAuth "Prometheus_${hostname}-pw";
       scrape_interval = if metric == "transmission" then "5s" else "30s";  # TODO: Make this configurable from the callee
-      scrape_timeout = "5s";
+      scrape_timeout = if metric == "transmission" then "5s" else "15s";
       static_configs = [{ targets = [ "${hostname}.status.${config.domainName}" ]; }];
     }] ++ acc)) [ ]
       metrics;
@@ -24,7 +24,7 @@ let
       metrics_path = "/${metric}-metrics";
       scheme = "https";
       bearer_token_file = config.age.secrets."Prometheus_${metric}-API-key".path;
-      scrape_interval = "5s";
+      scrape_interval = if metric == "transmission" then "5s" else "30s";
       static_configs = [{ targets = [ "${hostname}.status.${config.domainName}" ]; }];
     }] ++ acc)) [ ]
       metrics;
@@ -58,6 +58,7 @@ in
         cfg = {
           services.prometheus = {
             enable = true;
+            retentionTime = "1y";
             checkConfig = "syntax-only";  # "If you use credentials stored in external files they will not be visible to promtool and it will report errors"
             webExternalUrl = "https://prometheus.${config.domainName}";
 

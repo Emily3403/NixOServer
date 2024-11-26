@@ -122,5 +122,15 @@
       owner = "root";
     };
 
+    Ente_Minio = {
+      file = ../../secrets/Ente/Minio.age;
+      owner = "root";
+    };
+
+    Ente_Postgres = {
+      file = ../../secrets/Ente/Postgres.age;
+      owner = "root";
+    };
+
   };
 }

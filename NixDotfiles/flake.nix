@@ -27,7 +27,15 @@
               config.packageOverrides = pkgs: { vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; }; };
             };
 
-            pkgs-unstable = import nixpkgs-unstable { inherit system; };
+            pkgs-unstable = import nixpkgs-unstable {
+              inherit system;
+              config.packageOverrides = pkgs: { ente-web = pkgs.ente-web.overrideAttrs {
+                env = { NEXT_PUBLIC_ENTE_ENDPOINT="https://api.ente.ruwusch.de"; };
+
+                # The number of max jobs is (currently) hardcoded in the source code. Change it to match a more demanding setting
+                postPatch = ''substituteInPlace apps/photos/src/services/upload/uploadManager.ts --replace-fail "const maxConcurrentUploads = 4;" "const maxConcurrentUploads = 24;"'';
+              }; };
+            };
             pkgs-unfree = import nixpkgs { inherit system; config = { allowUnfree = true; }; };
 
             # make all inputs availabe in other nix files

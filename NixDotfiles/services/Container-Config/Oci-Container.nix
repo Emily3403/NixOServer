@@ -74,9 +74,9 @@ in
   } // additionalContainers;
 
   systemd.tmpfiles.rules = optionals (postgresEnvFile != null) [
-    "d ${dataDir}/postgresql/ 0750 70 70"
-    "d ${dataDir}/postgresql/15/ 0750 70 70"
+    "d ${dataDir}/postgresql/ 0750 71"  # TODO: This currently only works when the top dir is owned by root
+    "d ${dataDir}/postgresql/15/ 0750 71"
   ] ++ optionals (redisEnvFile != null) [
-    "d ${dataDir}/redis/ 0750 999 999"
+    "d ${dataDir}/redis/ 0750 999"
   ];
 }

@@ -1,0 +1,13 @@
+diff --git a/apps/photos/src/services/upload/uploadManager.ts b/apps/photos/src/services/upload/uploadManager.ts
+index 571ce34b9a..67d54e3217 100644
+--- a/web/apps/photos/src/services/upload/uploadManager.ts
++++ b/web/apps/photos/src/services/upload/uploadManager.ts
+@@ -81,7 +81,7 @@ export interface ProgressUpdater {
+ }
+ 
+ /** The number of uploads to process in parallel. */
+-const maxConcurrentUploads = 4;
++const maxConcurrentUploads = 8;
+ 
+ export interface UploadItemWithCollection {
+     localID: number;
