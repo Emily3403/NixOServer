@@ -122,5 +122,15 @@
       owner = "root";
     };
 
+#    Ente = {
+#      file = ../../secrets/Ente/Env.age;
+#      owner = "root";
+#    };
+
+    EntePostgres = {
+      file = ../../secrets/Ente/Postgres.age;
+      owner = "root";
+    };
+
   };
 }

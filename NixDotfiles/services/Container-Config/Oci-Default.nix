@@ -8,6 +8,7 @@ let DATA_DIR = "/data/TODO"; in
         inherit config lib pkgs;
         name = "TODO";
         image = "TODO";
+        dataDir = DATA_DIR;
 
         subdomain = "TODO";
         containerIP = "10.88.TODO.1";
