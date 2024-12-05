@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/utils.sh"
-check_variables DRIVES BOOT_POOL_NAME ROOT_POOL_NAME HOST_TO_INSTALL
+check_variables DRIVES HOST_TO_INSTALL
 
 mkdir -p /mnt/etc/nixos/
 cp -r "$SCRIPT_DIR"/../NixDotfiles/* /mnt/etc/nixos
@@ -25,6 +25,15 @@ sed -i "s|\"bootDevices_placeholder\"|$diskNames|g" \
 
 sed -i "s|\"abcd1234\"|\"$(head -c4 /dev/urandom | od -A none -t x4| sed 's| ||g' || true)\"|g" \
     "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
+
+# Set the root password
+if [ "$ROOT_PASSWORD" = "!" ]; then
+    rootHashPwd="!"
+else
+    check_root_pw
+    rootHashPwd=$(echo "$ROOT_PASSWORD" | mkpasswd -m SHA-512 -s)
+fi
+sed -i "s|rootHash_placeholder|${rootHashPwd}|" "/mnt/etc/nixos/users/root.nix"
 
 SSH_HOST_KEY_LOCATION="/mnt/etc/ssh/ssh_host_ed25519_key"
 SSH_ROOT_DIR="/root/.ssh/"

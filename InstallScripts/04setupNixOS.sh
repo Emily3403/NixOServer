@@ -8,6 +8,11 @@ if ! getent group nixbld > /dev/null; then
     sudo useradd -u 30000 -g nixbld -G nixbld nixbld
 fi
 
+mkdir -p /root/.config/nix
+echo "experimental-features = nix-command flakes
+cores = $(nproc)
+max-jobs = auto" > /root/.config/nix/nix.conf
+
 # Get the Nix package manager, if it isn't yet installed
 if [ ! "$(command -v "nix")" ];
 then

@@ -48,6 +48,23 @@ in
       environmentFiles = [ config.age.secrets.Transmission_Exporter-environment.path ];
     };
 
+    systemd.services.restart-transmission-exporter = {
+      description = "Restart the Transmission exporter";
+      enable = true;
+      script = "systemctl restart podman-transmission-exporter";
+    };
+
+    systemd.timers.restart-transmission-exporter = {
+      description = "Restart the Transmission exporter regularly";
+      enable = true;
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "*-*-* 7:00:00";
+        Persistent = true;
+        RandomizedDelaySec = 10;
+      };
+    };
+
     virtualisation.oci-containers.containers.syncthing-exporter = mkIf cfg.monitoredServices.syncthing {
       image = "f100024/syncthing_exporter:latest";
       ports = [ "127.0.0.1::9093" ];

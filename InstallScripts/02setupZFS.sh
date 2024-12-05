@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+source "$SCRIPT_DIR/utils.sh"
+check_variables DRIVES RAID_LEVEL
+
 check_zpool_status() {
     local pool_name="$1"
 
@@ -25,10 +29,6 @@ convert_dev_names_to_cryptsetup_name() {
     echo "${cryptsetup_names[@]}"
 }
 
-SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
-source "$SCRIPT_DIR/utils.sh"
-check_variables DRIVES RAID_LEVEL BOOT_POOL_NAME ROOT_POOL_NAME
-
 if [ "$NUM_HOT_SPARES" -gt 0 ]; then
     check_variables HOT_SPARES
     spare_bpool="spare $(convert_dev_names_to_cryptsetup_name "part2" "${HOT_SPARES[@]}")"
@@ -38,15 +38,37 @@ else
     spare_rpool=""
 fi
 
-if [[ -n "$LUKS_PASSWORD" ]]; then
-    rpool="$(convert_dev_names_to_cryptsetup_name "part3" "${DRIVES[@]}")"
-else
-    rpool="${DRIVES[*]/%/-part3}"
-fi
+
+
+# Initialize an empty array for storing groups of drives
+bpool_grouped_drives=()
+rpool_grouped_drives=()
+
+# Loop through DRIVES and split into groups
+for ((i = 0; i < ${#DRIVES[@]}; i += NUM_DRIVES)); do
+    bpool_grouped_drives+=("$RAID_LEVEL")
+    rpool_grouped_drives+=("$RAID_LEVEL")
+
+    # Extract a sub-array of size NUM_DRIVES
+    group=("${DRIVES[@]:i:NUM_DRIVES}")
+    for drive in "${group[@]}"; do
+        # Convert the drive into a full path
+        bpool_grouped_drives+=("${drive[*]/%/-part2}")  # Don't encrypt the boot pool
+
+        if [[ -n "$LUKS_PASSWORD" ]]; then
+            rpool_grouped_drives+=("$(convert_dev_names_to_cryptsetup_name "part3" "$drive")")
+        else
+            rpool_grouped_drives+=("${drive[*]/%/-part3}")
+        fi
+    done
+
+done
+
 
 echo -e "\n\nCreating boot pool ..."
 
-zpool create \
+# TODO: Add option to force create if normal create fails
+zpool create -f \
     -o compatibility=grub2 \
     -o ashift=12 \
     -o autotrim=on \
@@ -61,15 +83,14 @@ zpool create \
     -O com.sun:auto-snapshot=true \
     -O mountpoint=/boot \
     -R /mnt \
-    "$BOOT_POOL_NAME" \
-    "$RAID_LEVEL" \
-    "${DRIVES[@]/%/-part2}" \
+    bpool \
+    "${bpool_grouped_drives[@]/#/}" \
     $spare_bpool  # Splitting here is important, otherwise the array will be treated as a single element
 
-check_zpool_status "$BOOT_POOL_NAME"
+check_zpool_status bpool
 echo -e "\nCreating root pool ..."
 
-zpool create \
+zpool create -f \
     -o ashift=12 \
     -o autotrim=on \
     -O acltype=posixacl \
@@ -83,32 +104,30 @@ zpool create \
     -O com.sun:auto-snapshot=true \
     -O mountpoint=/ \
     -R /mnt \
-    "$ROOT_POOL_NAME" \
-    "$RAID_LEVEL" \
-    $rpool \
+    rpool \
+    "${rpool_grouped_drives[@]/#/}" \
     $spare_rpool  # Splitting here is important, otherwise the array will be treated as a single element
 
-check_zpool_status "$ROOT_POOL_NAME"
+check_zpool_status rpool
 
-zfs create -o canmount=off -o mountpoint=none "$ROOT_POOL_NAME"/nixos
-zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/root
-zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/var
-zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/var/lib
-zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/var/log
-zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/home -O \
-    com.sun:auto-snapshot=false  # Disable auto-snapshotting of user-data as my home directories contain backups and they do their own versioning
+zfs create -o canmount=off -o mountpoint=none rpool/nixos
+zfs create -o mountpoint=legacy rpool/nixos/root
+zfs create -o mountpoint=legacy rpool/nixos/var
+zfs create -o mountpoint=legacy rpool/nixos/var/lib
+zfs create -o mountpoint=legacy rpool/nixos/var/log
+zfs create -o mountpoint=legacy rpool/nixos/home -o com.sun:auto-snapshot=false  # Disable auto-snapshotting of user-data as my home directories contain backups and they do their own versioning
 
-zfs create -o mountpoint=none "$BOOT_POOL_NAME"/nixos
-zfs create -o mountpoint=legacy "$BOOT_POOL_NAME"/nixos/root
-zfs create -o mountpoint=legacy "$ROOT_POOL_NAME"/nixos/empty
+zfs create -o mountpoint=none bpool/nixos
+zfs create -o mountpoint=legacy bpool/nixos/root
+zfs create -o mountpoint=legacy rpool/nixos/empty
 
-mount -t zfs "$ROOT_POOL_NAME"/nixos/root /mnt/
+mount -t zfs rpool/nixos/root /mnt/
 mkdir /mnt/home
 mkdir /mnt/boot
-mount -t zfs "$ROOT_POOL_NAME"/nixos/home /mnt/home
-mount -t zfs "$BOOT_POOL_NAME"/nixos/root /mnt/boot
+mount -t zfs rpool/nixos/home /mnt/home
+mount -t zfs bpool/nixos/root /mnt/boot
 
-zfs snapshot "$ROOT_POOL_NAME"/nixos/empty@start
+zfs snapshot rpool/nixos/empty@start
 
 for disk in "${DRIVES[@]}"; do
     mkdir -p /mnt/boot/efis/"${disk##*/}"-part1

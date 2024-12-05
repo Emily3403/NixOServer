@@ -1,16 +1,3 @@
-# Services that should exist:
-# - Jellyfin
-# - Transmission-openvpn (docker)  (4TB – 8TB)
-# - openvpn compatible vpn
-#    - Bonus: Able to use mulvad
-# - Some form of cloud, probably Nextcloud  (4TB)
-#   - WebDAV, different Users, Calendar, Version control
-#   - Client _has_ to be able to check for metered connection
-#   - Stores the data encrypted
-# - Central identity management with Keycloak
-# - isisdl compressed videos    (2TB)
-
-
 { config, modulesPath, pkgs, pkgs-unfree, lib, ... }: {
   zfs-root = {
     boot = {
@@ -23,14 +10,12 @@
         enable = true;
         authorizedKeys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj"
         ];
       };
     };
   };
 
-  # This option is discouraged, however in all scenarios we want to import the root anymays as there is no other way of solving the problem
-  boot.zfs.forceImportRoot = lib.mkForce true;
+  boot.zfs.forceImportRoot = false;
 
   services.zfs = {
     autoSnapshot = {
@@ -65,13 +50,15 @@
     "usb_storage"
     "usbhid"
 
-    # Hetzner Specific
+    # Server Specific
+    "ehci_pci"
     "ata_piix"
+    "uhci_hcd"
+    "hpsa"
     "kvm-intel"
-
-    # Transmission
-    "tun"
   ];
+
+  boot.kernelModules = [ "kv-intel" ];
 
   boot.kernelParams = [
     "zfs.zfs_arc_max=103079215104"
@@ -79,10 +66,7 @@
     "zfs.zfs_arc_meta_limit=51539607552"
   ];
 
-  networking = {
-    hostName = "ruwusch";
-    hostId = "abcd1234";
-  };
+
 
   time.timeZone = "Europe/Berlin";
 
@@ -96,7 +80,6 @@
 
   monitoredServices = {
     prometheus = true;
-    transmission = true;
     syncthing = true;
     nextcloud = true;
   };

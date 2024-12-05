@@ -3,7 +3,7 @@
 # TODO: Failsafe if /dev/disk/by-id/ does not contain any drives
 
 # Find all drives using /dev/disk/by-id and store the names in a variable
-drive_names=$(find /dev/disk/by-id -type l -not -name "*part*" -name "ata*")
+drive_names=$(find /dev/disk/by-id -type l -not -name "*part*" -name "wwn*")
 
 # Check if the drives are not mounted
 unmounted_drives=()
@@ -16,7 +16,7 @@ for drive in $drive_names; do
 done
 
 # Check if the number of found drives is less than the desired number
-if [ "${#unmounted_drives[@]}" -lt "$NUM_DRIVES" ]; then
+if [ "${#unmounted_drives[@]}" -lt "$((NUM_DRIVES * NUM_VDEVS))" ]; then
     echo "Error: Not enough unmounted drives found. Expected: $NUM_DRIVES, found: ${#unmounted_drives[@]}"
     exit 1
 fi
@@ -24,11 +24,11 @@ fi
 # Sort drives by size and select the $NUM_DRIVES biggest drives
 selected_drives=()
 selected_hot_spares=()
-for device in $(lsblk -lnbdo NAME,SIZE | sort -k2,2nr | awk '{print "/dev/"$1}' | head -n "$NUM_DRIVES"); do
+for device in $(lsblk -lnbdo NAME,SIZE | sort -k2,2nr | awk '{print "/dev/"$1}' | head -n "$((NUM_DRIVES * NUM_VDEVS))"); do
     for drive_id in "${unmounted_drives[@]}"; do
         device_path=$(readlink -f "$drive_id")
         if [ "$device_path" == "$device" ]; then
-            if [ "${#selected_drives[@]}" -lt $(("$NUM_DRIVES" - "$NUM_HOT_SPARES")) ]; then
+            if [ "${#selected_drives[@]}" -lt $(("$NUM_DRIVES" * "$NUM_VDEVS" - "$NUM_HOT_SPARES")) ]; then
                 selected_drives+=("$drive_id")
             else
                 selected_hot_spares+=("$drive_id")

@@ -4,7 +4,7 @@
   description = "NixOS Server on ZFS";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/master";
     agenix = {
       url = "github:ryantm/agenix";
@@ -63,6 +63,7 @@
     {
       nixosConfigurations = {
         ruwusch = mkHost "ruwusch" "23.11" "x86_64-linux";
+        nixie = mkHost "nixie" "24.11" "x86_64-linux";
       };
 
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;

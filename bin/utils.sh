@@ -21,3 +21,12 @@ check_host_exists() {
         exit 1
     fi
 }
+
+check_root_pw() {
+    if [ -z "$ROOT_PASSWORD" ]; then
+        echo "Please set the ROOT_PASSWORD environment variable"
+        exit 1
+    fi
+}
+
+check_root_pw

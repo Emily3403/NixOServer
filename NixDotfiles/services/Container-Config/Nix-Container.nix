@@ -39,9 +39,8 @@ in
 {
   imports = imports ++ nginxImport;
 
-  hardware.opengl = mkIf enableHardwareTranscoding {
+  hardware.graphics = mkIf enableHardwareTranscoding {
     enable = true;
-    driSupport = true;
     extraPackages = [ pkgs.intel-media-driver ];
   };
 
@@ -63,9 +62,8 @@ in
           networking.firewall.allowedTCPPorts = [ containerPort ];
           imports = [ ../../users/root.nix ../../system.nix ] ++ imports ++ pgImport;
 
-          hardware.opengl = mkIf enableHardwareTranscoding {
+          hardware.graphics = mkIf enableHardwareTranscoding {
             enable = true;
-            driSupport = true;
             extraPackages = [ pkgs.intel-media-driver ];
           };
         }

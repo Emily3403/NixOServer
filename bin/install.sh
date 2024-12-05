@@ -15,6 +15,11 @@ fi
 
 set -e
 
+# Install dotfiles early on
+mkdir -p "$HOME/.config/fish" "$HOME/.config/btop"
+wget --inet4-only https://raw.githubusercontent.com/Emily3403/configAndDotfiles/main/roles/shell/tasks/dotfiles/fish/config.fish -O "$HOME/.config/fish/config.fish"
+wget --inet4-only https://raw.githubusercontent.com/Emily3403/configAndDotfiles/main/roles/shell/tasks/dotfiles/btop/btop.conf -O "$HOME/.config/btop/btop.conf"
+
 check_dependency() {
     command -v "$1" > /dev/null 2>&1 || {
         echo >&2 "Error: The required command '$1' is not installed. Please install it and try again."
