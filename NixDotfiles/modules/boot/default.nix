@@ -127,7 +127,7 @@ in
     (mkIf cfg.sshUnlock.enable {
 
       boot = {
-        kernelParams = [ "ip=dhcp" ];
+        kernelParams = [ "ip=130.149.220.19::130.149.220.126:255.255.255.128::ens2f0:off" ];
         initrd = {
           availableKernelModules = [ "e1000e" ];
 

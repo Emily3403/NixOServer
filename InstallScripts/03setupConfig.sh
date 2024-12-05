@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/utils.sh"
-check_variables DRIVES BOOT_POOL_NAME ROOT_POOL_NAME HOST_TO_INSTALL
+check_variables DRIVES HOST_TO_INSTALL
 
 mkdir -p /mnt/etc/nixos/
 cp -r "$SCRIPT_DIR"/../NixDotfiles/* /mnt/etc/nixos

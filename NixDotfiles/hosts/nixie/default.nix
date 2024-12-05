@@ -23,14 +23,13 @@
         enable = true;
         authorizedKeys = [
           "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj"
         ];
       };
     };
   };
 
   # This option is discouraged, however in all scenarios we want to import the root anymays as there is no other way of solving the problem
-  boot.zfs.forceImportRoot = lib.mkForce true;
+  boot.zfs.forceImportRoot = false;
 
   services.zfs = {
     autoSnapshot = {
@@ -65,13 +64,15 @@
     "usb_storage"
     "usbhid"
 
-    # Hetzner Specific
+    # Server Specific
+    "ehci_pci"
     "ata_piix"
+    "uhci_hcd"
+    "hpsa"
     "kvm-intel"
-
-    # Transmission
-    "tun"
   ];
+
+  boot.kernelModules = [ "kv-intel" ];
 
   boot.kernelParams = [
     "zfs.zfs_arc_max=103079215104"
@@ -80,7 +81,7 @@
   ];
 
   networking = {
-    hostName = "ruwusch";
+    hostName = "nixie";
     hostId = "abcd1234";
   };
 
@@ -96,7 +97,6 @@
 
   monitoredServices = {
     prometheus = true;
-    transmission = true;
     syncthing = true;
     nextcloud = true;
   };

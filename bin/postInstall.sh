@@ -28,7 +28,7 @@ git -C "$SCRIPT_DIR" config pull.rebase true
 mkdir -p /root/.config/nix
 echo "experimental-features = nix-command flakes
 cores = $(nproc)
-max-jobs = 2" > /root/.config/nix/nix.conf
+max-jobs = auto" > /root/.config/nix/nix.conf
 
 # Move and symlink the Nix directory
 cp -r /etc/nixos /etc/_backup-nixos
