@@ -26,6 +26,12 @@ let DATA_DIR = "/data/Grafana"; in
           "${config.age.secrets.Prometheus_ruwusch-pw.path}".hostPath = config.age.secrets.Prometheus_ruwusch-pw.path;
         };
 
+        additionalNginxConfig.extraConfig = ''
+          proxy_read_timeout 3600;
+          proxy_connect_timeout 3600;
+          proxy_send_timeout 3600;
+        '';
+
         cfg = {
           services.grafana = {
             enable = true;
@@ -47,10 +53,15 @@ let DATA_DIR = "/data/Grafana"; in
                 user = "grafana";
               };
 
+              dataproxy = {
+                timeout = 3600;
+                dialTimeout = 3600;
+                idle_conn_timeout_seconds = 3600;
+              };
+
               security = {
                 admin_user = "admin";
                 admin_password = "$__file{${config.age.secrets.Grafana_admin-pw.path}}";
-#                admin_email = "admins@inet.tu-berlin.de";
 
                 secret_key = "$__file{${config.age.secrets.Grafana_secret-key.path}}";
                 cookie_secure = true;
@@ -82,10 +93,16 @@ let DATA_DIR = "/data/Grafana"; in
                     access = "proxy";
                     url = "https://prometheus.${config.domainName}";
                     isDefault = true;
+
                     jsonData = {
                       basicAuth = true;
                       basicAuthUser = "admin";
+
+                      timeout = "1h";
+                      queryTimeout = "1h";
+                      timeInterval = "5s";
                     };
+
                     secureJsonData = {
                       basicAuthPassword = "$__file{${config.age.secrets.Prometheus_ruwusch-pw.path}}";
                     };

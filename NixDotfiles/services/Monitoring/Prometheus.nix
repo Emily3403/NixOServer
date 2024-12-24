@@ -55,6 +55,13 @@ in
           "${config.age.secrets.Prometheus_photoprism-API-key.path}".hostPath = config.age.secrets.Prometheus_photoprism-API-key.path;
         };
 
+        # Increase the wait timeout for grafana, because ruwusch is really slow
+        additionalNginxConfig.extraConfig = ''
+          proxy_read_timeout 3600;
+          proxy_connect_timeout 3600;
+          proxy_send_timeout 3600;
+        '';
+
         cfg = {
           services.prometheus = {
             enable = true;
