@@ -132,5 +132,10 @@
       owner = "root";
     };
 
+    Stirling-PDF = {
+      file = ../../secrets/Stirling-PDF.age;
+      owner = "1000";
+    };
+
   };
 }

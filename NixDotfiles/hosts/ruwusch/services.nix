@@ -24,6 +24,9 @@
     "PhotoManagement/Piwigo.nix"
     "PhotoManagement/Ente.nix"
 
+    # Carsten
+    "Stirling-PDF.nix"
+
     # Others
     "Luk-Docs.nix"
   ];

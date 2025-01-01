@@ -23,6 +23,7 @@ in
   "PhotoPrism.age".publicKeys = [ ruwusch ];
   "Tandoor.age".publicKeys = [ ruwusch ];
   "Piwigo-Mariadb.age".publicKeys = [ ruwusch ];
+  "Stirling-PDF.age".publicKeys = [ ruwusch ];
 
   "SSHKeys/wiki-js.age".publicKeys = [ ruwusch ];
 

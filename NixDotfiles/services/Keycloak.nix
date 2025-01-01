@@ -40,6 +40,8 @@ let DATA_DIR = "/data/Keycloak"; in
 
             "/" = {
               proxyPass = "http://192.168.7.101:80";
+
+              # Only allow requests from localhost, use `ssh -L 8080:localhost:443 <server>`
               extraConfig = ''
                 satisfy any;
                   allow ::1;

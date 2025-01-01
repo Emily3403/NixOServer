@@ -72,5 +72,6 @@
     mediainfo
     termshark
     trippy
+    smartmontools
   ];
 }
