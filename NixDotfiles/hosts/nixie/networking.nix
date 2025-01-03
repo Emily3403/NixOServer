@@ -4,14 +4,14 @@
 
   networking = {
     hostName = "nixie";
-    hostId = "abcd1234";
+    hostId = "abcd1234";  # TODO: Set this manually
     useDHCP = false;
 
     nameservers = [ "1.1.1.1" "8.8.8.8" ];
     timeServers = [ "0.nixos.pool.ntp.org" "1.nixos.pool.ntp.org" "2.nixos.pool.ntp.org" "3.nixos.pool.ntp.org" ];
 
-    firewall.allowedTCPPorts = [ 22 80 443 22000 ];
-    firewall.allowedUDPPorts = [ 21027 22000 ];
+    firewall.allowedTCPPorts = [ 22 80 443 ];
+    firewall.allowedUDPPorts = [ ];
 
     defaultGateway = {
       interface = "enp7s0f0";
@@ -39,7 +39,7 @@
       };
     };
 
-    # For the nixos-containers
+    # For the nixos-containers and wireguard
     nat = {
       enable = true;
       internalInterfaces = [ "ve-+" "wg0" ];

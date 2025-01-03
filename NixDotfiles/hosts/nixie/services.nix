@@ -5,23 +5,26 @@
 #    "Backup.nix"
 #    "Monitoring"
 #    "Wireguard.nix"
-#
+
 #    # Core Services
 #    "Keycloak.nix"
 #    "Nextcloud.nix"
 #    "HedgeDoc.nix"
 #    "Wiki-js.nix"
-#
+
 #    # Emily
-#    "Syncthing.nix"
+    "Syncthing.nix"
 #    "YouTrack.nix"
 #    "Tandoor.nix"
 #    "Get.nix"
-#
+
 #    "PhotoManagement/PhotoPrism.nix"
 #    "PhotoManagement/Piwigo.nix"
 #    "PhotoManagement/Ente.nix"
   ];
 
-  keycloak-setup.realm = "Emily-Realm";
+  keycloak-setup = {
+    subdomain = "auth";
+    realm = "Emily-Realm";
+  };
 }

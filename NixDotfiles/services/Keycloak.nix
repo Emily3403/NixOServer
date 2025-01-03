@@ -10,11 +10,14 @@ let DATA_DIR = "/data/Keycloak"; in
     (
       import ./Container-Config/Nix-Container.nix {
         inherit config lib pkgs;
-        name = "keycloak";
-        containerIP = "192.168.7.101";
-        containerPort = 80;
 
-        imports = [ ../users/services/keycloak.nix ];
+        name = "keycloak";
+        subdomain = "auth";
+        containerID = 2;
+
+        containerPort = 80;
+        subdomain = config.keycloak-setup.subdomain;
+
         bindMounts = {
           "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.Keycloak_DatabasePassword.path}".hostPath = config.age.secrets.Keycloak_DatabasePassword.path;
@@ -25,11 +28,11 @@ let DATA_DIR = "/data/Keycloak"; in
         };
         additionalNginxLocationConfig.extraConfig = ''
           proxy_busy_buffers_size   512k;
-          proxy_buffers   4 512k;
-          proxy_buffer_size   256k;
+          proxy_buffers           4 512k;
+          proxy_buffer_size         256k;
         '';
 
-        additionalNginxHostConfig."${"keycloak-admin"}.${config.domainName}" = {
+        additionalNginxHostConfig."${config.keycloak-setup.subdomain}-admin"."${config.domainName}" = {
           forceSSL = true;
           enableACME = true;
 
@@ -55,8 +58,8 @@ let DATA_DIR = "/data/Keycloak"; in
             enable = true;
 
             settings = {
-              hostname = "keycloak.${config.domainName}";
-              hostname-admin = "keycloak-admin.${config.domainName}";
+              hostname = "${config.keycloak-setup.subdomain}.${config.domainName}";
+              hostname-admin = "${config.keycloak-setup.subdomain}-admin.${config.domainName}";
 
               hostname-strict-backchannel = true;
               proxy = "edge";
