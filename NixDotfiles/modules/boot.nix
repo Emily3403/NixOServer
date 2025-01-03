@@ -12,11 +12,13 @@ in
       type = types.bool;
       default = true;
     };
+
     luks.enable = mkOption {
       description = "Use luks encryption";
       type = types.bool;
       default = false;
     };
+
     devNodes = mkOption {
       description = "Specify where to discover ZFS pools";
       type = types.str;
@@ -26,15 +28,18 @@ in
         x;
       default = "/dev/disk/by-id/";
     };
+
     bootDevices = mkOption {
       description = "Specify boot devices";
       type = types.nonEmptyListOf types.str;
     };
+
     removableEfi = mkOption {
       description = "install bootloader to fallback location";
       type = types.bool;
       default = true;
     };
+
     partitionScheme = mkOption {
       default = {
         biosBoot = "-part5";
@@ -46,17 +51,18 @@ in
       description = "Describe on disk partitions";
       type = types.attrsOf types.str;
     };
+
     sshUnlock = {
       enable = mkOption {
         type = types.bool;
         default = false;
       };
+
       authorizedKeys = mkOption {
         type = types.listOf types.str;
         default = [ ];
       };
     };
-
   };
 
   config = mkIf (cfg.enable) (mkMerge [
@@ -84,12 +90,10 @@ in
 
     {
       zfs-root.fileSystems = {
-        efiSystemPartitions =
-          (map (diskName: diskName + cfg.partitionScheme.efiBoot)
-            cfg.bootDevices);
-        swapPartitions =
-          (map (diskName: diskName + cfg.partitionScheme.swap) cfg.bootDevices);
+        efiSystemPartitions = (map (diskName: diskName + cfg.partitionScheme.efiBoot) cfg.bootDevices);
+        swapPartitions = (map (diskName: diskName + cfg.partitionScheme.swap) cfg.bootDevices);
       };
+
       boot = {
         supportedFilesystems = { zfs = true; };
         zfs = {
@@ -101,8 +105,7 @@ in
           generationsDir.copyKernels = true;
           efi = {
             canTouchEfiVariables = (if cfg.removableEfi then false else true);
-            efiSysMountPoint = ("/boot/efis/" + (head cfg.bootDevices)
-              + cfg.partitionScheme.efiBoot);
+            efiSysMountPoint = ("/boot/efis/" + (head cfg.bootDevices) + cfg.partitionScheme.efiBoot);
           };
 
           grub = {

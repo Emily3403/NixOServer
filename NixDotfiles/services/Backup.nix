@@ -9,10 +9,11 @@
     description = "Backup all PostgreSQL containers";
     wantedBy = [ "multi-user.target" ];
     path = [ "/run/current-system/sw" ];
+    restartIfChanged = false;
+
     serviceConfig = {
       Type = "oneshot";
       User = "root";
-
       ExecStart = "/root/NixOServer/FunctionScripts/dump_postgres.sh";
     };
   };

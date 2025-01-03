@@ -1,9 +1,9 @@
 { pkgs, config, options, lib, ... }:
 let
-  inherit (lib) mkIf;
-  cfg = config;
+  inherit (lib) mkIf mkOption types;
+  ncfg = config.host.services.nextcloud;
+  kcfg = config.host.services.keycloak;
 
-  DATA_DIR = "/data/Nextcloud";
   nginxConfig = ''
     client_body_buffer_size 400M;
     proxy_max_temp_file_size 10024m;
@@ -14,72 +14,83 @@ let
   '';
 in
 {
-  systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 nextcloud"
-    "d ${DATA_DIR}/nextcloud 0750 nextcloud"
-    "d ${DATA_DIR}/postgresql 0750 postgres"
-  ];
+  options.host.services.nextcloud = {
+    dataDir = mkOption {
+      type = types.str;
+      default = "/data/Nextcloud";
+    };
+
+    subdomain = mkOption {
+      type = types.str;
+      default = "cloud";
+    };
+
+    enableExporter = mkOption {
+      type = types.bool;
+      default = true;
+    };
+  };
+
+  config = {
+    systemd.tmpfiles.rules = [
+      "d ${ncfg.dataDir} 0750 nextcloud"
+      "d ${ncfg.dataDir}/nextcloud 0750 nextcloud"
+      "d ${ncfg.dataDir}/postgresql 0750 postgres"
+    ];
+
+    age.secrets.Nextcloud_admin-password = {
+      file = ../secrets/nixie/Nextcloud/admin-password.age;
+      owner = "nextcloud";
+    };
+
+    age.secrets.Nexcloud_keycloak-client-secret = {
+      file = ../secrets/nixie/Nextcloud/keycloak-client-secret.age;
+      owner = "nextcloud";
+    };
+
+    age.secrets.Nextcloud_exporter-tokenfile = mkIf ncfg.enableExporter {
+      file = ../secrets/nixie/Monitoring/Exporters/Nextcloud-Token.age;
+      owner = "nextcloud-exporter";
+    };
+  };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
         inherit config lib pkgs;
+
         name = "nextcloud";
-        subdomain = "cloud";
-        containerIP = "192.168.7.103";
+        subdomain = ncfg.subdomain;
+        containerID = 3;
         containerPort = 80;
+        isSystemUser = true;
 
         postgresqlName = "nextcloud";
-        imports = [ ../users/services/nextcloud.nix ];
-
         additionalNginxConfig.extraConfig = "client_max_body_size 200G;" + nginxConfig;
-        additionalNginxHostConfig."pics.${config.domainName}" = {
-          forceSSL = true;
-          enableACME = true;
-          globalRedirect = "cloud.${config.domainName}/apps/memories";
-        };
-
-        enableHardwareTranscoding = true;
 
         bindMounts = {
-          "/var/lib/nextcloud" = { hostPath = "${DATA_DIR}/nextcloud"; isReadOnly = false; };
-          "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
-          "${config.age.secrets.Nextcloud_AdminPassword.path}".hostPath = config.age.secrets.Nextcloud_AdminPassword.path;
-          "${config.age.secrets.Nexcloud_KeycloakClientSecret.path}".hostPath = config.age.secrets.Nexcloud_KeycloakClientSecret.path;
-          "${config.age.secrets.Nextcloud_Exporter-tokenfile.path}".hostPath = config.age.secrets.Nextcloud_Exporter-tokenfile.path;
+          "/var/lib/nextcloud" = { hostPath = "${ncfg.dataDir}/nextcloud"; isReadOnly = false; };
+          "/var/lib/postgresql" = { hostPath = "${ncfg.dataDir}/postgresql"; isReadOnly = false; };
+          "${config.age.secrets.Nextcloud_admin-password.path}".hostPath = config.age.secrets.Nextcloud_admin-password.path;
+          "${config.age.secrets.Nexcloud_keycloak-client-secret.path}".hostPath = config.age.secrets.Nexcloud_keycloak-client-secret.path;
+        } // lib.optionalAttrs ncfg.enableExporter {
+          "${config.age.secrets.Nextcloud_exporter-tokenfile.path}".hostPath = config.age.secrets.Nextcloud_exporter-tokenfile.path;
         };
 
         cfg = {
-          services.nginx.virtualHosts."cloud.${config.domainName}".extraConfig = nginxConfig;
-
-          # Memories app
-          environment.systemPackages = with pkgs; [ exiftool jellyfin-ffmpeg perl nodejs ];
-          systemd.services.nextcloud-cron = {
-            path = [ pkgs.perl pkgs.exiftool pkgs.jellyfin-ffmpeg ];
-          };
-
-          systemd.services."phpfpm-nextcloud".serviceConfig = {
-            PrivateDevices = lib.mkForce false;
-            SupplementaryGroups = [ "render" "video" ];
-          };
-
-          services.imaginary = {
-            enable = true;
-            settings.return-size = true;
-          };
+          services.nginx.virtualHosts."${ncfg.subdomain}.${config.host.networking.domainName}".extraConfig = nginxConfig;
 
           services.nextcloud = {
             enable = true;
-            package = pkgs.nextcloud29;
-            datadir = "/var/lib/nextcloud";
-            hostName = "cloud.${config.domainName}";
+            package = pkgs.nextcloud30;
+            hostName = "${ncfg.subdomain}.${config.host.networking.domainName}";
             https = true;
             maxUploadSize = "200G";
-            secretFile = config.age.secrets.Nexcloud_KeycloakClientSecret.path;
+            secretFile = config.age.secrets.Nexcloud_keycloak-client-secret.path;
 
             config = {
               adminuser = "admin";
-              adminpassFile = config.age.secrets.Nextcloud_AdminPassword.path;
+              adminpassFile = config.age.secrets.Nextcloud_admin-password.path;
 
               dbtype = "pgsql";
               dbhost = "/run/postgresql";
@@ -111,24 +122,22 @@ in
             appstoreEnable = true;
             extraAppsEnable = true;
 
-            autoUpdateApps.enable = true;
+            autoUpdateApps.enable = false;
             autoUpdateApps.startAt = "05:00:00";
 
             extraApps = {
-              inherit (pkgs.nextcloud29Packages.apps)
+              inherit (pkgs.nextcloud30Packages.apps)
                 calendar
                 contacts
-                deck
 #                files_markdown  # Not supported: https://github.com/icewind1991/files_markdown/issues/218
                 groupfolders
-                memories
-                notes
-                onlyoffice
+                # phonetrack  # TODO: Look into this
+                onlyoffice  # TODO: Documentserver
                 ;
 
               oidc_login = pkgs.fetchNextcloudApp rec {
-                url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v3.1.1/oidc_login.tar.gz";
-                sha256 = "sha256-EVHDDFtz92lZviuTqr+St7agfBWok83HpfuL6DFCoTE=";
+                url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v3.2.0/oidc_login.tar.gz";
+                sha256 = "141xkbvrwmhgmcicpd9g86jmhihqrp50ijmhgl4n9ksc8cldmdhf";  # get this with `nix-prefetch-url {url}`
                 license = "agpl3Only";
               };
             };
@@ -138,11 +147,11 @@ in
               loglevel = 1;
               overwriteprotocol = "https";
               default_phone_region = "DE";
-              trusted_proxies = [ config.containerHostIP ];
+              trusted_proxies = [ config.host.networking.containerHostIP ];
 
               # Behaviour of OpenID Connect with Keycloak
-              oidc_login_provider_url = "https://${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}/realms/${config.keycloak-setup.realm}";
-              oidc_login_logout_url = "https://cloud.${config.domainName}/apps/oidc_login/oidc";
+              oidc_login_provider_url = "https://${kcfg.subdomain}.${kcfg.domain}/realms/${kcfg.realm}";
+              oidc_login_logout_url = "https://${ncfg.subdomain}.${config.host.networking.domainName}/apps/oidc_login/oidc";
               oidc_login_client_id = "Nextcloud";
 
               oidc_login_auto_redirect = true;
@@ -191,26 +200,7 @@ in
               # Calendar
               calendarSubscriptionRefreshRate = "PT1H";
               maintenance_window_start = "1";
-
-              preview_imaginary_url = "http://localhost:8088";
-              enabledPreviewProviders = [
-                "OC\\Preview\\BMP"
-                "OC\\Preview\\GIF"
-                "OC\\Preview\\JPEG"
-                "OC\\Preview\\PNG"
-                "OC\\Preview\\Movie"
-                "OC\\Preview\\Imaginary"
-              ];
-
             };
-
-            # Memories – This has to be done like this because otherwise, an array would be created which the config does not like
-            settings."memories.exiftool" = "${lib.getExe pkgs.exiftool}";
-            settings."memories.exiftool_no_local" = true;
-            settings."memories.vod.path" = "/var/lib/nextcloud/store-apps/memories/bin-ext/go-vod-amd64";
-            settings."memories.vod.ffmpeg" = "${pkgs.jellyfin-ffmpeg}/bin/ffmpeg";
-            settings."memories.vod.ffprobe" = "${pkgs.jellyfin-ffmpeg}/bin/ffprobe";
-
           };
 
           systemd.services."nextcloud-setup" = {
@@ -218,11 +208,10 @@ in
             after = [ "postgresql.service" ];
           };
 
-
-          services.prometheus.exporters.nextcloud = mkIf config.monitoredServices.nextcloud {
+          services.prometheus.exporters.nextcloud = mkIf ncfg.enableExporter {
             enable = true;
-            url = "https://cloud.${config.domainName}";
-            tokenFile = config.age.secrets.Nextcloud_Exporter-tokenfile.path;
+            url = "https://${ncfg.subdomain}.${config.host.networking.domainName}";
+            tokenFile = config.age.secrets.Nextcloud_exporter-tokenfile.path;
             openFirewall = true;
           };
         };

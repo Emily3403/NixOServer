@@ -1,23 +1,105 @@
 { pkgs, config, lib, ... }:
-let DATA_DIR = "/data/Keycloak"; in
+let
+  cfg = config.host.services.keycloak;
+  inherit (lib) mkIf mkOption types;
+  format = pkgs.formats.json { };
+in
 {
-  systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 keycloak"
-    "d ${DATA_DIR}/postgresql 0750 postgres"
-  ];
+  options.host.services.keycloak = {
+    dataDir = mkOption {
+      type = types.str;
+      default = "/data/Keycloak";
+    };
+
+    subdomain = mkOption {
+      type = types.str;
+      default = "auth";
+    };
+
+    enableExporter = mkOption {
+      type = types.bool;
+      default = true;
+    };
+
+    domain = mkOption {
+      type = types.str;
+      default = config.host.networking.domainName;
+      description = "The domain name for the Keycloak instance, used by other services";
+    };
+
+    name = mkOption {
+      type = types.str;
+      default = "Keycloak";
+    };
+
+    realm = mkOption {
+      type = types.str;
+      default = "master";
+    };
+
+    attributeMapper =
+    let
+      options = {
+
+        username = mkOption {
+          type = types.str;
+          default = "preferred_username";
+          description = "The attribute for the username.";
+        };
+
+        name = mkOption {
+          type = types.str;
+          default = "name";
+        };
+
+        email = mkOption {
+          type = types.str;
+          default = "email";
+        };
+
+        groups = mkOption {
+          type = types.str;
+          default = "groups";
+        };
+
+      };
+    in
+      mkOption
+      {
+          type = types.submodule {
+            freeformType = format.type;
+            inherit options;
+          };
+          default = { };
+      };
+  };
+
+  config = {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0750 keycloak"
+      "d ${cfg.dataDir}/postgresql 0750 postgres"
+    ];
+
+    age.secrets.Keycloak_database-pw = {
+      file = ../secrets/nixie/Keycloak.age;
+      owner = "keycloak";
+    };
+  };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
         inherit config lib pkgs;
+
         name = "keycloak";
-        containerIP = "192.168.7.101";
+        subdomain = cfg.subdomain;
+        containerID = 2;
+
         containerPort = 80;
 
-        imports = [ ../users/services/keycloak.nix ];
         bindMounts = {
-          "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
-          "${config.age.secrets.Keycloak_DatabasePassword.path}".hostPath = config.age.secrets.Keycloak_DatabasePassword.path;
+          "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
+          "${config.age.secrets.Keycloak_database-pw.path}".hostPath = config.age.secrets.Keycloak_database-pw.path;
         };
 
         additionalNginxConfig.locations = {
@@ -25,11 +107,11 @@ let DATA_DIR = "/data/Keycloak"; in
         };
         additionalNginxLocationConfig.extraConfig = ''
           proxy_busy_buffers_size   512k;
-          proxy_buffers   4 512k;
-          proxy_buffer_size   256k;
+          proxy_buffers           4 512k;
+          proxy_buffer_size         256k;
         '';
 
-        additionalNginxHostConfig."${"keycloak-admin"}.${config.domainName}" = {
+        additionalNginxHostConfig."${config.host.services.keycloak.subdomain}-admin.${config.host.networking.domainName}" = {
           forceSSL = true;
           enableACME = true;
 
@@ -38,8 +120,9 @@ let DATA_DIR = "/data/Keycloak"; in
               # Allow access to the .well-known path for ACME challenge validation
             };
 
+            # Only allow requests from localhost, use `ssh -L 8080:localhost:443 <server>` and a custom entry in /etc/hosts to point the url to localhost
             "/" = {
-              proxyPass = "http://192.168.7.101:80";
+              proxyPass = "http://192.168.7.3:80";
               extraConfig = ''
                 satisfy any;
                   allow ::1;
@@ -51,25 +134,31 @@ let DATA_DIR = "/data/Keycloak"; in
         };
 
         cfg = {
+          systemd.services.keycloak.environment.KC_BOOTSTRAP_ADMIN_USERNAME = lib.mkForce "temp-admin";
+
           services.keycloak = {
             enable = true;
 
             settings = {
-              hostname = "keycloak.${config.domainName}";
-              hostname-admin = "keycloak-admin.${config.domainName}";
+              hostname = "https://${config.host.services.keycloak.subdomain}.${config.host.networking.domainName}";
+              hostname-admin = "https://${config.host.services.keycloak.subdomain}-admin.${config.host.networking.domainName}";
+              log = "console";
 
-              hostname-strict-backchannel = true;
-              proxy = "edge";
+              http-enabled = "true";
+              proxy-headers = "xforwarded";
+              proxy-trusted-addresses = config.host.networking.containerHostIP;
+
+#              metrics-enabled = true;  # TODO
             };
 
-            database.passwordFile = config.age.secrets.Keycloak_DatabasePassword.path;
-            initialAdminPassword = "changeme"; # TODO: Change this
+            database.passwordFile = config.age.secrets.Keycloak_database-pw.path;
+            initialAdminPassword = "changeme";
 
             themes.keywind = pkgs.stdenv.mkDerivation rec {
               name = "keywind";
               src = fetchGit {
                 url = "https://github.com/lukin/keywind";
-                rev = "6e5ef061bfdaafd7d22a3c812104ffe42aaa55b8";
+                rev = "bdf966fdae0071ccd46dab4efdc38458a643b409";
               };
               installPhase = ''
                 mkdir -p $out

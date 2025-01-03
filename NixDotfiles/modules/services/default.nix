@@ -1,19 +1,5 @@
-{ config, lib, pkgs, ... }:
-let
-  inherit (lib) types mkOption;
-  format = pkgs.formats.json { };
-in
-{
-  imports = [ ./Keycloak.nix ./Monitoring.nix ];
-
-  options.domainName = mkOption {
-    type = types.str;
-    description = "Domain name to be used";
-  };
-
-  options.containerHostIP = mkOption {
-    type = types.str;
-    description = "IP to be used for the nixos-containers";
-  };
-
-}
+# The idea of this module service system is to have a generic way to host services on different NixOS Installations.
+# Everything relevant to the host, such as subdomain or ram / storage requirements, should be configured from here.
+# The options that don't change on a per-host basis should be configured in `NixDotfiles/services`.
+# Also, secrets should be managed from here.
+{ config, lib, pkgs, ... }: { imports = [ ./Monitoring.nix ]; }

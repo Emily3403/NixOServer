@@ -2,9 +2,9 @@
 let DATA_DIR = "/data/TODO"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 TODO"
-    "d ${DATA_DIR}/TODO 0750 TODO"
-    "d ${DATA_DIR}/postgresql 0750 postgres"
+    "d ${cfg.dataDir} 0750 TODO"
+    "d ${cfg.dataDir}/TODO 0750 TODO"
+    "d ${cfg.dataDir}/postgresql 0750 postgres"
   ];
 
   imports = [
@@ -19,8 +19,8 @@ let DATA_DIR = "/data/TODO"; in
 
         imports = [ ../users/services/TODO.nix ];
         bindMounts = {
-          "/var/lib/TODO/" = { hostPath = "${DATA_DIR}/TODO"; isReadOnly = false; };
-          "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+          "/var/lib/TODO/" = { hostPath = "${cfg.dataDir}/TODO"; isReadOnly = false; };
+          "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.TODO.path}".hostPath = config.age.secrets.TODO.path;
         };
 

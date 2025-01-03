@@ -23,7 +23,7 @@ done
 sed -i "s|\"bootDevices_placeholder\"|$diskNames|g" \
     "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
 
-sed -i "s|\"abcd1234\"|\"$(head -c4 /dev/urandom | od -A none -t x4| sed 's| ||g' || true)\"|g" \
+sed -i "s|\"hostid_placeholder\"|\"$(head -c4 /dev/urandom | od -A none -t x4| sed 's| ||g' || true)\"|g" \
     "/mnt/etc/nixos/hosts/$HOST_TO_INSTALL/default.nix"
 
 # Set the root password

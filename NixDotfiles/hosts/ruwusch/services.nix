@@ -3,30 +3,18 @@
     # System
     "Nginx.nix"
     "Backup.nix"
-    "Monitoring"
+#    "Monitoring"
     "Wireguard.nix"
 
     # Core Services
     "Transmission.nix"
     "Jellyfin.nix"
+
+    # Carsten
     "Keycloak.nix"
     "Nextcloud.nix"
     "HedgeDoc.nix"
-    "Wiki-js.nix"
-
-    # Emily
-    "Syncthing.nix"
-    "YouTrack.nix"
-    "Tandoor.nix"
-    "Get.nix"
-
-    "PhotoManagement/PhotoPrism.nix"
-    "PhotoManagement/Piwigo.nix"
-    "PhotoManagement/Ente.nix"
-
-    # Others
-    "Luk-Docs.nix"
   ];
 
-  keycloak-setup.realm = "Super-Realm";
+  host.services.keycloak.realm = "Super-Realm";
 }

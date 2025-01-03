@@ -33,7 +33,7 @@
                 env = { NEXT_PUBLIC_ENTE_ENDPOINT="https://api.ente.ruwusch.de"; };
 
                 # The number of max jobs is (currently) hardcoded in the source code. Change it to match a more demanding setting
-                postPatch = ''substituteInPlace apps/photos/src/services/upload/uploadManager.ts --replace-fail "const maxConcurrentUploads = 4;" "const maxConcurrentUploads = 24;"'';
+                postPatch = ''substituteInPlace apps/photos/src/services/upload/uploadManager.ts --replace-fail "const maxConcurrentUploads = 4;" "const maxConcurrentUploads = 12;"'';
               }; };
             };
             pkgs-unfree = import nixpkgs { inherit system; config = { allowUnfree = true; }; };

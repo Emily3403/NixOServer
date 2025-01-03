@@ -24,6 +24,20 @@ git config --global user.name "$GIT_UNAME"
 # Due to the nature of this setup the NixOS Repo will always be one commit ahead. So make rebase the default strategy.
 git -C "$SCRIPT_DIR" config pull.rebase true
 
+# Setup SSH Config
+SSH_ROOT_DIR="/root/.ssh/"
+SSH_ROOT_ID="$SSH_ROOT_DIR/id_ed25519"
+if [ ! -d "$SSH_ROOT_DIR" ];
+then
+    mkdir -p /root/.ssh
+fi
+
+if [ ! -L "$SSH_ROOT_ID" ] || [ ! -e "$SSH_ROOT_ID" ];
+then
+    rm -f "$SSH_ROOT_ID"
+    ln -s "/etc/ssh/ssh_host_ed25519_key" "$SSH_ROOT_ID"
+fi
+
 # Setup NixOS config
 mkdir -p /root/.config/nix
 echo "experimental-features = nix-command flakes

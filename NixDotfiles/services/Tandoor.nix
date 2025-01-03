@@ -2,9 +2,9 @@
 let DATA_DIR = "/data/Tandoor"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 tandoor_recipes nginx"
-    "d ${DATA_DIR}/tandoor-recipes 0750 tandoor_recipes nginx"  # Nginx has to be able to serve the images
-    "d ${DATA_DIR}/postgresql 0750 postgres"
+    "d ${cfg.dataDir} 0750 tandoor_recipes nginx"
+    "d ${cfg.dataDir}/tandoor-recipes 0750 tandoor_recipes nginx"  # Nginx has to be able to serve the images
+    "d ${cfg.dataDir}/postgresql 0750 postgres"
   ];
 
   imports = [
@@ -18,12 +18,12 @@ let DATA_DIR = "/data/Tandoor"; in
         containerPort = 8080;
         postgresqlName = "tandoor_recipes";
 
-        additionalNginxConfig.locations."/media/".alias = "${DATA_DIR}/tandoor-recipes/";
+        additionalNginxConfig.locations."/media/".alias = "${cfg.dataDir}/tandoor-recipes/";
 
         imports = [ ../users/services/tandoor_recipes.nix ];
         bindMounts = {
-          "/var/lib/tandoor-recipes/" = { hostPath = "${DATA_DIR}/tandoor-recipes"; isReadOnly = false; };
-          "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+          "/var/lib/tandoor-recipes/" = { hostPath = "${cfg.dataDir}/tandoor-recipes"; isReadOnly = false; };
+          "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.Tandoor.path}".hostPath = config.age.secrets.Tandoor.path;
         };
 
@@ -34,7 +34,7 @@ let DATA_DIR = "/data/Tandoor"; in
 
             extraConfig = {
               SECRET_KEY_FILE = config.age.secrets.Tandoor.path;
-              ALLOWED_HOSTS = "tandoor.${config.domainName},recipes.${config.domainName}";
+              ALLOWED_HOSTS = "tandoor.${config.host.networking.domainName},recipes.${config.host.networking.domainName}";
 
               DB_ENGINE = "django.db.backends.postgresql";
               POSTGRES_HOST = "/run/postgresql/";

@@ -8,12 +8,12 @@ let utils = import ../../utils.nix { inherit lib; }; in
   services.nginx.virtualHosts = utils.recursiveMerge [
     additionalHostConfig
     {
-      "${subdomain}.${config.domainName}" = utils.recursiveMerge [
+      "${subdomain}.${config.host.networking.domainName}" = utils.recursiveMerge [
         additionalConfig
         {
           forceSSL = true;
           enableACME = true;
-          serverAliases = map (it: "${it}.${config.domainName}") additionalDomains;
+          serverAliases = map (it: "${it}.${config.host.networking.domainName}") additionalDomains;
 
           locations."/" = utils.recursiveMerge [
             additionalLocationConfig

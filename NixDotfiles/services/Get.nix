@@ -1,5 +1,5 @@
 { pkgs, config, lib, ... }: {
-  services.nginx.virtualHosts."get.${config.domainName}" = {
+  services.nginx.virtualHosts."get.${config.host.networking.domainName}" = {
     forceSSL = true;
     enableACME = true;
     

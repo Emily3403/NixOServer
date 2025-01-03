@@ -1,6 +1,11 @@
 {
-  name, subdomain ? null, containerIP, containerPort, bindMounts,
-  imports ? [], postgresqlName ? null, additionalDomains ? [ ], additionalContainerConfig ? {},
+  name, subdomain ? null, containerID /* Integer ID that counts up from 1 */,
+  containerPort, bindMounts,
+  user ? null /* attrset with optional name, uid, gid, isNormalUser / isSystemUser */,
+  isSystemUser ? false,
+  group ? null /* Same here except the attrs from group */,
+  imports ? [],
+  postgresqlName ? null, additionalDomains ? [ ], additionalContainerConfig ? {},
   makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
   enableHardwareTranscoding ? false,
   cfg, lib, config, pkgs
@@ -11,6 +16,7 @@ let
   utils = import ../../utils.nix { inherit lib; };
   containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort;
   stateVersion = config.system.stateVersion;
+  containerIP = "192.168.7.${toString (containerID + 1)}";
 
   pgImport = if postgresqlName == null then [] else [
     (
@@ -35,9 +41,46 @@ let
   ];
 
 
+  userConfig = let
+    userAttrs = if user == null then {} else user;
+    groupAttrs = if group == null then {} else group;
+    userName = if builtins.hasAttr "name" userAttrs then user.name else name;
+    uid = if builtins.hasAttr "uid" userAttrs then user.uid else containerID + 12000;
+    usingPg = (pgImport == []);
+  in {
+    users = {
+      "${userName}" = {
+        uid = uid;
+        isNormalUser = !isSystemUser;
+        isSystemUser = isSystemUser;
+
+        name = userName;
+        group = userName;
+
+        password = "!";  # Always disallow login
+      } // userAttrs;
+
+      "postgres" = mkIf usingPg {
+        uid = 71;
+        group = "postgres";
+      };
+    };
+
+    groups = {
+      "${userName}" = {
+        gid = uid;
+        members = [ userName ];
+      } // groupAttrs;
+
+      postgres.members = optional usingPg "postgres";
+    };
+  };
+
+
 in
 {
   imports = imports ++ nginxImport;
+  users = userConfig;
 
   hardware.graphics = mkIf enableHardwareTranscoding {
     enable = true;
@@ -49,7 +92,7 @@ in
     {
       autoStart = true;
       privateNetwork = true;
-      hostAddress = config.containerHostIP;
+      hostAddress = config.host.networking.containerHostIP;
       localAddress = containerIP;
 
       bindMounts = mkMerge [ bindMounts (mkIf enableHardwareTranscoding { "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; };}) ];
@@ -66,6 +109,8 @@ in
             enable = true;
             extraPackages = [ pkgs.intel-media-driver ];
           };
+
+          users = userConfig;
         }
       ];
     }

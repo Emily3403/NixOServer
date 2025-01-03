@@ -1,7 +1,44 @@
 let
   ruwusch = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOlF4l8I+lbs3JxYRfnkULPhV+svAtoDAr0CtpjR6Rtj root@ruwusch";
+  nixie = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDl1EuW3ahRjtYzafPWux9fQqqblfq3TmNS62dwX2Xcz root@nixie";
 in
 {
+
+  # Nixie only
+  "nixie/Keycloak.age".publicKeys = [ nixie ];
+
+  "nixie/Nextcloud/admin-password.age".publicKeys = [ nixie ];
+  "nixie/Nextcloud/keycloak-client-secret.age".publicKeys = [ nixie ];
+  "nixie/Monitoring/Exporters/Nextcloud-token.age".publicKeys = [ nixie ];
+  "nixie/Ente/Minio.age".publicKeys = [ nixie ];
+  "nixie/Ente/Postgres.age".publicKeys = [ nixie ];
+#  "nixie/.age".publicKeys = [ nixie ];
+#  "nixie/.age".publicKeys = [ nixie ];
+#  "nixie/.age".publicKeys = [ nixie ];
+#  "nixie/.age".publicKeys = [ nixie ];
+#  "nixie/.age".publicKeys = [ nixie ];
+#  "nixie/.age".publicKeys = [ nixie ];
+#  "nixie/.age".publicKeys = [ nixie ];
+#  "nixie/.age".publicKeys = [ nixie ];
+
+
+
+
+
+
+
+
+
+
+
+
+
+  # Ruwusch only
+
+
+  # Shared
+
+
   "Keycloak/DatabasePassword.age".publicKeys = [ ruwusch ];
   "Keycloak/AdminPassword.age".publicKeys = [ ruwusch ];
 

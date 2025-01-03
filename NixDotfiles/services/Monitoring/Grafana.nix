@@ -2,9 +2,9 @@
 let DATA_DIR = "/data/Grafana"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 grafana"
-    "d ${DATA_DIR}/grafana 0750 grafana"
-    "d ${DATA_DIR}/postgresql 0750 postgres"
+    "d ${cfg.dataDir} 0750 grafana"
+    "d ${cfg.dataDir}/grafana 0750 grafana"
+    "d ${cfg.dataDir}/postgresql 0750 postgres"
   ];
 
   imports = [
@@ -19,8 +19,8 @@ let DATA_DIR = "/data/Grafana"; in
 
         imports = [ ../../users/services/Monitoring/grafana.nix ];
         bindMounts = {
-          "/var/lib/grafana/" = { hostPath = "${DATA_DIR}/grafana"; isReadOnly = false; };
-          "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+          "/var/lib/grafana/" = { hostPath = "${cfg.dataDir}/grafana"; isReadOnly = false; };
+          "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.Grafana_admin-pw.path}".hostPath = config.age.secrets.Grafana_admin-pw.path;
           "${config.age.secrets.Grafana_secret-key.path}".hostPath = config.age.secrets.Grafana_secret-key.path;
           "${config.age.secrets.Prometheus_ruwusch-pw.path}".hostPath = config.age.secrets.Prometheus_ruwusch-pw.path;
@@ -33,8 +33,8 @@ let DATA_DIR = "/data/Grafana"; in
 
             settings = {
               server = {
-                root_url = "https://status.${config.domainName}";
-                domain = "status.${config.domainName}";
+                root_url = "https://status.${config.host.networking.domainName}";
+                domain = "status.${config.host.networking.domainName}";
                 enforce_domain = true;
                 enable_gzip = true;
                 http_addr = "0.0.0.0";
@@ -80,7 +80,7 @@ let DATA_DIR = "/data/Grafana"; in
                     name = "Prometheus";
                     type = "prometheus";
                     access = "proxy";
-                    url = "https://prometheus.${config.domainName}";
+                    url = "https://prometheus.${config.host.networking.domainName}";
                     isDefault = true;
                     jsonData = {
                       basicAuth = true;

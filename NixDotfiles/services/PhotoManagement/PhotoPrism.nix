@@ -2,9 +2,9 @@
 let DATA_DIR = "/data/PhotoPrism"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 photoprism"
-    "d ${DATA_DIR}/photoprism 0750 photoprism"
-    "d ${DATA_DIR}/mysql 0750 postgres"
+    "d ${cfg.dataDir} 0750 photoprism"
+    "d ${cfg.dataDir}/photoprism 0750 photoprism"
+    "d ${cfg.dataDir}/mysql 0750 postgres"
   ];
 
   imports = [
@@ -17,8 +17,8 @@ let DATA_DIR = "/data/PhotoPrism"; in
 
         imports = [ ../../users/services/photoprism.nix ];
         bindMounts = {
-          "/var/lib/private/photoprism/" = { hostPath = "${DATA_DIR}/photoprism"; isReadOnly = false; };
-          "/var/lib/mysql" = { hostPath = "${DATA_DIR}/mysql"; isReadOnly = false; };
+          "/var/lib/private/photoprism/" = { hostPath = "${cfg.dataDir}/photoprism"; isReadOnly = false; };
+          "/var/lib/mysql" = { hostPath = "${cfg.dataDir}/mysql"; isReadOnly = false; };
           "${config.age.secrets.PhotoPrism.path}".hostPath = config.age.secrets.PhotoPrism.path;
         };
 
@@ -40,7 +40,7 @@ let DATA_DIR = "/data/PhotoPrism"; in
               PHOTOPRISM_DATABASE_NAME = "photoprism";
               PHOTOPRISM_DATABASE_SERVER = "/run/mysqld/mysqld.sock";
               PHOTOPRISM_DATABASE_USER = "photoprism";
-              PHOTOPRISM_SITE_URL = "https://photoprism.${config.domainName}";
+              PHOTOPRISM_SITE_URL = "https://photoprism.${config.host.networking.domainName}";
               PHOTOPRISM_SITE_TITLE = "PhotoPrism";
               PHOTOPRISM_UPLOAD_NSFW = "true";
             };

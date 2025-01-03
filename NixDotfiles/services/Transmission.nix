@@ -8,7 +8,7 @@ let DATA_DIR = "/data/Transmission"; in
         inherit config lib pkgs;
         name = "transmission";
         image = "haugene/transmission-openvpn:latest";
-        dataDir = DATA_DIR;
+        dataDir = cfg.dataDir;
 
         containerIP = "10.88.2.1";
         containerPort = 9091;
@@ -22,16 +22,16 @@ let DATA_DIR = "/data/Transmission"; in
         environmentFiles = [ config.age.secrets.Transmission_EnvironmentFile.path ];
 
         volumes = [
-          "${DATA_DIR}/data:/data"
-          "${DATA_DIR}/config:/config"
+          "${cfg.dataDir}/data:/data"
+          "${cfg.dataDir}/config:/config"
         ];
       }
     )
   ];
 
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR}/ 0750 jellyfin jellyfin"
-    "d ${DATA_DIR}/data/ 0750 jellyfin jellyfin"
-    "d ${DATA_DIR}/config/ 0750 jellyfin jellyfin"
+    "d ${cfg.dataDir}/ 0750 jellyfin jellyfin"
+    "d ${cfg.dataDir}/data/ 0750 jellyfin jellyfin"
+    "d ${cfg.dataDir}/config/ 0750 jellyfin jellyfin"
   ];
 }

@@ -8,7 +8,7 @@ let DATA_DIR = "/data/Piwigo"; in
         inherit config lib pkgs;
         name = "piwigo";
         image = "linuxserver/piwigo:14.3.0";
-        dataDir = DATA_DIR;
+        dataDir = cfg.dataDir;
 
         containerIP = "10.88.4.1";
         containerPort = 80;
@@ -19,8 +19,8 @@ let DATA_DIR = "/data/Piwigo"; in
         };
 
         volumes = [
-          "${DATA_DIR}/config:/config"
-          "${DATA_DIR}/gallery:/gallery"
+          "${cfg.dataDir}/config:/config"
+          "${cfg.dataDir}/gallery:/gallery"
         ];
       }
     )
@@ -29,7 +29,7 @@ let DATA_DIR = "/data/Piwigo"; in
         inherit config lib pkgs;
         name = "piwigo-mariadb";
         image = "linuxserver/mariadb:10.11.6";
-        dataDir = DATA_DIR;
+        dataDir = cfg.dataDir;
 
         containerIP = "10.88.4.2";
         containerPort = 3306;
@@ -43,16 +43,16 @@ let DATA_DIR = "/data/Piwigo"; in
         environmentFiles = [ config.age.secrets.Piwigo_Mariadb.path ];
 
         volumes = [
-          "${DATA_DIR}/mariadb-config:/config"
+          "${cfg.dataDir}/mariadb-config:/config"
         ];
       }
     )
   ];
 
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 5014 5014"
-    "d ${DATA_DIR}/config/ 0750 5014 5014"
-    "d ${DATA_DIR}/gallery/ 0750 5014 5014"
-    "d ${DATA_DIR}/mariadb-config/ 0750 5015 5015"
+    "d ${cfg.dataDir} 0750 5014 5014"
+    "d ${cfg.dataDir}/config/ 0750 5014 5014"
+    "d ${cfg.dataDir}/gallery/ 0750 5014 5014"
+    "d ${cfg.dataDir}/mariadb-config/ 0750 5015 5015"
   ];
 }

@@ -8,7 +8,7 @@ let DATA_DIR = "/data/Affine"; in
         inherit config lib pkgs;
         name = "affine";
         image = "ghcr.io/toeverything/affine-graphql:beta";
-        dataDir = DATA_DIR;
+        dataDir = cfg.dataDir;
 
         containerIP = "10.88.5.1";
         containerPort = 443;
@@ -18,7 +18,7 @@ let DATA_DIR = "/data/Affine"; in
           AFFINE_ADMIN_EMAIL = "seebeckemily3403@gmail.com";
 
           REDIS_SERVER_HOST = "127.0.0.1";
-          AFFINE_SERVER_HOST = "affine.{config.domainName}";
+          AFFINE_SERVER_HOST = "affine.{config.host.networking.domainName}";
           AFFINE_SERVER_HTTPS = "true";
           AFFINE_SERVER_PORT = "443";
 
@@ -31,14 +31,14 @@ let DATA_DIR = "/data/Affine"; in
 
 
         volumes = [
-          "${DATA_DIR}/affine:/root/.affine/"
+          "${cfg.dataDir}/affine:/root/.affine/"
         ];
       }
     )
   ];
 
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 root root"
-    "d ${DATA_DIR}/affine/ 0750 root root"
+    "d ${cfg.dataDir} 0750 root root"
+    "d ${cfg.dataDir}/affine/ 0750 root root"
   ];
 }

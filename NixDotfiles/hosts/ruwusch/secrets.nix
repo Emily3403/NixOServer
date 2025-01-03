@@ -22,25 +22,7 @@
       owner = "grafana";
     };
 
-    Keycloak_DatabasePassword = {
-      file = ../../secrets/Keycloak/DatabasePassword.age;
-      owner = "keycloak";
-    };
 
-    Keycloak_AdminPassword = {
-      file = ../../secrets/Keycloak/AdminPassword.age;
-      owner = "keycloak";
-    };
-
-    Nextcloud_AdminPassword = {
-      file = ../../secrets/Nextcloud/AdminPassword.age;
-      owner = "nextcloud";
-    };
-
-    Nexcloud_KeycloakClientSecret = {
-      file = ../../secrets/Nextcloud/KeycloakClientSecret.age;
-      owner = "nextcloud";
-    };
 
     HedgeDoc_EnvironmentFile = {
       file = ../../secrets/HedgeDoc.age;
@@ -67,25 +49,14 @@
       owner = "root";
     };
 
-    Prometheus_SyncthingExporter-environment = {
-      file = ../../secrets/Monitoring/Exporters/Syncthing-Exporter.age;
-      owner = "root";
-    };
 
-    Prometheus_syncthing-API-key = {
-      file = ../../secrets/Monitoring/Exporters/Syncthing-Token.age;
-      owner = "prometheus";
-    };
 
     Prometheus_photoprism-API-key = {
       file = ../../secrets/Monitoring/Exporters/PhotoPrism-Token.age;
       owner = "prometheus";
     };
 
-    Nextcloud_Exporter-tokenfile = {
-      file = ../../secrets/Monitoring/Exporters/Nextcloud-Token.age;
-      owner = "nextcloud-exporter";
-    };
+
 
     Wireguard = {
       file = ../../secrets/Wireguard.age;
@@ -122,15 +93,6 @@
       owner = "root";
     };
 
-    Ente_Minio = {
-      file = ../../secrets/Ente/Minio.age;
-      owner = "root";
-    };
-
-    Ente_Postgres = {
-      file = ../../secrets/Ente/Postgres.age;
-      owner = "root";
-    };
 
   };
 }

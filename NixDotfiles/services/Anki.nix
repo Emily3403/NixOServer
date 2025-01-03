@@ -2,8 +2,8 @@
 let DATA_DIR = "/data/Anki"; in
 {
   systemd.tmpfiles.rules = [
-#    "d ${DATA_DIR} 0750 TODO"
-#    "d ${DATA_DIR}/anki-sync-server 0750 TODO"
+#    "d ${cfg.dataDir} 0750 TODO"
+#    "d ${cfg.dataDir}/anki-sync-server 0750 TODO"
   ];
 
   imports = [
@@ -18,7 +18,7 @@ let DATA_DIR = "/data/Anki"; in
 
         imports = [ ../users/services/TODO.nix ];
         bindMounts = {
-          "/var/lib/TODO/" = { hostPath = "${DATA_DIR}/TODO"; isReadOnly = false; };
+          "/var/lib/TODO/" = { hostPath = "${cfg.dataDir}/TODO"; isReadOnly = false; };
           "${config.age.secrets.TODO.path}".hostPath = config.age.secrets.TODO.path;
         };
 

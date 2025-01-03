@@ -1,5 +1,5 @@
 {
-  name, image, dataDir, subdomain ? null, containerIP, containerPort, volumes, makeLocaltimeVolume ? true, additionalContainers ? {},
+  name, image, dataDir, subdomain ? null, containerID, containerPort, volumes, makeLocaltimeVolume ? true, additionalContainers ? {},
   imports ? [], environment ? { }, environmentFiles ? [ ], postgresEnvFile ? null, redisEnvFile ? null, additionalContainerConfig ? {}, additionalDomains ? [ ],
   makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
   config, lib, pkgs
@@ -8,6 +8,8 @@ let
 
   inherit (lib) mkIf optional optionals;
   utils = import ../../utils.nix { inherit lib; };
+
+  containerIP = "10.88.1.${toString (containerID + 1)}";
   containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort;
   defVolumes = [ "/etc/resolv.conf:/etc/resolv.conf:ro" ] ++ optional makeLocaltimeVolume "/etc/localtime:/etc/localtime:ro";
 
@@ -54,12 +56,12 @@ in
     ];
 
      "${name}-postgres" = mkIf (postgresEnvFile != null) {
-      image = "postgres:15-alpine";
+      image = "postgres:17-alpine";
       extraOptions = [ "--pod=${podName}" ];
 
       environment = { POSTGRES_DB = name; };
       environmentFiles = [ postgresEnvFile ];
-      volumes = [ "${dataDir}/postgresql/15:/var/lib/postgresql/data" ] ++ defVolumes;
+      volumes = [ "${dataDir}/postgresql/17:/var/lib/postgresql/data" ] ++ defVolumes;
       cmd = [ "-h" "127.0.0.1" ];
     };
 
@@ -75,7 +77,7 @@ in
 
   systemd.tmpfiles.rules = optionals (postgresEnvFile != null) [
     "d ${dataDir}/postgresql/ 0750 71"  # TODO: This currently only works when the top dir is owned by root
-    "d ${dataDir}/postgresql/15/ 0750 71"
+    "d ${dataDir}/postgresql/17/ 0750 71"
   ] ++ optionals (redisEnvFile != null) [
     "d ${dataDir}/redis/ 0750 999"
   ];

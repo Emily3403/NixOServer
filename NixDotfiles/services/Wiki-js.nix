@@ -2,9 +2,9 @@
 let DATA_DIR = "/data/Wiki-js"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 wiki-js"
-    "d ${DATA_DIR}/postgresql 0750 postgres"
-    "d ${DATA_DIR}/wiki-js 0750 wiki-js"
+    "d ${cfg.dataDir} 0750 wiki-js"
+    "d ${cfg.dataDir}/postgresql 0750 postgres"
+    "d ${cfg.dataDir}/wiki-js 0750 wiki-js"
   ];
 
   imports = [
@@ -19,8 +19,8 @@ let DATA_DIR = "/data/Wiki-js"; in
         postgresqlName = "wiki-js";
         imports = [ ../users/services/wiki-js.nix ];
         bindMounts = {
-          "/var/lib/wiki-js/" = { hostPath = "${DATA_DIR}/wiki-js"; isReadOnly = false; };
-          "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+          "/var/lib/wiki-js/" = { hostPath = "${cfg.dataDir}/wiki-js"; isReadOnly = false; };
+          "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.WikiJs_SSHKey.path}".hostPath = config.age.secrets.WikiJs_SSHKey.path;
         };
 

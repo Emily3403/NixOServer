@@ -2,9 +2,9 @@
 let DATA_DIR = "/data/Hedgedoc"; in
 {
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 hedgedoc"
-    "d ${DATA_DIR}/hedgedoc 0750 hedgedoc"
-    "d ${DATA_DIR}/postgresql 0750 postgres"
+    "d ${cfg.dataDir} 0750 hedgedoc"
+    "d ${cfg.dataDir}/hedgedoc 0750 hedgedoc"
+    "d ${cfg.dataDir}/postgresql 0750 postgres"
   ];
 
   imports = [
@@ -24,8 +24,8 @@ let DATA_DIR = "/data/Hedgedoc"; in
         postgresqlName = "hedgedoc";
         imports = [ ../users/services/hedgedoc.nix ];
         bindMounts = {
-          "/var/lib/hedgedoc/" = { hostPath = "${DATA_DIR}/hedgedoc"; isReadOnly = false; };
-          "/var/lib/postgresql" = { hostPath = "${DATA_DIR}/postgresql"; isReadOnly = false; };
+          "/var/lib/hedgedoc/" = { hostPath = "${cfg.dataDir}/hedgedoc"; isReadOnly = false; };
+          "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.HedgeDoc_EnvironmentFile.path}".hostPath = config.age.secrets.HedgeDoc_EnvironmentFile.path;
         };
 
@@ -34,8 +34,8 @@ let DATA_DIR = "/data/Hedgedoc"; in
           environmentFile = config.age.secrets.HedgeDoc_EnvironmentFile.path;
 
           settings = {
-            domain = "pad.${config.domainName}";
-            allowOrigin = [ "localhost" "pad.${config.domainName}" ];
+            domain = "pad.${config.host.networking.domainName}";
+            allowOrigin = [ "localhost" "pad.${config.host.networking.domainName}" ];
             host = "0.0.0.0";
             protocolUseSSL = true;
 
@@ -56,20 +56,20 @@ let DATA_DIR = "/data/Hedgedoc"; in
             # Authentication
             sessionSecret = "$SESSION_SECRET";
             oauth2 = {
-              providerName = config.keycloak-setup.name;
+              providerName = config.host.services.keycloak.name;
               clientID = "HedgeDoc";
               clientSecret = "$CLIENT_SECRET";
 
-              authorizationURL = "https://${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}/realms/${config.keycloak-setup.realm}/protocol/openid-connect/auth";
-              tokenURL = "https://${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}/realms/${config.keycloak-setup.realm}/protocol/openid-connect/token";
-              baseURL = "${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}";
-              userProfileURL = "https://${config.keycloak-setup.subdomain}.${config.keycloak-setup.domain}/realms/${config.keycloak-setup.realm}/protocol/openid-connect/userinfo";
+              authorizationURL = "https://${config.host.services.keycloak.subdomain}.${config.host.services.keycloak.domain}/realms/${config.host.services.keycloak.realm}/protocol/openid-connect/auth";
+              tokenURL = "https://${config.host.services.keycloak.subdomain}.${config.host.services.keycloak.domain}/realms/${config.host.services.keycloak.realm}/protocol/openid-connect/token";
+              baseURL = "${config.host.services.keycloak.subdomain}.${config.host.services.keycloak.domain}";
+              userProfileURL = "https://${config.host.services.keycloak.subdomain}.${config.host.services.keycloak.domain}/realms/${config.host.services.keycloak.realm}/protocol/openid-connect/userinfo";
 
-              userProfileUsernameAttr = config.keycloak-setup.attributeMapper.username;
-              userProfileDisplayNameAttr = config.keycloak-setup.attributeMapper.name;
-              userProfileEmailAttr = config.keycloak-setup.attributeMapper.email;
+              userProfileUsernameAttr = config.host.services.keycloak.attributeMapper.username;
+              userProfileDisplayNameAttr = config.host.services.keycloak.attributeMapper.name;
+              userProfileEmailAttr = config.host.services.keycloak.attributeMapper.email;
               scope = "openid email profile";
-              rolesClaim = config.keycloak-setup.attributeMapper.groups;
+              rolesClaim = config.host.services.keycloak.attributeMapper.groups;
               # accessRole = "";
             };
           };

@@ -8,7 +8,7 @@ let DATA_DIR = "/data/TODO"; in
         inherit config lib pkgs;
         name = "TODO";
         image = "TODO";
-        dataDir = DATA_DIR;
+        dataDir = cfg.dataDir;
 
         subdomain = "TODO";
         containerIP = "10.88.TODO.1";
@@ -17,14 +17,14 @@ let DATA_DIR = "/data/TODO"; in
         environmentFiles = [ config.age.secrets.TODO.path ];
 
         volumes = [
-          "${DATA_DIR}/TODO:/TODO"
+          "${cfg.dataDir}/TODO:/TODO"
         ];
       }
     )
   ];
 
   systemd.tmpfiles.rules = [
-    "d ${DATA_DIR} 0750 5000 5000"
-    "d ${DATA_DIR}/TODO/ 0750 5000 5000"
+    "d ${cfg.dataDir} 0750 5000 5000"
+    "d ${cfg.dataDir}/TODO/ 0750 5000 5000"
   ];
 }
