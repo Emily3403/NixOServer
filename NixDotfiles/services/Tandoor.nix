@@ -13,7 +13,7 @@ let DATA_DIR = "/data/Tandoor"; in
         inherit config lib pkgs;
         name = "tandoor";
         subdomain = "tandoor";
-        additionalDomains = [ "recipes" ];
+        additionalDomains = [ ];
         containerIP = "192.168.7.111";
         containerPort = 8080;
         postgresqlName = "tandoor_recipes";

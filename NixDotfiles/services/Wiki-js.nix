@@ -12,7 +12,7 @@ let DATA_DIR = "/data/Wiki-js"; in
       import ./Container-Config/Nix-Container.nix {
         inherit config lib pkgs;
         name = "wiki-js";
-        subdomain = "wiki";
+        subdomain = "old-wiki";
         containerIP = "192.168.7.102";
         containerPort = 3000;
 

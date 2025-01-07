@@ -36,6 +36,8 @@
     autoSnapshot = {
       enable = true;
       flags = "-k -p --utc";
+      frequent = 0;
+      hourly = 0;
       weekly = 7; # How many snapshots to keep
       monthly = 48;
     };
@@ -98,7 +100,6 @@
   monitoredServices = {
     prometheus = true;
     transmission = true;
-    syncthing = true;
     nextcloud = true;
   };
 }

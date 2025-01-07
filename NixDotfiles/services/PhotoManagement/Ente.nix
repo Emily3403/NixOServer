@@ -21,7 +21,7 @@ in
         inherit config lib pkgs;
         name = "ente";
         image = "ghcr.io/ente-io/server";
-        subdomain = "api.ente";
+        subdomain = "legacy-ente";
         dataDir = DATA_DIR;
 
         containerIP = "10.88.6.1";
@@ -65,7 +65,7 @@ in
     '';
   };
 
-  services.nginx.virtualHosts."minio-api.ente.${config.domainName}" = {
+  services.nginx.virtualHosts."minio-legacy-api.ente.${config.domainName}" = {
     enableACME = true;
     forceSSL = true;
     locations."/".proxyPass = "http://10.88.6.1:3200";

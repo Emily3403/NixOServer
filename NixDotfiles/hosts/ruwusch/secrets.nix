@@ -22,7 +22,7 @@
       owner = "grafana";
     };
 
-    Keycloak_DatabasePassword = {
+  Keycloak_DatabasePassword = {
       file = ../../secrets/Keycloak/DatabasePassword.age;
       owner = "keycloak";
     };
@@ -62,30 +62,24 @@
       owner = "root";
     };
 
+    Transmission_PodEnv = {
+      file = ../../secrets/Transmission-PodEnv.age;
+      owner = "root";
+    };
+
     Transmission_Exporter-environment = {
       file = ../../secrets/Monitoring/Exporters/Transmission.age;
       owner = "root";
     };
 
-    Prometheus_SyncthingExporter-environment = {
-      file = ../../secrets/Monitoring/Exporters/Syncthing-Exporter.age;
-      owner = "root";
-    };
 
-    Prometheus_syncthing-API-key = {
-      file = ../../secrets/Monitoring/Exporters/Syncthing-Token.age;
-      owner = "prometheus";
-    };
 
     Prometheus_photoprism-API-key = {
       file = ../../secrets/Monitoring/Exporters/PhotoPrism-Token.age;
       owner = "prometheus";
     };
 
-    Nextcloud_Exporter-tokenfile = {
-      file = ../../secrets/Monitoring/Exporters/Nextcloud-Token.age;
-      owner = "nextcloud-exporter";
-    };
+
 
     Wireguard = {
       file = ../../secrets/Wireguard.age;
@@ -122,20 +116,25 @@
       owner = "root";
     };
 
-    Ente_Minio = {
-      file = ../../secrets/Ente/Minio.age;
-      owner = "root";
-    };
-
-    Ente_Postgres = {
-      file = ../../secrets/Ente/Postgres.age;
-      owner = "root";
-    };
 
     Stirling-PDF = {
       file = ../../secrets/Stirling-PDF.age;
       owner = "1000";
     };
 
+    Nextcloud_Exporter-tokenfile = {
+      file = ../../secrets/Monitoring/Exporters/Nextcloud-Token.age;
+      owner = "nextcloud-exporter";
+    };
+
+    Prometheus_SyncthingExporter-environment = {
+      file = ../../secrets/Monitoring/Exporters/Syncthing-Exporter.age;
+      owner = "root";
+    };
+
+    Prometheus_syncthing-API-key = {
+      file = ../../secrets/Monitoring/Exporters/Syncthing-Token.age;
+      owner = "prometheus";
+    };
   };
 }

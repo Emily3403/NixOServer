@@ -18,6 +18,8 @@ in
 
   "HedgeDoc.age".publicKeys = [ ruwusch ];
   "Transmission.age".publicKeys = [ ruwusch ];
+  "Transmission-Nix.age".publicKeys = [ ruwusch ];
+  "Transmission-PodEnv.age".publicKeys = [ ruwusch ];
   "Luk-Docs.age".publicKeys = [ ruwusch ];
   "Wireguard.age".publicKeys = [ ruwusch ];
   "PhotoPrism.age".publicKeys = [ ruwusch ];

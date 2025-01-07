@@ -12,8 +12,8 @@ let
       metrics_path = "/${metric}-metrics";
       scheme = "https";
       basic_auth = mkBasicAuth "Prometheus_${hostname}-pw";
-      scrape_interval = if metric == "transmission" then "5s" else "30s";  # TODO: Make this configurable from the callee
-      scrape_timeout = if metric == "transmission" then "5s" else "15s";
+      scrape_interval = if metric == "transmission" then "10s" else "30s";  # TODO: Make this configurable from the callee
+      scrape_timeout = if metric == "transmission" then "10s" else "15s";
       static_configs = [{ targets = [ "${hostname}.status.${config.domainName}" ]; }];
     }] ++ acc)) [ ]
       metrics;
