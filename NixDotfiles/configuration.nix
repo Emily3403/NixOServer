@@ -17,6 +17,8 @@ in
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
 
+#  nixpkgs.config.allowUnfree = lib.mkForce true;
+
   # Podman
   virtualisation.podman = {
     enable = true;

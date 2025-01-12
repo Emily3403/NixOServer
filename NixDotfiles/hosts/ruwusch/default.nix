@@ -11,7 +11,7 @@
 # - isisdl compressed videos    (2TB)
 
 
-{ config, modulesPath, pkgs, pkgs-unfree, lib, ... }: {
+{ config, modulesPath, pkgs, lib, ... }: {
   zfs-root = {
     boot = {
       devNodes = "/dev/disk/by-id/";

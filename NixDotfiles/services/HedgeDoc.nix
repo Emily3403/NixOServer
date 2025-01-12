@@ -1,20 +1,51 @@
 { pkgs, config, lib, ... }:
-let DATA_DIR = "/data/Hedgedoc"; in
+let
+  cfg = config.host.services.hedgedoc;
+  kcfg = config.host.services.keycloak;
+  inherit (lib) mkIf mkOption types;
+in
 {
-  systemd.tmpfiles.rules = [
-    "d ${cfg.dataDir} 0750 hedgedoc"
-    "d ${cfg.dataDir}/hedgedoc 0750 hedgedoc"
-    "d ${cfg.dataDir}/postgresql 0750 postgres"
-  ];
+  options.host.services.hedgedoc = {
+    dataDir = mkOption {
+      type = types.str;
+      default = "/data/HedgeDoc";
+    };
+
+    subdomain = mkOption {
+      type = types.str;
+      default = "pad";
+    };
+
+    enableExporter = mkOption {
+      type = types.bool;
+      default = true;
+    };
+  };
+
+  config = {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0750 hedgedoc"
+      "d ${cfg.dataDir}/hedgedoc 0750 hedgedoc"
+      "d ${cfg.dataDir}/postgresql 0750 postgres"
+    ];
+    
+    age.secrets.HedgeDoc = {
+      file = ../secrets/nixie/HedgeDoc.age;
+      owner = "hedgedoc";
+    };
+  };
+
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
         inherit config lib pkgs;
+
         name = "hedgedoc";
-        subdomain = "pad";
-        containerIP = "192.168.7.104";
+        subdomain = cfg.subdomain;
+        containerID = 4;
         containerPort = 3000;
+        isSystemUser = true;
 
         additionalNginxConfig.locations = {
           "/metrics".return = "403";
@@ -22,20 +53,19 @@ let DATA_DIR = "/data/Hedgedoc"; in
         };
 
         postgresqlName = "hedgedoc";
-        imports = [ ../users/services/hedgedoc.nix ];
         bindMounts = {
           "/var/lib/hedgedoc/" = { hostPath = "${cfg.dataDir}/hedgedoc"; isReadOnly = false; };
           "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
-          "${config.age.secrets.HedgeDoc_EnvironmentFile.path}".hostPath = config.age.secrets.HedgeDoc_EnvironmentFile.path;
+          "${config.age.secrets.HedgeDoc.path}".hostPath = config.age.secrets.HedgeDoc.path;
         };
 
         cfg.services.hedgedoc = {
           enable = true;
-          environmentFile = config.age.secrets.HedgeDoc_EnvironmentFile.path;
+          environmentFile = config.age.secrets.HedgeDoc.path;
 
           settings = {
-            domain = "pad.${config.host.networking.domainName}";
-            allowOrigin = [ "localhost" "pad.${config.host.networking.domainName}" ];
+            domain = "${cfg.subdomain}.${config.host.networking.domainName}";
+            allowOrigin = [ "localhost" "${cfg.subdomain}.${config.host.networking.domainName}" ];
             host = "0.0.0.0";
             protocolUseSSL = true;
 
@@ -56,21 +86,20 @@ let DATA_DIR = "/data/Hedgedoc"; in
             # Authentication
             sessionSecret = "$SESSION_SECRET";
             oauth2 = {
-              providerName = config.host.services.keycloak.name;
+              providerName = kcfg.name;
               clientID = "HedgeDoc";
               clientSecret = "$CLIENT_SECRET";
 
-              authorizationURL = "https://${config.host.services.keycloak.subdomain}.${config.host.services.keycloak.domain}/realms/${config.host.services.keycloak.realm}/protocol/openid-connect/auth";
-              tokenURL = "https://${config.host.services.keycloak.subdomain}.${config.host.services.keycloak.domain}/realms/${config.host.services.keycloak.realm}/protocol/openid-connect/token";
-              baseURL = "${config.host.services.keycloak.subdomain}.${config.host.services.keycloak.domain}";
-              userProfileURL = "https://${config.host.services.keycloak.subdomain}.${config.host.services.keycloak.domain}/realms/${config.host.services.keycloak.realm}/protocol/openid-connect/userinfo";
+              authorizationURL = "https://${kcfg.subdomain}.${kcfg.domain}/realms/${kcfg.realm}/protocol/openid-connect/auth";
+              tokenURL = "https://${kcfg.subdomain}.${kcfg.domain}/realms/${kcfg.realm}/protocol/openid-connect/token";
+              baseURL = "${kcfg.subdomain}.${kcfg.domain}";
+              userProfileURL = "https://${kcfg.subdomain}.${kcfg.domain}/realms/${kcfg.realm}/protocol/openid-connect/userinfo";
 
-              userProfileUsernameAttr = config.host.services.keycloak.attributeMapper.username;
-              userProfileDisplayNameAttr = config.host.services.keycloak.attributeMapper.name;
-              userProfileEmailAttr = config.host.services.keycloak.attributeMapper.email;
+              userProfileUsernameAttr = kcfg.attributeMapper.username;
+              userProfileDisplayNameAttr = kcfg.attributeMapper.name;
+              userProfileEmailAttr = kcfg.attributeMapper.email;
               scope = "openid email profile";
-              rolesClaim = config.host.services.keycloak.attributeMapper.groups;
-              # accessRole = "";
+              rolesClaim = kcfg.attributeMapper.groups;
             };
           };
         };

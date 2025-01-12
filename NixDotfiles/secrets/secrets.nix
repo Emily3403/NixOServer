@@ -12,9 +12,9 @@ in
   "nixie/Monitoring/Exporters/Nextcloud-token.age".publicKeys = [ nixie ];
   "nixie/Ente/Minio.age".publicKeys = [ nixie ];
   "nixie/Ente/Postgres.age".publicKeys = [ nixie ];
-#  "nixie/.age".publicKeys = [ nixie ];
-#  "nixie/.age".publicKeys = [ nixie ];
-#  "nixie/.age".publicKeys = [ nixie ];
+  "nixie/HedgeDoc.age".publicKeys = [ nixie ];
+  "nixie/Wiki-js.age".publicKeys = [ nixie ];
+  "nixie/Tandoor.age".publicKeys = [ nixie ];
 #  "nixie/.age".publicKeys = [ nixie ];
 #  "nixie/.age".publicKeys = [ nixie ];
 #  "nixie/.age".publicKeys = [ nixie ];

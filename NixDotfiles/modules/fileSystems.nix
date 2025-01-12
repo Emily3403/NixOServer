@@ -27,6 +27,7 @@ in
       default = [ ];
     };
   };
+
   config.fileSystems = mkMerge (mapAttrsToList
     (dataset: mountpoint: {
       "${mountpoint}" = {
@@ -36,6 +37,7 @@ in
         neededForBoot = true;
       };
     })
+
     cfg.datasets ++ mapAttrsToList
     (bindsrc: mountpoint: {
       "${mountpoint}" = {
@@ -44,6 +46,7 @@ in
         options = [ "bind" "X-mount.mkdir" "noatime" ];
       };
     })
+
     cfg.bindmounts ++ map
     (esp: {
       "/boot/efis/${esp}" = {
@@ -60,6 +63,7 @@ in
       };
     })
     cfg.efiSystemPartitions);
+
   config.swapDevices = mkDefault (map
     (swap: {
       device = "${config.zfs-root.boot.devNodes}${swap}";

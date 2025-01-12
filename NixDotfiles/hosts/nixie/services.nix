@@ -8,14 +8,13 @@
 #    # Core Services
     "Keycloak.nix"
     "Nextcloud.nix"
-#    "HedgeDoc.nix"
-#    "Wiki-js.nix"
+    "HedgeDoc.nix"
+    "Wiki-js.nix"
 
-#    # Emily
     "Syncthing.nix"
     "YouTrack.nix"
-#    "Tandoor.nix"
-#    "Get.nix"
+    "Tandoor.nix"
+    "Get.nix"
 
 #    "PhotoManagement/PhotoPrism.nix"
 #    "PhotoManagement/Piwigo.nix"
@@ -31,12 +30,16 @@
 
       ente.enableExporter = false;
 
+      hedgedoc.subdomain = "emily-pad";
 
-      keycloak.realm = "Emily-Realm";
-
+      keycloak = {
+        realm = "Emily-Realm";
+        subdomain = "auth";
+      };
     };
 
 
+    hardware.raid.HPSmartArray.enable = true;
   };
 
 

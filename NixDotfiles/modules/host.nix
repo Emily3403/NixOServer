@@ -26,6 +26,12 @@ in
           type = types.nonEmptyListOf types.str;
         };
 
+        additionalBootLoaderDevices = mkOption {
+          description = "Specify additional devices to install a stage 1 bootloader to. Useful if you can't directly boot from your hard drives...";
+          type = types.listOf types.str;
+          default = [ ];
+        };
+
         additionalKernelModules = mkOption {
           description = "Additional kernel modules to load";
           type = types.listOf types.str;

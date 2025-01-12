@@ -1,9 +1,10 @@
 # Drive Setup
-export NUM_DRIVES=2         # The number of drives per vdev
-export RAID_LEVEL="mirror"  # possible values are `stripe`, `mirror`, `raidz1` or any option zfs supports
-export NUM_VDEVS=2          # The number of vdevs to add with the same RAID configuration. Typically 1, however 2 is needed for RAID-10
+export NUM_DRIVES=4         # The number of drives per vdev
+export RAID_LEVEL="raidz1"  # possible values are `stripe`, `mirror`, `raidz1` or any option zfs supports
+export NUM_VDEVS=1          # The number of vdevs to add with the same RAID configuration. Typically 1, however 2 is needed for RAID-10
 export SWAP_AMOUNT_GB=128
 export NUM_HOT_SPARES=0     # The number of hot spares should be included in `NUM_DRIVES`. Set to 0 to disable hot spares.
+export ADDITIONAL_EFI_DEVICE=""
 
 # Configuration of the system
 export LUKS_PASSWORD=""  # Leave blank to disable encryption

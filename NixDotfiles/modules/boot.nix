@@ -2,6 +2,7 @@
 
 let
   cfg = config.zfs-root.boot;
+  hcfg = config.host;
   inherit (lib) mkIf types mkDefault mkOption mkMerge strings;
   inherit (builtins) head toString map tail;
 in
@@ -90,7 +91,7 @@ in
 
     {
       zfs-root.fileSystems = {
-        efiSystemPartitions = (map (diskName: diskName + cfg.partitionScheme.efiBoot) cfg.bootDevices);
+        efiSystemPartitions = (map (diskName: diskName + cfg.partitionScheme.efiBoot) (cfg.bootDevices ++ hcfg.additionalBootLoaderDevices));
         swapPartitions = (map (diskName: diskName + cfg.partitionScheme.swap) cfg.bootDevices);
       };
 
@@ -110,18 +111,16 @@ in
 
           grub = {
             enable = true;
-            devices = (map (diskName: cfg.devNodes + diskName) cfg.bootDevices);
+            devices = (map (diskName: cfg.devNodes + diskName) (cfg.bootDevices ++ hcfg.additionalBootLoaderDevices));
             efiInstallAsRemovable = cfg.removableEfi;
             copyKernels = true;
             efiSupport = true;
             zfsSupport = true;
-            extraInstallCommands = (toString (map
-              (diskName: ''
+            extraInstallCommands = (toString (map (diskName: ''
                 set -x
                 ${pkgs.coreutils-full}/bin/cp -r ${config.boot.loader.efi.efiSysMountPoint}/EFI /boot/efis/${diskName}${cfg.partitionScheme.efiBoot}
                 set +x
-              '')
-              (tail cfg.bootDevices)));
+              '') ((tail cfg.bootDevices) ++ hcfg.additionalBootLoaderDevices)));
           };
         };
       };

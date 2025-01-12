@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unfree, config, lib, ... }:
+{ pkgs, config, lib, ... }:
 let DATA_DIR = "/data/Jellyfin"; in
 {
   systemd.tmpfiles.rules = [

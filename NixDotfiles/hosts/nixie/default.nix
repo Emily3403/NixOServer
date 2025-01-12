@@ -1,10 +1,9 @@
-{ config, modulesPath, pkgs, pkgs-unfree, lib, ... }: {
+{ config, modulesPath, pkgs, lib, ... }: {
   host = {
     name = "nixie";
     id = "abcd1234";
-    bootDevices = [ "bootDevices_placeholder" ];
-
-    enableHardwareAcceleration = true;
+    bootDevices = [ "wwn-0x600508b1001c5029b5a15539c6e5c036" "wwn-0x600508b1001cbe28f550555fc3bd3cbe" "wwn-0x600508b1001c6475f8f96e4aaf5cfa76" "wwn-0x600508b1001c9652ea88895b0976fc23" ];
+#    additionalBootLoaderDevices = [ "usb-HP_iLO_Internal_SD-CARD_000002660A01-0:0" ];
 
     zfs = {
       autoSnapshot = {

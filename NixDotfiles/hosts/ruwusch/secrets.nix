@@ -22,23 +22,6 @@
       owner = "grafana";
     };
 
-
-
-    HedgeDoc_EnvironmentFile = {
-      file = ../../secrets/HedgeDoc.age;
-      owner = "hedgedoc";
-    };
-
-    LukDocs_EnvironmentFile = {
-      file = ../../secrets/Luk-Docs.age;
-      owner = "root";
-    };
-
-    WikiJs_SSHKey = {
-      file = ../../secrets/SSHKeys/wiki-js.age;
-      owner = "wiki-js";
-    };
-
     Transmission_EnvironmentFile = {
       file = ../../secrets/Transmission.age;
       owner = "root";
@@ -68,10 +51,7 @@
       owner = "photoprism";
     };
 
-    Tandoor = {
-      file = ../../secrets/Tandoor.age;
-      owner = "tandoor_recipes";
-    };
+
 
     Piwigo_Mariadb = {
       file = ../../secrets/Piwigo-Mariadb.age;
