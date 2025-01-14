@@ -17,11 +17,27 @@
     in
     f [ ] attrList;
 
-  makeNginxMetricConfig = service: ip: {
+
+  makeNixContainerIP = id: "192.168.7.${toString (id + 1)}";
+  makeOciContainerIP = id: "10.88.1.${toString (id + 1)}";
+
+#  makeOciContainerUID = id: "";
+
+  makeNginxMetricConfig = service: ip: port /* str */: {
     forceSSL = true;
     enableACME = true;
-    basicAuthFile = config.age.secrets.Monitoring_host-htpasswd.path;
-    locations."/${service}-metrics".proxyPass = "http://${ip}/metrics";
+    locations."/${service}-metrics".proxyPass = "http://${ip}:${port}/metrics";
   };
+
+  # TODO: Merge this somehow into the above
+  makeNginxBearerMetricConfig = service: ip: port /* str */: {
+    forceSSL = true;
+    enableACME = true;
+    locations."/${service}-metrics" = {
+      proxyPass = "http://${ip}:${port}/metrics";
+      extraConfig = "auth_basic off;";  # Authentication is handled by the Bearer Token
+    };
+  };
+
 
 }

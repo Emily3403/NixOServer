@@ -49,118 +49,96 @@ in
           default = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily" ];
         };
 
-        zfs = mkOption {
-          description = "ZFS Options (snapshots, ARC, scrubbing)";
-          default = null;
+        zfs = {
+          autoSnapshot = {
+            enable = mkOption {
+              default = true;
+              type = types.bool;
+              description = "Enable zfs-auto-snapshot";
+            };
 
-          type = types.submodule {
-            options = {
-              autoSnapshot = mkOption {
-                description = "Enable zfs-auto-snapshot";
-                default = null;
+            hourly = mkOption {
+              default = 0;
+              type = types.int;
+              description = "Number of hourly auto-snapshots that you wish to keep.";
+            };
 
-                type = types.submodule {
-                  options = {
-                    enable = mkOption {
-                      default = false;
-                      type = types.bool;
-                      description = "Enable zfs-auto-snapshot";
-                    };
+            daily = mkOption {
+              default = 7;
+              type = types.int;
+              description = "Number of daily auto-snapshots that you wish to keep.";
+            };
 
-                    hourly = mkOption {
-                      default = 0;
-                      type = types.int;
-                      description = "Number of hourly auto-snapshots that you wish to keep.";
-                    };
+            weekly = mkOption {
+              default = 4;
+              type = types.int;
+              description = "Number of weekly auto-snapshots that you wish to keep.";
+            };
 
-                    daily = mkOption {
-                      default = 7;
-                      type = types.int;
-                      description = "Number of daily auto-snapshots that you wish to keep.";
-                    };
-
-                    weekly = mkOption {
-                      default = 4;
-                      type = types.int;
-                      description = "Number of weekly auto-snapshots that you wish to keep.";
-                    };
-
-                    monthly = mkOption {
-                      default = 12;
-                      type = types.int;
-                      description = "Number of monthly auto-snapshots that you wish to keep.";
-                    };
-                  };
-                };
-              };
-
-              arc = mkOption {
-                description = "Set the ZFS ARC limits";
-                default = null;
-
-                type = types.submodule {
-                  options = {
-                    minGB = mkOption {
-                      default = 4;
-                      type = types.int;
-                      description = "Minimum size of the ARC in Gigabytes";
-                    };
-
-                    maxGB = mkOption {
-                      default = 8;
-                      type = types.int;
-                      description = "Maximum size of the ARC in Gigabytes";
-                    };
-                  };
-                };
-              };
-
-              scrub = mkOption {
-                description = "Enable ZFS scrubbing";
-                type = types.bool;
-                default = true;
-              };
-
-              metrics = mkOption {
-                description = "Enable ZFS metrics";
-                type = types.bool;
-                default = true;
-              };
-
-              encrypted = mkOption {
-                description = "Is the ZFS encrypted with LUKS?";
-                type = types.bool;
-                default = false;
-              };
-
+            monthly = mkOption {
+              default = 12;
+              type = types.int;
+              description = "Number of monthly auto-snapshots that you wish to keep.";
             };
           };
+
+          arc = {
+            minGB = mkOption {
+              default = 4;
+              type = types.int;
+              description = "Minimum size of the ARC in Gigabytes";
+            };
+
+            maxGB = mkOption {
+              default = 8;
+              type = types.int;
+              description = "Maximum size of the ARC in Gigabytes";
+            };
+          };
+
+          scrub = mkOption {
+            description = "Enable ZFS scrubbing";
+            type = types.bool;
+            default = true;
+          };
+
+          metrics = mkOption {
+            description = "Enable ZFS metrics";
+            type = types.bool;
+            default = true;
+          };
+
+          encrypted = mkOption {
+            description = "Is the ZFS encrypted with LUKS?";
+            type = types.bool;
+            default = false;
+          };
+
         };
 
-        networking = mkOption {
-          description = "Configure networking";
-          type = types.submodule {
-            options = {
+        networking = {
+          domainName = mkOption {
+            type = types.str;
+            description = "Domain name to be used";
+            default = "ruwusch.de";
+          };
 
-              domainName = mkOption {
-                type = types.str;
-                description = "Domain name to be used";
-                default = "inet.tu-berlin.de";
-              };
+          monitoringDomain = mkOption {
+            type = types.str;
+            description = "fqdn to be used for monitoring the host";
+            default = "${config.networking.hostName}.status.${config.host.networking.domainName}";
+          };
 
-              containerHostIP = mkOption {
-                type = types.str;
-                description = "IP address of the container host";
-                default = "192.168.7.1";
-              };
+          containerHostIP = mkOption {
+            type = types.str;
+            description = "IP address of the container host";
+            default = "192.168.7.1";
+          };
 
-              timeZone = mkOption {
-                type = types.str;
-                description = "Timezone";
-                default = "Europe/Berlin";
-              };
-
-            };
+          timeZone = mkOption {
+            type = types.str;
+            description = "Timezone";
+            default = "Europe/Berlin";
           };
         };
       };
@@ -179,6 +157,7 @@ in
     };
 
     boot.zfs.forceImportRoot = false;
+    powerManagement.cpuFreqGovernor = "performance";
 
     services.zfs = {
       autoSnapshot = {
@@ -194,8 +173,8 @@ in
 
       autoScrub = {
         enable = config.host.zfs.scrub;
-        interval = "Sun *-*-01..07 02:00:00";  # Always run on the first Sunday in the month
-        randomizedDelaySec = "6h";
+        interval = "Sun *-*-01..07 02:00:00"; # Always run on the first Sunday in the month
+        randomizedDelaySec = "1h";
       };
     };
 
@@ -211,8 +190,6 @@ in
       "sr_mod"
       "nvme"
       "ahci"
-
-      "igb"
 
       # QEMU
       "virtio_pci"
@@ -237,12 +214,15 @@ in
     ] ++ config.host.initrdAdditionalKernelModules;
 
     time.timeZone = config.host.networking.timeZone;
+
     networking = {
       hostName = config.host.name;
       hostId = config.host.id;
+
+      firewall = {
+        enable = true;
+        allowedTCPPorts = [ 22 80 443 ];
+      };
     };
-    services.timesyncd.enable = true;
-
-
   };
 }

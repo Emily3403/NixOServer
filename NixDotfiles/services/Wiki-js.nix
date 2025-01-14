@@ -1,7 +1,10 @@
 { pkgs, config, lib, ... }:
 let
   cfg = config.host.services.wiki-js;
+  utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
+
+  containerID = 5;
 in
 {
   options.host.services.wiki-js = {
@@ -22,21 +25,20 @@ in
       "d ${cfg.dataDir}/postgresql 0750 postgres"
       "d ${cfg.dataDir}/wiki-js 0750 wiki-js"
     ];
-    
+
     age.secrets.Wiki-js_ssh-key = {
       file = ../secrets/${config.host.name}/Wiki-js.age;
       owner = "wiki-js";
     };
   };
-  
+
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs;
+        inherit config lib pkgs containerID;
+        subdomain = cfg.subdomain;
 
         name = "wiki-js";
-        subdomain = cfg.subdomain;
-        containerID = 5;
         containerPort = 3000;
 
         postgresqlName = "wiki-js";

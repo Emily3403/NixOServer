@@ -1,24 +1,36 @@
-{
-  name, subdomain ? null, containerID /* Integer ID that counts up from 1 */,
-  containerPort, bindMounts,
-  user ? null /* attrset with optional name, uid, gid, isNormalUser / isSystemUser */,
-  isSystemUser ? false,
-  group ? null /* Same here except the attrs from group */,
-  imports ? [],
-  postgresqlName ? null, additionalDomains ? [ ], additionalContainerConfig ? {},
-  makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
-  enableHardwareTranscoding ? false,
-  cfg, lib, config, pkgs
+{ name
+, subdomain ? null
+, fqdn ? null
+, containerID /* Integer ID that counts up from 1 */
+, containerPort /* int */
+, additionalPorts ? []
+, bindMounts
+, user ? null /* attrset with optional name, uid, gid, isNormalUser / isSystemUser */
+, isSystemUser ? false
+, group ? null /* Same here except the attrs from group */
+, imports ? [ ]
+, postgresqlName ? null
+, additionalDomains ? [ ]
+, additionalContainerConfig ? { }
+, makeNginxConfig ? true
+, nginxLocation ? "/"
+, additionalNginxConfig ? { }
+, additionalNginxLocationConfig ? { }
+, additionalNginxHostConfig ? { }
+, enableHardwareTranscoding ? false
+, cfg
+, lib
+, config
+, pkgs
 }:
 let
 
   inherit (lib) mkIf optional optionals mkMerge;
   utils = import ../../utils.nix { inherit config lib; };
-  containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort;
   stateVersion = config.system.stateVersion;
-  containerIP = "192.168.7.${toString (containerID + 1)}";
+  containerIP = utils.makeNixContainerIP containerID;
 
-  pgImport = if postgresqlName == null then [] else [
+  pgImport = if postgresqlName == null then [ ] else [
     (
       import ./Postgresql.nix {
         inherit pkgs lib;
@@ -27,64 +39,64 @@ let
     )
   ];
 
-  nginxImport = if makeNginxConfig == false then [] else [
-    (
-      import ./Nginx.nix {
-        inherit containerIP config additionalDomains lib;
-        containerPort = containerPortStr;
-        subdomain = if subdomain != null then subdomain else name;
-        additionalConfig = additionalNginxConfig;
-        additionalLocationConfig = additionalNginxLocationConfig;
-        additionalHostConfig = additionalNginxHostConfig;
-      }
-    )
-  ];
+  userConfig =
+    let
+      userAttrs = if user == null then { } else user;
+      groupAttrs = if group == null then { } else group;
+      userName = if builtins.hasAttr "name" userAttrs then user.name else name;
+      groupName = if builtins.hasAttr "name" groupAttrs then group.name else userName;
+      uid = if builtins.hasAttr "uid" userAttrs then user.uid else containerID + 12000;
+      usingPg = (pgImport == [ ]);
+    in
+    {
+      users = {
+        "${userName}" = {
+          uid = uid;
+          isNormalUser = !isSystemUser;
+          isSystemUser = isSystemUser;
 
+          name = userName;
+          group = userName;
 
-  userConfig = let
-    userAttrs = if user == null then {} else user;
-    groupAttrs = if group == null then {} else group;
-    userName = if builtins.hasAttr "name" userAttrs then user.name else name;
-    uid = if builtins.hasAttr "uid" userAttrs then user.uid else containerID + 12000;
-    usingPg = (pgImport == []);
-  in {
-    users = {
-      "${userName}" = {
-        uid = uid;
-        isNormalUser = !isSystemUser;
-        isSystemUser = isSystemUser;
+          password = "!"; # Always disallow login
+        } // userAttrs;
 
-        name = userName;
-        group = userName;
+        "postgres" = mkIf usingPg {
+          uid = 71;
+          group = "postgres";
+        };
+      };
 
-        password = "!";  # Always disallow login
-      } // userAttrs;
+      groups = {
+        "${groupName}" = {
+          gid = uid;
+          members = [ userName ];
+        } // groupAttrs;
 
-      "postgres" = mkIf usingPg {
-        uid = 71;
-        group = "postgres";
+        postgres.members = optional usingPg "postgres";
       };
     };
-
-    groups = {
-      "${userName}" = {
-        gid = uid;
-        members = [ userName ];
-      } // groupAttrs;
-
-      postgres.members = optional usingPg "postgres";
-    };
-  };
 
 
 in
 {
-  imports = imports ++ nginxImport;
+  imports = imports ++ [(
+    import ./Nginx.nix {
+      inherit containerIP fqdn config additionalDomains lib containerPort;
+      enable = makeNginxConfig;
+      subdomain = if subdomain != null then subdomain else name;
+      location = nginxLocation;
+      additionalConfig = additionalNginxConfig;
+      additionalLocationConfig = additionalNginxLocationConfig;
+      additionalHostConfig = additionalNginxHostConfig;
+    }
+  )];
+
   users = userConfig;
 
   hardware.graphics = mkIf enableHardwareTranscoding {
     enable = true;
-    extraPackages = with pkgs; [ vpl-gpu-rt intel-media-driver intel-media-sdk intel-ocl vaapiVdpau libvdpau-va-gl vaapiIntel ];
+    extraPackages = with pkgs; [ intel-media-driver intel-compute-runtime-legacy1 ];
   };
 
   containers."${name}" = utils.recursiveMerge [
@@ -95,22 +107,24 @@ in
       hostAddress = config.host.networking.containerHostIP;
       localAddress = containerIP;
 
-      bindMounts = mkMerge [ bindMounts (mkIf enableHardwareTranscoding { "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; };}) ];
-      allowedDevices = optionals (enableHardwareTranscoding) [ { node = "/dev/dri/renderD128"; modifier = "rw"; } { node = "/dev/dri/card0"; modifier = "rw"; } ];
+      bindMounts = mkMerge [ bindMounts (mkIf enableHardwareTranscoding { "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; }; }) ];
+      allowedDevices = optionals (enableHardwareTranscoding) [{ node = "/dev/dri/renderD128"; modifier = "rw"; } { node = "/dev/dri/card0"; modifier = "rw"; }];
 
       config = { pkgs, config, lib, ... }: utils.recursiveMerge [
         cfg
         {
           system.stateVersion = stateVersion;
-          networking.firewall.allowedTCPPorts = [ containerPort ];
+          nixpkgs.config.allowUnfree = true;
+          networking.firewall.allowedTCPPorts = [ containerPort ] ++ additionalPorts;
+          users = userConfig;
           imports = [ ../../users/root.nix ../../system.nix ] ++ imports ++ pgImport;
 
           hardware.graphics = mkIf enableHardwareTranscoding {
             enable = true;
-            extraPackages = with pkgs; [ vpl-gpu-rt intel-media-driver intel-media-sdk intel-ocl vaapiVdpau libvdpau-va-gl vaapiIntel ];
+            extraPackages = with pkgs; [ intel-media-driver intel-compute-runtime-legacy1 ];
           };
 
-          users = userConfig;
+          environment.sessionVariables = mkIf enableHardwareTranscoding { LIBVA_DRIVER_NAME = "iHD"; };
         }
       ];
     }

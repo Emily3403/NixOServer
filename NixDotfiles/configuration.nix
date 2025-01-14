@@ -1,33 +1,15 @@
-# configuration in this file is shared by all hosts
-
-{ pkgs, pkgs-unstable, inputs, lib, config, ... }:
-let
-  inherit (inputs) self;
-in
-{
+# This configuration file contains all the nix-specific code
+{ pkgs, inputs, lib, config, ... }: {
 
   # Safety mechanism: refuse to build unless everything is tracked by git
-  system.configurationRevision =
-    if (self ? rev) then
-      self.rev
-    else
-      throw "refusing to build: git tree is dirty";
+  system.configurationRevision = if (inputs.self ? rev) then inputs.self.rev else throw "refusing to build: git tree is dirty";
 
-  # NixOS Setup  TODO: Migrate this to system.nix
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  # NixOS Setup
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
-
-#  nixpkgs.config.allowUnfree = lib.mkForce true;
-
-  # Podman
-  virtualisation.podman = {
-    enable = true;
-    defaultNetwork.settings = { dns_enabled = false; };
-    dockerCompat = true;
-  };
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+#  nix.settings.download-buffer-size = 134217728;  # Double the default
 
   environment.defaultPackages = with pkgs; [
     inputs.agenix.packages.x86_64-linux.default
   ];
-
 }
