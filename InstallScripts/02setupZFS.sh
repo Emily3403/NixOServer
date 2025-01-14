@@ -31,14 +31,13 @@ convert_dev_names_to_cryptsetup_name() {
 
 if [ "$NUM_HOT_SPARES" -gt 0 ]; then
     check_variables HOT_SPARES
+    # TODO: I think this always makes encrypted boot and root pool
     spare_bpool="spare $(convert_dev_names_to_cryptsetup_name "part2" "${HOT_SPARES[@]}")"
     spare_rpool="spare $(convert_dev_names_to_cryptsetup_name "part3" "${HOT_SPARES[@]}")"
 else
     spare_bpool=""
     spare_rpool=""
 fi
-
-
 
 # Initialize an empty array for storing groups of drives
 bpool_grouped_drives=()

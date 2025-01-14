@@ -1,7 +1,10 @@
 { pkgs, config, lib, ... }:
 let
   cfg = config.host.services.syncthing;
+  utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
+
+  containerID = 1;
 in
 {
 
@@ -33,28 +36,28 @@ in
       allowedUDPPorts = [ 21027 22000 ];
     };
 
-    age.secrets = mkIf cfg.enableExporter {
-      Prometheus_syncthing-exporter-environment = {
-        file = ../secrets/${config.host.name}/Monitoring/Exporters/Syncthing-Exporter.age;
-        owner = "root";
-      };
+    age.secrets.Prometheus_Syncthing-exporter  = mkIf cfg.enableExporter {
+      file = ../secrets/nixie/Monitoring/Exporters/${config.host.name}/Syncthing.age;
+      owner = "root";
     };
+
+    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxBearerMetricConfig "syncthing" (utils.makeNixContainerIP containerID) "8080");
+
   };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs;
+        inherit config lib pkgs containerID;
+        subdomain = cfg.subdomain;
 
         name = "syncthing";
-        subdomain = config.host.services.syncthing.subdomain;
-        containerID = 1;
         containerPort = 8080;
 
         user.uid = 237;
         isSystemUser = true;
 
-        additionalContainerConfig.forwardPorts = [ { hostPort = 22000; } { hostPort = 22000; protocol = "udp"; } { hostPort = 21027; protocol = "udp"; } ];
+        additionalContainerConfig.forwardPorts = [{ hostPort = 22000; } { hostPort = 22000; protocol = "udp"; } { hostPort = 21027; protocol = "udp"; }];
 
         bindMounts = {
           "/var/lib/syncthing/" = { hostPath = "${cfg.dataDir}/syncthing"; isReadOnly = false; };
@@ -73,7 +76,7 @@ in
             settings = {
               options = {
                 urAccepted = -1;
-                maxFolderConcurrency = 8;  # Turn this down if using HDDs
+                maxFolderConcurrency = 8; # Turn this down if using HDDs
               };
 
               devices =
@@ -99,5 +102,29 @@ in
         };
       }
     )
+
+    (
+      import ./Container-Config/Oci-Container.nix {
+        inherit config lib pkgs;
+        enable = cfg.enableExporter;
+        dataDir = cfg.dataDir;
+        fqdn = config.host.networking.monitoringDomain;
+
+        name = "syncthing-exporter";
+        image = "f100024/syncthing_exporter:0.3.12";
+        containerID = 25;
+
+        containerPort = 9093;
+        nginxLocation = "/syncthing-exporter-metrics";
+        nginxProxyPassLocation = "/metrics";
+
+        environmentFiles = [ config.age.secrets.Prometheus_Syncthing-exporter.path ];
+        environment = {
+          SYNCTHING_URI = "https://${cfg.subdomain}.${config.host.networking.domainName}";
+          SYNCTHING_TIMEOUT = "60s";
+        };
+      }
+    )
+
   ];
 }

@@ -33,7 +33,7 @@ fi
 sed -i "s|rootHash_placeholder|${rootHashPwd}|" "/mnt/etc/nixos/users/root.nix"
 
 SSH_HOST_KEY_LOCATION="/mnt/etc/ssh/ssh_host_ed25519_key"
-SSH_ROOT_DIR="/root/.ssh/"
+SSH_ROOT_DIR="/mnt/root/.ssh/"
 SSH_ROOT_ID="$SSH_ROOT_DIR/id_ed25519"
 
 if [ -n "$HOST_PRIVATE_SSH_KEY" ];
@@ -44,11 +44,7 @@ then
     ssh-keygen -f "$SSH_HOST_KEY_LOCATION" -y > "/mnt/etc/ssh/ssh_host_ed25519_key.pub"
 fi
 
-if [ ! -d "$SSH_ROOT_DIR" ];
-then
-    mkdir -p /root/.ssh
-fi
-
+mkdir -p "$SSH_ROOT_DIR"
 if [ ! -L "$SSH_ROOT_ID" ] || [ ! -e "$SSH_ROOT_ID" ];
 then
     rm -f "$SSH_ROOT_ID"

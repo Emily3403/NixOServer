@@ -1,7 +1,10 @@
 { pkgs, config, lib, ... }:
 let
   cfg = config.host.services.tandoor;
+  utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
+
+  containerID = 6;
 in
 {
   options.host.services.tandoor = {
@@ -24,12 +27,12 @@ in
   config = {
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0750 tandoor_recipes nginx"
-      "d ${cfg.dataDir}/tandoor-recipes 0750 tandoor_recipes nginx"  # Nginx has to be able to serve the images
+      "d ${cfg.dataDir}/tandoor-recipes 0750 tandoor_recipes nginx" # Nginx has to be able to serve the images
       "d ${cfg.dataDir}/postgresql 0750 postgres"
     ];
 
     age.secrets.Tandoor = {
-      file = ../secrets/${config.host.name}/Tandoor-secret-key.age;
+      file = ../secrets/${config.host.name}/Tandoor.age;
       owner = "tandoor_recipes";
     };
   };
@@ -38,11 +41,10 @@ in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs;
+        inherit config lib pkgs containerID;
+        subdomain = cfg.subdomain;
 
         name = "tandoor";
-        subdomain = cfg.subdomain;
-        containerID = 6;
         containerPort = 8080;
         postgresqlName = "tandoor_recipes";
 
@@ -72,9 +74,10 @@ in
               POSTGRES_HOST = "/run/postgresql/";
               POSTGRES_DB = "tandoor_recipes";
               POSTGRES_USER = "tandoor_recipes";
+              SOCIAL_PROVIDERS = "allauth.socialaccount.providers.openid_connect";
 
-              ENABLE_METRICS = 0;  # Once Prometheus is set up, this can be enabled
-              TZ = "Europe/Berlin";
+              ENABLE_METRICS = 0; # Once Prometheus is set up, this can be enabled
+              TZ = config.host.networking.timeZone;
             };
           };
         };

@@ -2,12 +2,10 @@
   imports = map (it: ../../services/${it}) [
     # System
     "Nginx.nix"
-    "Backup.nix"
-    "Wireguard.nix"
+    "Backup/Restic-Client.nix"
 
-    # Core Services
-    "Transmission.nix"
-    "Jellyfin.nix"
+    "WireGuard.nix"
+    "Media"
 
     # Carsten
     "Keycloak.nix"
@@ -17,8 +15,7 @@
 
   config = {
     host.services = {
-      nextcloud.enableExporter = false;
-      transmission.enableExporter = false;
+      restic.enableExporter = false;
 
       keycloak = {
         realm = "Super-Realm";

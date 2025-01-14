@@ -2,7 +2,7 @@
   imports = map (it: ../../services/${it}) [
     # System
     "Nginx.nix"
-    "Backup.nix"
+    "Backup/Restic-Client.nix"
 
     # Core Services
     "Monitoring"
@@ -10,34 +10,26 @@
     "Keycloak.nix"
     "Nextcloud.nix"
     "HedgeDoc.nix"
+    "Get.nix"
     "Wiki-js.nix"
     "YouTrack.nix"
-    "Get.nix"
+    "Firefly-III.nix"
 
     # Ruwusch but hosted on SSD
     "Stirling-PDF.nix"
     "Tandoor.nix"
 
-    "PhotoManagement/Ente.nix"
-#    "PhotoManagement/PhotoPrism.nix"
-#    "PhotoManagement/Piwigo.nix"
+    "Photo-Management"
   ];
 
   config = {
     host.services = {
-      syncthing.enableExporter = false;
-
-      nextcloud.enableExporter = false;
-      nextcloud.subdomain = "wolke";
-
+      restic.enableExporter = false;
       ente.enableExporter = false;
 
+      nextcloud.subdomain = "wolke";
       hedgedoc.subdomain = "emily-pad";
-
-      keycloak = {
-        realm = "Emily-Realm";
-        subdomain = "auth";
-      };
+      keycloak.realm = "Emily-Realm";
     };
 
 

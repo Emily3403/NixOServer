@@ -1,26 +1,12 @@
-# Services that should exist:
-# - Jellyfin
-# - Transmission-openvpn (docker)  (4TB – 8TB)
-# - openvpn compatible vpn
-#    - Bonus: Able to use mulvad
-# - Some form of cloud, probably Nextcloud  (4TB)
-#   - WebDAV, different Users, Calendar, Version control
-#   - Client _has_ to be able to check for metered connection
-#   - Stores the data encrypted
-# - Central identity management with Keycloak
-# - isisdl compressed videos    (2TB)
-
-
 { config, modulesPath, pkgs, lib, ... }: {
   host = {
     name = "ruwusch";
-    id = "42069420";
-    bootDevices = [ "wwn-0x5000c500db1e5ef4" "wwn-0x5000c500db3750a7" ];
-#    bootDevices = [ "wwn-0x5000c500db24ffb3" "wwn-0x5000c500db235066" ];
+    id = "42042069";
+    bootDevices = [ "wwn-0x5000cca267f080f2" "wwn-0x5000cca267ebaefd" "wwn-0x5000cca252d156af" ];
 
     authorizedKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj nana"
     ];
 
     zfs = {
@@ -28,12 +14,12 @@
         enable = true;
         daily = 15;
         weekly = 9;
-        monthly = 60;  # 5 years
+        monthly = 60; # 5 years
       };
 
       arc = {
-        minGB = 32;
-        maxGB = 56;
+        minGB = 78;
+        maxGB = 112;
       };
 
       encrypted = true;
@@ -41,11 +27,9 @@
 
     initrdAdditionalKernelModules = [
       "uhci_hcd"
-      "kvm-amd"
+      "kvm-intel"
       "e1000e"
     ];
-
-    networking.domainName = "ruwusch.de";
   };
 
   networking = {
@@ -62,11 +46,21 @@
       internalInterfaces = [ "ve-+" ];
       externalInterface = "eno1";
     };
+
+    # IPv6 Connectivity
+    interfaces.eno1.ipv6.addresses = [{
+        address = "2a01:4f8:172:3d0d::";
+        prefixLength = 64;
+    }];
+
+    defaultGateway6 = {
+      address = "fe80::1";
+      interface = "eno1";
+    };
   };
 
   # This option is discouraged, however in all scenarios we want to import the root anymays as there is no other way of solving the problem
   boot.zfs.forceImportRoot = lib.mkForce true;
-  powerManagement.cpuFreqGovernor = "performance";
 
   # import other host-specific things
   imports = [

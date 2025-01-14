@@ -1,7 +1,10 @@
 { pkgs, config, lib, ... }:
 let
   cfg = config.host.services.youtrack;
+  utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
+
+  containerID = 22;
 in
 {
 
@@ -17,18 +20,25 @@ in
     };
   };
 
+  config = {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0750 13001 13001"
+      "d ${cfg.dataDir}/data/ 0750 13001 13001"
+      "d ${cfg.dataDir}/conf/ 0750 13001 13001"
+      "d ${cfg.dataDir}/logs/ 0750 13001 13001"
+      "d ${cfg.dataDir}/backups/ 0750 13001 13001"
+    ];
+  };
+
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib pkgs;
-
-        enable = true;
-        name = "youtrack";
-        image = "jetbrains/youtrack:2024.3.55417";
+        inherit config lib pkgs containerID;
+        subdomain = cfg.subdomain;
         dataDir = cfg.dataDir;
 
-        subdomain = cfg.subdomain;
-        containerID = 1;
+        name = "youtrack";
+        image = "jetbrains/youtrack:2024.3.55417";
         containerPort = 8080;
 
         volumes = [
@@ -40,14 +50,4 @@ in
       }
     )
   ];
-
-  config = {
-    systemd.tmpfiles.rules = [
-      "d ${cfg.dataDir} 0750 13001 13001"
-      "d ${cfg.dataDir}/data/ 0750 13001 13001"
-      "d ${cfg.dataDir}/conf/ 0750 13001 13001"
-      "d ${cfg.dataDir}/logs/ 0750 13001 13001"
-      "d ${cfg.dataDir}/backups/ 0750 13001 13001"
-    ];
-  };
 }

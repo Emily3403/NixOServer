@@ -4,6 +4,8 @@ let
   kcfg = config.host.services.keycloak;
   utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
+
+  containerID = 4;
 in
 {
   options.host.services.hedgedoc = {
@@ -29,7 +31,7 @@ in
       "d ${cfg.dataDir}/hedgedoc 0750 hedgedoc"
       "d ${cfg.dataDir}/postgresql 0750 postgres"
     ];
-    
+
     age.secrets.HedgeDoc = {
       file = ../secrets/${config.host.name}/HedgeDoc.age;
       owner = "hedgedoc";
@@ -40,11 +42,10 @@ in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs;
+        inherit config lib pkgs containerID;
+        subdomain = cfg.subdomain;
 
         name = "hedgedoc";
-        subdomain = cfg.subdomain;
-        containerID = 4;
         containerPort = 3000;
         isSystemUser = true;
 
@@ -108,7 +109,5 @@ in
     )
   ];
 
-  config = {
-#    services.nginx.virtualHosts."${config.networking.hostName}.status.${config.host.networking.domainName}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "hedgedoc" "192.168.7.");
-  };
+  config.services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "hedgedoc" (utils.makeNixContainerIP containerID) "3000");
 }

@@ -1,7 +1,10 @@
 { pkgs, config, lib, ... }:
 let
   cfg = config.host.services.keycloak;
+  utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
+
+  containerID = 2;
   format = pkgs.formats.json { };
 in
 {
@@ -38,40 +41,40 @@ in
     };
 
     attributeMapper =
-    let
-      options = {
+      let
+        options = {
 
-        username = mkOption {
-          type = types.str;
-          default = "preferred_username";
-          description = "The attribute for the username.";
+          username = mkOption {
+            type = types.str;
+            default = "preferred_username";
+            description = "The attribute for the username.";
+          };
+
+          name = mkOption {
+            type = types.str;
+            default = "name";
+          };
+
+          email = mkOption {
+            type = types.str;
+            default = "email";
+          };
+
+          groups = mkOption {
+            type = types.str;
+            default = "groups";
+          };
+
         };
-
-        name = mkOption {
-          type = types.str;
-          default = "name";
-        };
-
-        email = mkOption {
-          type = types.str;
-          default = "email";
-        };
-
-        groups = mkOption {
-          type = types.str;
-          default = "groups";
-        };
-
-      };
-    in
+      in
       mkOption
-      {
+        {
           type = types.submodule {
             freeformType = format.type;
             inherit options;
           };
           default = { };
-      };
+        };
   };
 
   config = {
@@ -84,18 +87,19 @@ in
       file = ../secrets/${config.host.name}/Keycloak.age;
       owner = "keycloak";
     };
+
+    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "keycloak" (utils.makeNixContainerIP containerID) "9000");
   };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs;
+        inherit config lib pkgs containerID;
+        subdomain = cfg.subdomain;
 
         name = "keycloak";
-        subdomain = cfg.subdomain;
-        containerID = 2;
-
         containerPort = 80;
+        additionalPorts = [ 9000 ];
 
         bindMounts = {
           "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
@@ -103,8 +107,10 @@ in
         };
 
         additionalNginxConfig.locations = {
+          # According to https://www.keycloak.org/server/reverseproxy#_exposed_path_recommendations
           "~* ^/(admin|welcome|metrics|health)(/.*)?$".return = "403";
         };
+
         additionalNginxLocationConfig.extraConfig = ''
           proxy_busy_buffers_size   512k;
           proxy_buffers           4 512k;
@@ -148,7 +154,7 @@ in
               proxy-headers = "xforwarded";
               proxy-trusted-addresses = config.host.networking.containerHostIP;
 
-#              metrics-enabled = true;  # TODO
+              metrics-enabled = true;
             };
 
             database.passwordFile = config.age.secrets.Keycloak.path;
@@ -160,6 +166,7 @@ in
                 url = "https://github.com/lukin/keywind";
                 rev = "bdf966fdae0071ccd46dab4efdc38458a643b409";
               };
+
               installPhase = ''
                 mkdir -p $out
                 cp -r $src/theme/keywind/* $out/

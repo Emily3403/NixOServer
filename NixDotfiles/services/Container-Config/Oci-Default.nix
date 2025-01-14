@@ -1,32 +1,92 @@
 { pkgs, config, lib, ... }:
-let DATA_DIR = "/data/TODO"; in
+let
+  cfg = config.host.services.todo;
+  utils = import ../../utils.nix { inherit config lib; };
+  inherit (lib) mkIf mkOption types;
+
+  containerID = TODO;
+in
 {
+  options.host.services.todo = {
+    dataDir = mkOption {
+      type = types.str;
+      default = "/data/Todo";
+    };
+
+    subdomain = mkOption {
+      type = types.str;
+      default = "todo";
+    };
+
+    enableExporter = mkOption {
+      type = types.bool;
+      default = true;
+    };
+  };
+
+  config = {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0750 TODO"
+      "d ${cfg.dataDir}/todo 0750 TODO"
+    ];
+
+    age.secrets.Todo = {
+      file = ../secrets/${config.host.name}/Todo.age;
+      owner = "TODO";
+    };
+
+    age.secrets.Prometheus_Todo-exporter = mkIf cfg.enableExporter {
+      file = ../secrets/nixie/Monitoring/Exporters/${config.host.name}/Todo.age;
+      owner = "TODO";
+    };
+
+    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "todo" (utils.makeNixContainerIP containerID) "TODO");
+  };
 
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib pkgs;
-
-        enable = true;
-        name = "TODO";
-        image = "TODO";
+        inherit config lib pkgs containerID;
         dataDir = cfg.dataDir;
+        subdomain = cfg.subdomain;
 
-        subdomain = "TODO";
-        containerIP = "10.88.TODO.1";
-        containerPort = 80;
-        environment = { };
-        environmentFiles = [ config.age.secrets.TODO.path ];
+        name = "todo";
+        image = "TODO";
+        containerPort = TODO;
+
+        environmentFiles = [ config.age.secrets.Todo.path ];
+        postgresEnvFile = config.age.secrets.Todo_Postgres.path;
+
+        environment = {
+
+        };
 
         volumes = [
           "${cfg.dataDir}/TODO:/TODO"
         ];
       }
     )
-  ];
 
-  systemd.tmpfiles.rules = [
-    "d ${cfg.dataDir} 0750 5000 5000"
-    "d ${cfg.dataDir}/TODO/ 0750 5000 5000"
+    (
+      import ./Container-Config/Oci-Container.nix {
+        inherit config lib pkgs;
+        enable = cfg.enableExporter;
+        dataDir = cfg.dataDir;
+        fqdn = config.host.networking.monitoringDomain;
+
+        name = "TODO";
+        image = "TODO";
+        containerID = TODO;
+
+        containerPort = TODO;
+        nginxLocation = "/todo-metrics";
+        nginxProxyPassLocation = "/metrics";
+
+        environmentFiles = [ config.age.secrets.Prometheus_Todo-exporter.path ];
+        environment = {
+
+        };
+      }
+    )
   ];
 }
