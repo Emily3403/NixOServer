@@ -38,40 +38,40 @@ in
     };
 
     attributeMapper =
-    let
-      options = {
+      let
+        options = {
 
-        username = mkOption {
-          type = types.str;
-          default = "preferred_username";
-          description = "The attribute for the username.";
+          username = mkOption {
+            type = types.str;
+            default = "preferred_username";
+            description = "The attribute for the username.";
+          };
+
+          name = mkOption {
+            type = types.str;
+            default = "name";
+          };
+
+          email = mkOption {
+            type = types.str;
+            default = "email";
+          };
+
+          groups = mkOption {
+            type = types.str;
+            default = "groups";
+          };
+
         };
-
-        name = mkOption {
-          type = types.str;
-          default = "name";
-        };
-
-        email = mkOption {
-          type = types.str;
-          default = "email";
-        };
-
-        groups = mkOption {
-          type = types.str;
-          default = "groups";
-        };
-
-      };
-    in
+      in
       mkOption
-      {
+        {
           type = types.submodule {
             freeformType = format.type;
             inherit options;
           };
           default = { };
-      };
+        };
   };
 
   config = {
@@ -103,8 +103,10 @@ in
         };
 
         additionalNginxConfig.locations = {
+        # According to https://www.keycloak.org/server/reverseproxy#_exposed_path_recommendations
           "~* ^/(admin|welcome|metrics|health)(/.*)?$".return = "403";
         };
+
         additionalNginxLocationConfig.extraConfig = ''
           proxy_busy_buffers_size   512k;
           proxy_buffers           4 512k;
@@ -160,6 +162,7 @@ in
                 url = "https://github.com/lukin/keywind";
                 rev = "bdf966fdae0071ccd46dab4efdc38458a643b409";
               };
+
               installPhase = ''
                 mkdir -p $out
                 cp -r $src/theme/keywind/* $out/

@@ -1,7 +1,14 @@
-{
-  subdomain, containerIP, containerPort /* str */,
-  additionalDomains ? [ ], additionalConfig ? {}, additionalLocationConfig ? {}, additionalHostConfig ? {},
-  config, lib
+{ subdomain
+, location ? "/"
+, containerIP
+, containerPort /* str */
+, useHttps ? false
+, additionalDomains ? [ ]
+, additionalConfig ? { }
+, additionalLocationConfig ? { }
+, additionalHostConfig ? { }
+, config
+, lib
 }:
 let utils = import ../../utils.nix { inherit config lib; }; in
 {
@@ -15,10 +22,10 @@ let utils = import ../../utils.nix { inherit config lib; }; in
           enableACME = true;
           serverAliases = map (it: "${it}.${config.host.networking.domainName}") additionalDomains;
 
-          locations."/" = utils.recursiveMerge [
+          locations."${location}" = utils.recursiveMerge [
             additionalLocationConfig
             {
-              proxyPass = "http://${containerIP}:${containerPort}/";
+              proxyPass = (if useHttps then "https" else "http") + "://${containerIP}:${containerPort}/";
             }
           ];
         }
