@@ -37,7 +37,6 @@ in
       import ./Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
 
-        enable = true;
         name = "stirling-pdf";
         dataDir = cfg.dataDir;
         subdomain = cfg.subdomain;
@@ -60,7 +59,7 @@ in
 
           SECURITY_LOGINMETHOD = "oauth2";
           SECURITY_OAUTH2_ENABLED = "true";
-          SECURITY_OAUTH2_CLIENT_KEYCLOAK_ISSUER = "https://kc.ruwusch.de/realms/Super-Realm";  # TODO: This keycloak setup should be the subdomain of ruwusch, not hardcoded
+          SECURITY_OAUTH2_CLIENT_KEYCLOAK_ISSUER = "https://kc.ruwusch.de/realms/Super-Realm"; # TODO: This keycloak setup should be the subdomain of ruwusch, not hardcoded
           SECURITY_OAUTH2_CLIENT_KEYCLOAK_CLIENTID = "Stirling-PDF";
           SECURITY_OAUTH2_CLIENT_KEYCLOAK_USEASUSERNAME = "preferred_username";
 

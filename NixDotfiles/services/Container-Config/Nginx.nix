@@ -1,7 +1,13 @@
-{
-  subdomain, containerIP, containerPort /* str */,
-  additionalDomains ? [ ], additionalConfig ? {}, additionalLocationConfig ? {}, additionalHostConfig ? {},
-  config, lib
+{ subdomain
+, containerIP
+, containerPort /* str */
+, useHttps ? false
+, additionalDomains ? [ ]
+, additionalConfig ? { }
+, additionalLocationConfig ? { }
+, additionalHostConfig ? { }
+, config
+, lib
 }:
 let utils = import ../../utils.nix { inherit config lib; }; in
 {
@@ -18,7 +24,7 @@ let utils = import ../../utils.nix { inherit config lib; }; in
           locations."/" = utils.recursiveMerge [
             additionalLocationConfig
             {
-              proxyPass = "http://${containerIP}:${containerPort}/";
+              proxyPass = (if useHttps then "https" else "http") + "://${containerIP}:${containerPort}/";
             }
           ];
         }

@@ -56,7 +56,7 @@ in
           "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.Grafana_admin-pw.path}".hostPath = config.age.secrets.Grafana_admin-pw.path;
           "${config.age.secrets.Grafana_secret-key.path}".hostPath = config.age.secrets.Grafana_secret-key.path;
-          "${config.age.secrets.Prometheus_nixie-pw.path}".hostPath = config.age.secrets.Prometheus_nixie-pw.path;
+          "${config.age.secrets.Prometheus_nixie.path}".hostPath = config.age.secrets.Prometheus_nixie.path;
         };
 
         cfg = {
@@ -113,13 +113,19 @@ in
                     type = "prometheus";
                     access = "proxy";
                     url = "https://${config.host.services.prometheus.subdomain}.${config.host.networking.domainName}";
-                    isDefault = true;
+                    isDefault = false; # TODO: This doesn't quite work yet
+
                     jsonData = {
                       basicAuth = true;
                       basicAuthUser = "admin";
+
+                      timeInterval = "5s";
+                      queryTimeout = "500s";
+                      prometheusType = "Prometheus";
                     };
+
                     secureJsonData = {
-                      basicAuthPassword = "$__file{${config.age.secrets.Prometheus_nixie-pw.path}}";
+                      basicAuthPassword = "$__file{${config.age.secrets.Prometheus_nixie.path}}";
                     };
                   }
                 ];
