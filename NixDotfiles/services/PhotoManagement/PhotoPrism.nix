@@ -51,12 +51,12 @@ let DATA_DIR = "/data/PhotoPrism"; in
             enable = true;
             package = pkgs.mariadb;
             ensureDatabases = [ "photoprism" ];
-            ensureUsers = [ {
+            ensureUsers = [{
               name = "photoprism";
               ensurePermissions = {
                 "photoprism.*" = "ALL PRIVILEGES";
               };
-            } ];
+            }];
           };
 
         };

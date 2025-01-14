@@ -2,7 +2,7 @@
   imports = map (it: ../../services/${it}) [
     # System
     "Nginx.nix"
-    "Backup.nix"
+    "Backup/Restic-Client.nix"
 
     # Core Services
     "Monitoring"
@@ -19,25 +19,23 @@
     "Tandoor.nix"
 
     "PhotoManagement/Ente.nix"
-#    "PhotoManagement/PhotoPrism.nix"
-#    "PhotoManagement/Piwigo.nix"
+    #    "PhotoManagement/PhotoPrism.nix"
+    #    "PhotoManagement/Piwigo.nix"
   ];
 
   config = {
     host.services = {
-      syncthing.enableExporter = false;
-
-      nextcloud.enableExporter = false;
-      nextcloud.subdomain = "wolke";
+      restic = {
+        backup-host = "mar-restic.inet.tu-berlin.de";  # TODO
+        enableExporter = false;
+        repoName = "emily-nixie";
+      };
 
       ente.enableExporter = false;
 
+      nextcloud.subdomain = "wolke";
       hedgedoc.subdomain = "emily-pad";
-
-      keycloak = {
-        realm = "Emily-Realm";
-        subdomain = "auth";
-      };
+      keycloak.realm = "Emily-Realm";
     };
 
 

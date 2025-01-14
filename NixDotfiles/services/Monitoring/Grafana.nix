@@ -1,7 +1,10 @@
 { pkgs, config, lib, ... }:
 let
   cfg = config.host.services.grafana;
+  utils = import ../../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
+
+  containerID = 11;
 in
 {
 
@@ -25,12 +28,12 @@ in
     ];
 
     age.secrets.Grafana_admin-pw = {
-      file = ../../secrets/${config.host.name}/Monitoring/Grafana-admin-pw.age;
+      file = ../../secrets/${config.host.name}/Monitoring/Grafana/admin-pw.age;
       owner = "grafana";
     };
 
     age.secrets.Grafana_secret-key = {
-      file = ../../secrets/${config.host.name}/Monitoring/Grafana-secret-key.age;
+      file = ../../secrets/${config.host.name}/Monitoring/Grafana/secret-key.age;
       owner = "grafana";
     };
 
@@ -40,11 +43,10 @@ in
   imports = [
     (
       import ../Container-Config/Nix-Container.nix {
-        inherit config lib pkgs;
+        inherit config lib pkgs containerID;
+        subdomain = cfg.subdomain;
 
         name = "grafana";
-        subdomain = cfg.subdomain;
-        containerID = 11;
         containerPort = 3000;
         postgresqlName = "grafana";
 
@@ -56,7 +58,7 @@ in
           "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.Grafana_admin-pw.path}".hostPath = config.age.secrets.Grafana_admin-pw.path;
           "${config.age.secrets.Grafana_secret-key.path}".hostPath = config.age.secrets.Grafana_secret-key.path;
-          "${config.age.secrets.Prometheus_nixie-pw.path}".hostPath = config.age.secrets.Prometheus_nixie-pw.path;
+          "${config.age.secrets.Prometheus_nixie.path}".hostPath = config.age.secrets.Prometheus_nixie.path;
         };
 
         cfg = {
@@ -95,6 +97,26 @@ in
                 default_theme = "dark";
               };
 
+              "auth.generic_oauth" = {
+                enabled = true;
+                name = "Keycloak";
+
+                allow_sign_up = true;
+                auto_login = true;
+                use_pkce = true;
+                skip_org_role_sync = true;
+
+                client_id = "Grafana";
+                scopes = "openid email profile";
+                email_attribute_path = "email";
+                login_attribute_path = "preferred_username";
+                name_attribute_path = "name";
+
+                auth_url = "https://kc.ruwusch.de/realms/Super-Realm/protocol/openid-connect/auth";
+                token_url = "https://kc.ruwusch.de/realms/Super-Realm/protocol/openid-connect/token";
+                signout_redirect_url = "https://kc.ruwusch.de/realms/Super-Realm/protocol/openid-connect/logout?post_logout_redirect_uri=https%3A%2F%2F${cfg.subdomain}.${config.host.networking.domainName}%2Flogin";
+              };
+
               analytics = {
                 reporting_enabled = false;
                 check_for_updates = true;
@@ -113,13 +135,19 @@ in
                     type = "prometheus";
                     access = "proxy";
                     url = "https://${config.host.services.prometheus.subdomain}.${config.host.networking.domainName}";
-                    isDefault = true;
+                    isDefault = false; # TODO: This doesn't quite work yet
+
                     jsonData = {
                       basicAuth = true;
                       basicAuthUser = "admin";
+
+                      timeInterval = "5s";
+                      queryTimeout = "500s";
+                      prometheusType = "Prometheus";
                     };
+
                     secureJsonData = {
-                      basicAuthPassword = "$__file{${config.age.secrets.Prometheus_nixie-pw.path}}";
+                      basicAuthPassword = "$__file{${config.age.secrets.Prometheus_nixie.path}}";
                     };
                   }
                 ];

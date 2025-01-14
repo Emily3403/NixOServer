@@ -6,6 +6,7 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.11";
     nixpkgs-unstable.url = "github:NixOS/nixpkgs/master";
+
     agenix = {
       url = "github:ryantm/agenix";
       inputs.darwin.follows = "";
@@ -24,24 +25,32 @@
             # You can also add more  channels to pin package version.
             pkgs = import nixpkgs {
               inherit system;
-              config.allowUnfree = true;
-              config.packageOverrides = pkgs: { vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; }; };
-            };
 
-            pkgs-unfree = {
-              inherit system;
               config.allowUnfree = true;
-              config.packageOverrides = pkgs: { vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; }; };
+#              overlays = [ (import ...) ];
+              config.packageOverrides = pkgs: {
+                vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
+              };
+
+              config.permittedInsecurePackages = [
+                "aspnetcore-runtime-6.0.36"
+                "aspnetcore-runtime-wrapped-6.0.36"
+                "dotnet-sdk-6.0.428"
+                "dotnet-sdk-wrapped-6.0.428"
+              ];
             };
 
             pkgs-unstable = import nixpkgs-unstable {
               inherit system;
-              config.packageOverrides = pkgs: { ente-web = pkgs.ente-web.overrideAttrs {
-                env = { NEXT_PUBLIC_ENTE_ENDPOINT="https://api.ente.ruwusch.de"; };
+              config.allowUnfree = true;
 
-                # The number of max jobs is (currently) hardcoded in the source code. Change it to match a more demanding setting
-                postPatch = ''substituteInPlace apps/photos/src/services/upload/uploadManager.ts --replace-fail "const maxConcurrentUploads = 4;" "const maxConcurrentUploads = 12;"'';
-              }; };
+              config.packageOverrides = pkgs: {
+                ente-web = pkgs.ente-web.overrideAttrs {
+                  env = { NEXT_PUBLIC_ENTE_ENDPOINT = "https://api.ente.ruwusch.de"; NEXT_PUBLIC_ENTE_ALBUMS_ENDPOINT = "https://albums.ruwusch.de"; };
+                  # The number of max jobs is (currently) hardcoded in the source code. Change it to match a more demanding setting
+                  postPatch = ''substituteInPlace apps/photos/src/services/upload/uploadManager.ts --replace-fail "const maxConcurrentUploads = 4;" "const maxConcurrentUploads = 12;"'';
+                };
+              };
             };
 
             # make all inputs availabe in other nix files
@@ -57,19 +66,17 @@
             ./system.nix
             agenix.nixosModules.default
 
-            # Users
-            ./users/default.nix
-
             # Configuration per host
             ./hosts/${hostName}
-          ] ++ [ { system.stateVersion = stateVersion; } ];
+            ./users/hosts/${hostName}.nix
+          ] ++ [{ system.stateVersion = stateVersion; }];
         };
 
     in
     {
       nixosConfigurations = {
-        ruwusch = mkHost "ruwusch" "23.11" "x86_64-linux";
         nixie = mkHost "nixie" "24.11" "x86_64-linux";
+        ruwusch = mkHost "ruwusch" "23.11" "x86_64-linux";
       };
 
       formatter.x86_64-linux = nixpkgs.legacyPackages.x86_64-linux.nixpkgs-fmt;
