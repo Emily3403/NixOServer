@@ -1,8 +1,12 @@
 { pkgs, config, options, lib, ... }:
 let
   inherit (lib) mkIf mkOption types;
+  utils = import ../utils.nix { inherit config lib; };
+
   ncfg = config.host.services.nextcloud;
   kcfg = config.host.services.keycloak;
+
+  containerID = 3;
 
   nginxConfig = ''
     client_body_buffer_size 400M;
@@ -43,25 +47,26 @@ in
       owner = "nextcloud";
     };
 
-    age.secrets.Nexcloud_keycloak-client-secret = {
-      file = ../secrets/${config.host.name}/Nextcloud/keycloak-client-secret.age;
+    age.secrets.Nextcloud_keycloak = {
+      file = ../secrets/${config.host.name}/Nextcloud/keycloak.age;
       owner = "nextcloud";
     };
 
     age.secrets.Nextcloud_exporter-tokenfile = mkIf ncfg.enableExporter {
-      file = ../secrets/${config.host.name}/Monitoring/Exporters/Nextcloud-Token.age;
-      owner = "nextcloud-exporter";
+      file = ../secrets/nixie/Monitoring/Exporters/${config.host.name}/Nextcloud.age;
+      owner = "995";
     };
+
+    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf ncfg.enableExporter (utils.makeNginxMetricConfig "nextcloud" (utils.makeNixContainerIP containerID) "9205");
   };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs;
+        inherit config lib pkgs containerID;
+        subdomain = ncfg.subdomain;
 
         name = "nextcloud";
-        subdomain = ncfg.subdomain;
-        containerID = 3;
         containerPort = 80;
         isSystemUser = true;
 
@@ -72,7 +77,7 @@ in
           "/var/lib/nextcloud" = { hostPath = "${ncfg.dataDir}/nextcloud"; isReadOnly = false; };
           "/var/lib/postgresql" = { hostPath = "${ncfg.dataDir}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.Nextcloud_admin-password.path}".hostPath = config.age.secrets.Nextcloud_admin-password.path;
-          "${config.age.secrets.Nexcloud_keycloak-client-secret.path}".hostPath = config.age.secrets.Nexcloud_keycloak-client-secret.path;
+          "${config.age.secrets.Nextcloud_keycloak.path}".hostPath = config.age.secrets.Nextcloud_keycloak.path;
         } // lib.optionalAttrs ncfg.enableExporter {
           "${config.age.secrets.Nextcloud_exporter-tokenfile.path}".hostPath = config.age.secrets.Nextcloud_exporter-tokenfile.path;
         };
@@ -82,11 +87,11 @@ in
 
           services.nextcloud = {
             enable = true;
-            package = pkgs.nextcloud30;
+            package = pkgs.nextcloud31;
             hostName = "${ncfg.subdomain}.${config.host.networking.domainName}";
             https = true;
             maxUploadSize = "200G";
-            secretFile = config.age.secrets.Nexcloud_keycloak-client-secret.path;
+            secretFile = config.age.secrets.Nextcloud_keycloak.path;
 
             config = {
               adminuser = "admin";
@@ -132,12 +137,12 @@ in
 #                files_markdown  # Not supported: https://github.com/icewind1991/files_markdown/issues/218
                 groupfolders
                 # phonetrack  # TODO: Look into this
-                onlyoffice  # TODO: Documentserver
+                onlyoffice
                 ;
 
               oidc_login = pkgs.fetchNextcloudApp rec {
                 url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v3.2.0/oidc_login.tar.gz";
-                sha256 = "141xkbvrwmhgmcicpd9g86jmhihqrp50ijmhgl4n9ksc8cldmdhf";  # get this with `nix-prefetch-url {url}`
+                sha256 = "141xkbvrwmhgmcicpd9g86jmhihqrp50ijmhgl4n9ksc8cldmdhf"; # get this with `nix-prefetch-url {url}`
                 license = "agpl3Only";
               };
             };

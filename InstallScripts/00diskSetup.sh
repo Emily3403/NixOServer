@@ -45,6 +45,7 @@ for drive_id in "${selected_drives[@]}"; do
     capacity=$(lsblk -bndo SIZE "$device_path" | numfmt --to=iec)
     echo "$drive_id -> $device_path (Capacity: $capacity)"
 done
+
 if [ "$NUM_HOT_SPARES" -gt 0 ]; then
     echo -e "\nHot spares:"
     for drive_id in "${selected_hot_spares[@]}"; do
@@ -68,6 +69,6 @@ while true; do
     esac
 done
 
-# Save the drives into an array and export it
+# Save the drives into an array and export it for the other scripts to use
 export DRIVES=("${selected_drives[@]}")
 export HOT_SPARES=("${selected_hot_spares[@]}")
