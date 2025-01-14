@@ -1,7 +1,10 @@
 { pkgs, config, lib, ... }:
 let
   cfg = config.host.services.stirling-pdf;
+  utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
+
+  containerID = 13;
 in
 {
   options.host.services.stirling-pdf = {
@@ -35,15 +38,15 @@ in
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib pkgs;
-
-        enable = true;
-        name = "stirling-pdf";
+        inherit config lib pkgs containerID;
         dataDir = cfg.dataDir;
         subdomain = cfg.subdomain;
-        image = "stirlingtools/stirling-pdf:latest";
-        containerID = 13;
+
+        name = "stirling-pdf";
+        image = "stirlingtools/stirling-pdf:0.43.1";
         containerPort = 8080;
+
+        additionalNginxConfig.extraConfig = "client_max_body_size 1G;";  # 1G of PDF should be enough
 
         environmentFiles = [ config.age.secrets.Stirling-PDF.path ];
         environment = {
@@ -60,7 +63,7 @@ in
 
           SECURITY_LOGINMETHOD = "oauth2";
           SECURITY_OAUTH2_ENABLED = "true";
-          SECURITY_OAUTH2_CLIENT_KEYCLOAK_ISSUER = "https://kc.ruwusch.de/realms/Super-Realm";  # TODO: This keycloak setup should be the subdomain of ruwusch, not hardcoded
+          SECURITY_OAUTH2_CLIENT_KEYCLOAK_ISSUER = "https://kc.ruwusch.de/realms/Super-Realm"; # TODO: This keycloak setup should be the subdomain of ruwusch, not hardcoded
           SECURITY_OAUTH2_CLIENT_KEYCLOAK_CLIENTID = "Stirling-PDF";
           SECURITY_OAUTH2_CLIENT_KEYCLOAK_USEASUSERNAME = "preferred_username";
 

@@ -1,1 +1,1 @@
-{ config, lib, pkgs, ... }: { imports = [ ./boot.nix ./fileSystems.nix ./host.nix ./services ]; }
+{ config, lib, pkgs, ... }: { imports = [ ./boot.nix ./fileSystems.nix ./host.nix ]; }
