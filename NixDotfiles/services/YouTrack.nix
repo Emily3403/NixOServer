@@ -17,12 +17,21 @@ in
     };
   };
 
+  config = {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0750 13001 13001"
+      "d ${cfg.dataDir}/data/ 0750 13001 13001"
+      "d ${cfg.dataDir}/conf/ 0750 13001 13001"
+      "d ${cfg.dataDir}/logs/ 0750 13001 13001"
+      "d ${cfg.dataDir}/backups/ 0750 13001 13001"
+    ];
+  };
+
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
 
-        enable = true;
         name = "youtrack";
         image = "jetbrains/youtrack:2024.3.55417";
         dataDir = cfg.dataDir;
@@ -40,14 +49,4 @@ in
       }
     )
   ];
-
-  config = {
-    systemd.tmpfiles.rules = [
-      "d ${cfg.dataDir} 0750 13001 13001"
-      "d ${cfg.dataDir}/data/ 0750 13001 13001"
-      "d ${cfg.dataDir}/conf/ 0750 13001 13001"
-      "d ${cfg.dataDir}/logs/ 0750 13001 13001"
-      "d ${cfg.dataDir}/backups/ 0750 13001 13001"
-    ];
-  };
 }

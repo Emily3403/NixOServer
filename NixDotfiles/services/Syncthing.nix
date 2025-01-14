@@ -47,14 +47,14 @@ in
         inherit config lib pkgs;
 
         name = "syncthing";
-        subdomain = config.host.services.syncthing.subdomain;
+        subdomain = cfg.subdomain;
         containerID = 1;
         containerPort = 8080;
 
         user.uid = 237;
         isSystemUser = true;
 
-        additionalContainerConfig.forwardPorts = [ { hostPort = 22000; } { hostPort = 22000; protocol = "udp"; } { hostPort = 21027; protocol = "udp"; } ];
+        additionalContainerConfig.forwardPorts = [{ hostPort = 22000; } { hostPort = 22000; protocol = "udp"; } { hostPort = 21027; protocol = "udp"; }];
 
         bindMounts = {
           "/var/lib/syncthing/" = { hostPath = "${cfg.dataDir}/syncthing"; isReadOnly = false; };
@@ -73,7 +73,7 @@ in
             settings = {
               options = {
                 urAccepted = -1;
-                maxFolderConcurrency = 8;  # Turn this down if using HDDs
+                maxFolderConcurrency = 8; # Turn this down if using HDDs
               };
 
               devices =

@@ -7,13 +7,12 @@ let DATA_DIR = "/data/TODO"; in
       import ./Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
 
-        enable = true;
         name = "TODO";
         image = "TODO";
         dataDir = cfg.dataDir;
 
         subdomain = "TODO";
-        containerIP = "10.88.TODO.1";
+        containerID = TODO;
         containerPort = 80;
         environment = { };
         environmentFiles = [ config.age.secrets.TODO.path ];

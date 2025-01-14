@@ -29,7 +29,7 @@ in
       "d ${cfg.dataDir}/hedgedoc 0750 hedgedoc"
       "d ${cfg.dataDir}/postgresql 0750 postgres"
     ];
-    
+
     age.secrets.HedgeDoc = {
       file = ../secrets/${config.host.name}/HedgeDoc.age;
       owner = "hedgedoc";
@@ -109,6 +109,11 @@ in
   ];
 
   config = {
-#    services.nginx.virtualHosts."${config.networking.hostName}.status.${config.host.networking.domainName}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "hedgedoc" "192.168.7.");
+    #    services.nginx.virtualHosts."${config.networking.hostName}.status.${config.host.networking.domainName}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "hedgedoc" "192.168.7.");
+    services.nginx.virtualHosts."${config.networking.hostName}.status.${config.host.networking.domainName}" = mkIf cfg.enableExporter {
+      forceSSL = true;
+      enableACME = true;
+      locations."/hedgedoc-metrics".proxyPass = "http://192.168.7.5/metrics";
+    };
   };
 }

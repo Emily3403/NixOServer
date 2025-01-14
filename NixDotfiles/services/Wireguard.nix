@@ -56,16 +56,14 @@
           allowedIPs = [ "192.168.42.2/32" ];
         }
 
-#        {
-#          name = "carsten";
-#          publicKey = "";
-#
-#          persistentKeepalive = 30;
-#          allowedIPs = [ "192.168.42.113/32" ];
-#        }
+        {
+          name = "carsten";
+          publicKey = "kt6AWgqmTljmCUYj7vno3GuBLDVTxTNldcb4fAtjdmI=";
+
+          persistentKeepalive = 30;
+          allowedIPs = [ "192.168.42.77/32" ];
+        }
       ];
     };
   };
 }
-
-

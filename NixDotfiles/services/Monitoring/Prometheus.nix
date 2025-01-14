@@ -12,14 +12,14 @@ let
       job_name = "${hostname}-${metric}";
       metrics_path = "/${metric}-metrics";
       scheme = "https";
-      basic_auth = mkBasicAuth "Prometheus_${hostname}-pw";
-      scrape_interval = if metric == "transmission" then "5s" else "30s";  # TODO: Make this configurable from the callee
+      basic_auth = mkBasicAuth "Prometheus_${hostname}";
+      scrape_interval = if metric == "transmission" then "5s" else "30s"; # TODO: Make this configurable from the callee
       scrape_timeout = if metric == "transmission" then "5s" else "15s";
       static_configs = [{ targets = [ "${hostname}.status.${config.host.networking.domainName}" ]; }];
     }] ++ acc)) [ ]
       metrics;
 
-   mkBearerScrapers = hostname: metrics:
+  mkBearerScrapers = hostname: metrics:
     (foldl' (acc: metric: [{
       job_name = "${hostname}-${metric}";
       metrics_path = "/${metric}-metrics";
@@ -58,8 +58,13 @@ in
       owner = "prometheus";
     };
 
-    age.secrets.Prometheus_ruwusch-pw = {
+    age.secrets.Prometheus_ruwusch = {
       file = ../../secrets/${config.host.name}/Monitoring/Access/ruwusch.age;
+      owner = "prometheus";
+    };
+
+    age.secrets.Prometheus_old-ruwusch = {
+      file = ../../secrets/${config.host.name}/Monitoring/Access/old-ruwusch.age;
       owner = "prometheus";
     };
   };
@@ -80,8 +85,9 @@ in
 
         bindMounts = {
           "/var/lib/prometheus2/" = { hostPath = "${cfg.dataDir}/prometheus2"; isReadOnly = false; };
-          "${config.age.secrets.Prometheus_nixie-pw.path}".hostPath = config.age.secrets.Prometheus_nixie-pw.path;
-          "${config.age.secrets.Prometheus_ruwusch-pw.path}".hostPath = config.age.secrets.Prometheus_ruwusch-pw.path;
+          "${config.age.secrets.Prometheus_nixie.path}".hostPath = config.age.secrets.Prometheus_nixie.path;
+          "${config.age.secrets.Prometheus_ruwusch.path}".hostPath = config.age.secrets.Prometheus_ruwusch.path;
+          "${config.age.secrets.Prometheus_old-ruwusch.path}".hostPath = config.age.secrets.Prometheus_old-ruwusch.path;
           "${config.age.secrets.Prometheus_syncthing-API-key.path}".hostPath = config.age.secrets.Prometheus_syncthing-API-key.path;
         };
 
@@ -89,7 +95,7 @@ in
           services.prometheus = {
             enable = true;
             retentionTime = "15y";
-            checkConfig = "syntax-only";  # "If you use credentials stored in external files they will not be visible to promtool and it will report errors"
+            checkConfig = "syntax-only"; # "If you use credentials stored in external files they will not be visible to promtool and it will report errors"
             webExternalUrl = "https://${cfg.subdomain}.${config.host.networking.domainName}";
 
             # Needed for htpasswd with basic_auth_users (https://prometheus.io/docs/prometheus/latest/configuration/https/)
@@ -100,8 +106,13 @@ in
                 def = [ ];
               in
               # This can easily be extended to include more hosts
+              (mkScrapers "nixie" ([ "prometheus" "transmission" "syncthing-exporter" "jellyfin" "nextcloud" "hedgedoc" ] ++ def)) ++
               (mkScrapers "ruwusch" ([ "prometheus" "transmission" "syncthing-exporter" "jellyfin" "nextcloud" "hedgedoc" ] ++ def)) ++
-              (mkBearerScrapers "ruwusch" ([ "syncthing" ]))
+              (mkScrapers "old-ruwusch" ([ "prometheus" "transmission" "syncthing-exporter" "jellyfin" "nextcloud" "hedgedoc" ] ++ def)) ++
+
+              (mkBearerScrapers "nixie" ([ "syncthing" ])) ++
+              (mkBearerScrapers "ruwusch" ([ "syncthing" ])) ++
+              (mkBearerScrapers "old-ruwusch" ([ "syncthing" ]))
             ;
 
           };

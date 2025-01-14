@@ -2,7 +2,7 @@
   imports = map (it: ../../services/${it}) [
     # System
     "Nginx.nix"
-    "Backup.nix"
+    "Backup/Restic-Client.nix"
 
     # Core Services
     "Monitoring"
@@ -19,8 +19,8 @@
     "Tandoor.nix"
 
     "PhotoManagement/Ente.nix"
-#    "PhotoManagement/PhotoPrism.nix"
-#    "PhotoManagement/Piwigo.nix"
+    #    "PhotoManagement/PhotoPrism.nix"
+    #    "PhotoManagement/Piwigo.nix"
   ];
 
   config = {
