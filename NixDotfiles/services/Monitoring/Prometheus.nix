@@ -13,13 +13,13 @@ let
       metrics_path = "/${metric}-metrics";
       scheme = "https";
       basic_auth = mkBasicAuth "Prometheus_${hostname}-pw";
-      scrape_interval = if metric == "transmission" then "5s" else "30s";  # TODO: Make this configurable from the callee
+      scrape_interval = if metric == "transmission" then "5s" else "30s"; # TODO: Make this configurable from the callee
       scrape_timeout = if metric == "transmission" then "5s" else "15s";
       static_configs = [{ targets = [ "${hostname}.status.${config.host.networking.domainName}" ]; }];
     }] ++ acc)) [ ]
       metrics;
 
-   mkBearerScrapers = hostname: metrics:
+  mkBearerScrapers = hostname: metrics:
     (foldl' (acc: metric: [{
       job_name = "${hostname}-${metric}";
       metrics_path = "/${metric}-metrics";
@@ -89,7 +89,7 @@ in
           services.prometheus = {
             enable = true;
             retentionTime = "15y";
-            checkConfig = "syntax-only";  # "If you use credentials stored in external files they will not be visible to promtool and it will report errors"
+            checkConfig = "syntax-only"; # "If you use credentials stored in external files they will not be visible to promtool and it will report errors"
             webExternalUrl = "https://${cfg.subdomain}.${config.host.networking.domainName}";
 
             # Needed for htpasswd with basic_auth_users (https://prometheus.io/docs/prometheus/latest/configuration/https/)

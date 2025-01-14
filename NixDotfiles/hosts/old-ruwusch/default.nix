@@ -1,9 +1,8 @@
 { config, modulesPath, pkgs, lib, ... }: {
   host = {
-    name = "ruwusch";
-    id = "42069420";
-    bootDevices = [ "wwn-0x5000c500db1e5ef4" "wwn-0x5000c500db3750a7" ];
-    #    bootDevices = [ "wwn-0x5000c500db24ffb3" "wwn-0x5000c500db235066" ];
+    name = "old-ruwusch";
+    id = "74d69d3c";
+    bootDevices = [ "ata-HGST_HUH721008ALE600_JEKEPRYZ" "ata-HGST_HUH721008ALE600_7SH74DYD" "ata-HGST_HUH721008ALE600_JEK330VN" ];
 
     authorizedKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"
@@ -19,8 +18,8 @@
       };
 
       arc = {
-        minGB = 32;
-        maxGB = 56;
+        minGB = 64;
+        maxGB = 96;
       };
 
       encrypted = true;
@@ -31,6 +30,14 @@
       "kvm-intel"
       "e1000e"
     ];
+  };
+
+  zfs-root.fileSystems.datasets = lib.mkForce {
+    "bpool/nixos/root" = "/boot";
+    "rpool/nixos/root" = "/";
+    "rpool/nixos/home" = "/home";
+    "rpool/nixos/var/lib" = "/var/lib";
+    "rpool/nixos/var/log" = "/var/log";
   };
 
   networking = {

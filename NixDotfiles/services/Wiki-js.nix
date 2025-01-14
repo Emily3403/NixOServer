@@ -22,13 +22,13 @@ in
       "d ${cfg.dataDir}/postgresql 0750 postgres"
       "d ${cfg.dataDir}/wiki-js 0750 wiki-js"
     ];
-    
+
     age.secrets.Wiki-js_ssh-key = {
       file = ../secrets/${config.host.name}/Wiki-js.age;
       owner = "wiki-js";
     };
   };
-  
+
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {

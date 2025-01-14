@@ -3,14 +3,14 @@
     name = "nixie";
     id = "69420420";
     bootDevices = [ "wwn-0x600508b1001c45ba5b71f00bcbda09c6" "wwn-0x600508b1001c455e43aa950f99f84287" "wwn-0x600508b1001cd6bba7589bc2985434fa" "wwn-0x600508b1001c100c12a98dee2b4cec1f" ];
-#    additionalBootLoaderDevices = [ "usb-HP_iLO_Internal_SD-CARD_000002660A01-0:0" ];
+    #    additionalBootLoaderDevices = [ "usb-HP_iLO_Internal_SD-CARD_000002660A01-0:0" ];
 
     zfs = {
       autoSnapshot = {
         enable = true;
         daily = 15;
         weekly = 9;
-        monthly = 60;  # 5 years
+        monthly = 60; # 5 years
       };
 
       arc = {
@@ -33,8 +33,6 @@
   };
 
   networking = {
-#    hostName = "nixie";
-#    hostId = "abcd1234";  # TODO: Set this manually
     useDHCP = false;
 
     nameservers = [ "1.1.1.1" "8.8.8.8" ];

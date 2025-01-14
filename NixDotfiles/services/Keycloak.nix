@@ -38,40 +38,40 @@ in
     };
 
     attributeMapper =
-    let
-      options = {
+      let
+        options = {
 
-        username = mkOption {
-          type = types.str;
-          default = "preferred_username";
-          description = "The attribute for the username.";
+          username = mkOption {
+            type = types.str;
+            default = "preferred_username";
+            description = "The attribute for the username.";
+          };
+
+          name = mkOption {
+            type = types.str;
+            default = "name";
+          };
+
+          email = mkOption {
+            type = types.str;
+            default = "email";
+          };
+
+          groups = mkOption {
+            type = types.str;
+            default = "groups";
+          };
+
         };
-
-        name = mkOption {
-          type = types.str;
-          default = "name";
-        };
-
-        email = mkOption {
-          type = types.str;
-          default = "email";
-        };
-
-        groups = mkOption {
-          type = types.str;
-          default = "groups";
-        };
-
-      };
-    in
+      in
       mkOption
-      {
+        {
           type = types.submodule {
             freeformType = format.type;
             inherit options;
           };
           default = { };
-      };
+        };
   };
 
   config = {
@@ -148,7 +148,7 @@ in
               proxy-headers = "xforwarded";
               proxy-trusted-addresses = config.host.networking.containerHostIP;
 
-#              metrics-enabled = true;  # TODO
+              #              metrics-enabled = true;  # TODO
             };
 
             database.passwordFile = config.age.secrets.Keycloak.path;

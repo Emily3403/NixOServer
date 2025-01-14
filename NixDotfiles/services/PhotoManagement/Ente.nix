@@ -75,13 +75,13 @@ in
     };
 
     # TODO: This unit doesn't get started when the minio containers gets started...
-     systemd.services."${config.virtualisation.oci-containers.backend}-ente-minio-provision" = {
-        serviceConfig.Type = "oneshot";
-        after = [ "${config.virtualisation.oci-containers.backend}-ente-minio.service" ];
-        wants = [ "${config.virtualisation.oci-containers.backend}-ente-minio.service" ];
+    systemd.services."${config.virtualisation.oci-containers.backend}-ente-minio-provision" = {
+      serviceConfig.Type = "oneshot";
+      after = [ "${config.virtualisation.oci-containers.backend}-ente-minio.service" ];
+      wants = [ "${config.virtualisation.oci-containers.backend}-ente-minio.service" ];
 
-        # See https://github.com/ente-io/ente/blob/main/server/scripts/compose/minio-provision.sh
-        script = let exec-in-container = "${pkgs.podman}/bin/podman exec -ti ente-minio"; in ''
+      # See https://github.com/ente-io/ente/blob/main/server/scripts/compose/minio-provision.sh
+      script = let exec-in-container = "${pkgs.podman}/bin/podman exec -ti ente-minio"; in ''
         source ${config.age.secrets.Ente_Minio.path}
 
         while ! ${exec-in-container} mc config host add ente http://localhost:3200 $MINIO_ROOT_USER $MINIO_ROOT_PASSWORD
@@ -91,7 +91,7 @@ in
         done
 
         ${exec-in-container} mc mb --ignore-existing /data/b2-eu-cen'';
-     };
+    };
 
   };
 
@@ -108,13 +108,13 @@ in
 
         dataDir = cfg.dataDir;
         containerPort = 8080;
-#        environment = { ENVIRONMENT = "production"; };  # TODO
+        #        environment = { ENVIRONMENT = "production"; };  # TODO
         postgresEnvFile = config.age.secrets.Ente_Postgres.path;
 
         volumes = [
           "${cfg.dataDir}/logs:/var/logs"
           "${cfg.dataDir}/data:/data:ro"
-#          "${cfg.dataDir}/configurations:/configurations"
+          #          "${cfg.dataDir}/configurations:/configurations"
           "${cfg.dataDir}/museum.yaml:/museum.yaml:ro"
         ];
       }
@@ -144,7 +144,7 @@ in
         additionalNginxHostConfig."minio-api.ente.${config.host.networking.domainName}" = {
           enableACME = true;
           forceSSL = true;
-          locations."/".proxyPass = "http://10.88.1.9:3200";  # TODO: This IP is hardcoded, it would be best if this is somehow dependent on containerID
+          locations."/".proxyPass = "http://10.88.1.9:3200"; # TODO: This IP is hardcoded, it would be best if this is somehow dependent on containerID
           extraConfig = ''
             chunked_transfer_encoding off;
             real_ip_header X-Real-IP;
@@ -160,8 +160,8 @@ in
           '';
         };
 
-        volumes = [ "${cfg.dataDir}/minio-data:/data"  ];
-        additionalContainerConfig.cmd = ["server" "/data" "--address" ":3200" "--console-address" ":3201"];
+        volumes = [ "${cfg.dataDir}/minio-data:/data" ];
+        additionalContainerConfig.cmd = [ "server" "/data" "--address" ":3200" "--console-address" ":3201" ];
       }
     )
   ];

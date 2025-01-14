@@ -1,4 +1,4 @@
-{ pkgs, pkgs-unfree, config, lib, ... }:
+{ pkgs, config, lib, ... }:
 let
   users = [ "Emily" "Carsten" "Buddy" "Shalin" "Martin" "Jannes" ];
 
@@ -28,11 +28,10 @@ in
       "d ${cfg.dataDir} 0750 jellyfin jellyfin"
       "d ${cfg.dataDir}/jellyfin/ 0750 jellyfin jellyfin"
     ] ++
-      map (user: "d ${cfg.dataDir}/Media-${user}/ 0750 jellyfin jellyfin") users;
+    map (user: "d ${cfg.dataDir}/Media-${user}/ 0750 jellyfin jellyfin") users;
 
     users.groups.video.members = [ "jellyfin" ];
     users.groups.render.members = [ "jellyfin" ];
-
   };
 
   imports = [
@@ -57,8 +56,8 @@ in
         bindMounts = {
           "/var/lib/jellyfin" = { hostPath = "${cfg.dataDir}/jellyfin"; isReadOnly = false; };
           "/var/lib/data" = { hostPath = "/data/Transmission/data"; };
-        } //  # Will generate /var/lib/Media-Emily = { hostPath = cfg.dataDir/Media-Emily };
-          builtins.listToAttrs ( map ( user: { name = "/var/lib/Media-${user}"; value = { hostPath = "${cfg.dataDir}/Media-${user}"; };  } ) users ) ;
+        } // # Will generate /var/lib/Media-Emily = { hostPath = cfg.dataDir/Media-Emily };
+        builtins.listToAttrs (map (user: { name = "/var/lib/Media-${user}"; value = { hostPath = "${cfg.dataDir}/Media-${user}"; }; }) users);
 
         cfg = {
           services.jellyfin = {
@@ -68,7 +67,6 @@ in
 
           users.groups.video.members = [ "jellyfin" ];
           users.groups.render.members = [ "jellyfin" ];
-
         };
       }
     )

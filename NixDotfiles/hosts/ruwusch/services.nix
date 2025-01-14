@@ -2,8 +2,9 @@
   imports = map (it: ../../services/${it}) [
     # System
     "Nginx.nix"
-    "Backup.nix"
+    "Backup/Postgres.nix"
     "Wireguard.nix"
+    "Syncthing.nix"
 
     # Core Services
     "Transmission.nix"
@@ -18,7 +19,9 @@
   config = {
     host.services = {
       nextcloud.enableExporter = false;
-      transmission.enableExporter = false;
+
+      syncthing.subdomain = "other-sync";
+      syncthing.enableExporter = false;
 
       keycloak = {
         realm = "Super-Realm";

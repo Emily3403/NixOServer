@@ -16,7 +16,7 @@ let DATA_DIR = "/data/Affine"; in
         containerPort = 443;
         environment = {
           NODE_OPTIONS = "--import=./scripts/register.js";
-#          AFFINE_CONFIG_PATH = "/root/.affine/config";
+          #          AFFINE_CONFIG_PATH = "/root/.affine/config";
           AFFINE_ADMIN_EMAIL = "seebeckemily3403@gmail.com";
 
           REDIS_SERVER_HOST = "127.0.0.1";

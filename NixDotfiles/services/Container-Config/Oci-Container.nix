@@ -1,8 +1,27 @@
-{
-  enable, name, image, dataDir, subdomain ? null, containerID, containerPort, volumes, makeLocaltimeVolume ? true, additionalContainers ? {},
-  imports ? [], environment ? { }, environmentFiles ? [ ], postgresEnvFile ? null, redisEnvFile ? null, additionalContainerConfig ? {}, additionalDomains ? [ ],
-  makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
-  config, lib, pkgs
+{ enable
+, name
+, image
+, dataDir
+, subdomain ? null
+, containerID
+, containerPort
+, volumes
+, makeLocaltimeVolume ? true
+, additionalContainers ? { }
+, imports ? [ ]
+, environment ? { }
+, environmentFiles ? [ ]
+, postgresEnvFile ? null
+, redisEnvFile ? null
+, additionalContainerConfig ? { }
+, additionalDomains ? [ ]
+, makeNginxConfig ? true
+, additionalNginxConfig ? { }
+, additionalNginxLocationConfig ? { }
+, additionalNginxHostConfig ? { }
+, config
+, lib
+, pkgs
 }:
 let
 
@@ -42,41 +61,42 @@ in
     '';
   };
 
-  virtualisation.oci-containers.containers =mkIf enable {
-    "${name}" = utils.recursiveMerge [
-      additionalContainerConfig
-      {
-        image = image;
+  virtualisation.oci-containers.containers = mkIf enable
+    {
+      "${name}" = utils.recursiveMerge [
+        additionalContainerConfig
+        {
+          image = image;
+          extraOptions = [ "--pod=${podName}" ];
+
+          volumes = volumes ++ defVolumes;
+          environment = { TZ = "Europe/Berlin"; } // environment;
+          environmentFiles = environmentFiles;
+        }
+      ];
+
+      "${name}-postgres" = mkIf (postgresEnvFile != null) {
+        image = "postgres:17-alpine";
         extraOptions = [ "--pod=${podName}" ];
 
-        volumes = volumes ++ defVolumes;
-        environment = { TZ = "Europe/Berlin"; } // environment;
-        environmentFiles = environmentFiles;
-      }
-    ];
+        environment = { POSTGRES_DB = name; };
+        environmentFiles = [ postgresEnvFile ];
+        volumes = [ "${dataDir}/postgresql/17:/var/lib/postgresql/data" ] ++ defVolumes;
+        cmd = [ "-h" "127.0.0.1" ];
+      };
 
-     "${name}-postgres" = mkIf (postgresEnvFile != null) {
-      image = "postgres:17-alpine";
-      extraOptions = [ "--pod=${podName}" ];
+      "${name}-redis" = mkIf (redisEnvFile != null) {
+        image = "redis:7.2.4-alpine";
+        extraOptions = [ "--pod=${podName}" ];
 
-      environment = { POSTGRES_DB = name; };
-      environmentFiles = [ postgresEnvFile ];
-      volumes = [ "${dataDir}/postgresql/17:/var/lib/postgresql/data" ] ++ defVolumes;
-      cmd = [ "-h" "127.0.0.1" ];
-    };
-
-    "${name}-redis" = mkIf (redisEnvFile != null) {
-      image = "redis:7.2.4-alpine";
-      extraOptions = [ "--pod=${podName}" ];
-
-      environmentFiles = [ redisEnvFile ];
-      volumes = [ "${dataDir}/redis:/data" ] ++ defVolumes;
-      cmd = [ "--bind" "127.0.0.1" ];
-    };
-  } // additionalContainers;
+        environmentFiles = [ redisEnvFile ];
+        volumes = [ "${dataDir}/redis:/data" ] ++ defVolumes;
+        cmd = [ "--bind" "127.0.0.1" ];
+      };
+    } // additionalContainers;
 
   systemd.tmpfiles.rules = optionals (enable && postgresEnvFile != null) [
-    "d ${dataDir}/postgresql/ 0750 70"  # TODO: This currently only works when the top dir is owned by root
+    "d ${dataDir}/postgresql/ 0750 70" # TODO: This currently only works when the top dir is owned by root
     "d ${dataDir}/postgresql/17/ 0750 70"
   ] ++ optionals (enable && redisEnvFile != null) [
     "d ${dataDir}/redis/ 0750 999"

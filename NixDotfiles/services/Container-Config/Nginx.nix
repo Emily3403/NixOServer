@@ -1,7 +1,12 @@
-{
-  subdomain, containerIP, containerPort /* str */,
-  additionalDomains ? [ ], additionalConfig ? {}, additionalLocationConfig ? {}, additionalHostConfig ? {},
-  config, lib
+{ subdomain
+, containerIP
+, containerPort /* str */
+, additionalDomains ? [ ]
+, additionalConfig ? { }
+, additionalLocationConfig ? { }
+, additionalHostConfig ? { }
+, config
+, lib
 }:
 let utils = import ../../utils.nix { inherit config lib; }; in
 {

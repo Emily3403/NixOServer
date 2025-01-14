@@ -1,14 +1,24 @@
-{
-  name, subdomain ? null, containerID /* Integer ID that counts up from 1 */,
-  containerPort, bindMounts,
-  user ? null /* attrset with optional name, uid, gid, isNormalUser / isSystemUser */,
-  isSystemUser ? false,
-  group ? null /* Same here except the attrs from group */,
-  imports ? [],
-  postgresqlName ? null, additionalDomains ? [ ], additionalContainerConfig ? {},
-  makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
-  enableHardwareTranscoding ? false,
-  cfg, lib, config, pkgs
+{ name
+, subdomain ? null
+, containerID /* Integer ID that counts up from 1 */
+, containerPort
+, bindMounts
+, user ? null /* attrset with optional name, uid, gid, isNormalUser / isSystemUser */
+, isSystemUser ? false
+, group ? null /* Same here except the attrs from group */
+, imports ? [ ]
+, postgresqlName ? null
+, additionalDomains ? [ ]
+, additionalContainerConfig ? { }
+, makeNginxConfig ? true
+, additionalNginxConfig ? { }
+, additionalNginxLocationConfig ? { }
+, additionalNginxHostConfig ? { }
+, enableHardwareTranscoding ? false
+, cfg
+, lib
+, config
+, pkgs
 }:
 let
 
@@ -18,7 +28,7 @@ let
   stateVersion = config.system.stateVersion;
   containerIP = "192.168.7.${toString (containerID + 1)}";
 
-  pgImport = if postgresqlName == null then [] else [
+  pgImport = if postgresqlName == null then [ ] else [
     (
       import ./Postgresql.nix {
         inherit pkgs lib;
@@ -27,7 +37,7 @@ let
     )
   ];
 
-  nginxImport = if makeNginxConfig == false then [] else [
+  nginxImport = if makeNginxConfig == false then [ ] else [
     (
       import ./Nginx.nix {
         inherit containerIP config additionalDomains lib;
@@ -41,40 +51,42 @@ let
   ];
 
 
-  userConfig = let
-    userAttrs = if user == null then {} else user;
-    groupAttrs = if group == null then {} else group;
-    userName = if builtins.hasAttr "name" userAttrs then user.name else name;
-    uid = if builtins.hasAttr "uid" userAttrs then user.uid else containerID + 12000;
-    usingPg = (pgImport == []);
-  in {
-    users = {
-      "${userName}" = {
-        uid = uid;
-        isNormalUser = !isSystemUser;
-        isSystemUser = isSystemUser;
+  userConfig =
+    let
+      userAttrs = if user == null then { } else user;
+      groupAttrs = if group == null then { } else group;
+      userName = if builtins.hasAttr "name" userAttrs then user.name else name;
+      uid = if builtins.hasAttr "uid" userAttrs then user.uid else containerID + 12000;
+      usingPg = (pgImport == [ ]);
+    in
+    {
+      users = {
+        "${userName}" = {
+          uid = uid;
+          isNormalUser = !isSystemUser;
+          isSystemUser = isSystemUser;
 
-        name = userName;
-        group = userName;
+          name = userName;
+          group = userName;
 
-        password = "!";  # Always disallow login
-      } // userAttrs;
+          password = "!"; # Always disallow login
+        } // userAttrs;
 
-      "postgres" = mkIf usingPg {
-        uid = 71;
-        group = "postgres";
+        "postgres" = mkIf usingPg {
+          uid = 71;
+          group = "postgres";
+        };
+      };
+
+      groups = {
+        "${userName}" = {
+          gid = uid;
+          members = [ userName ];
+        } // groupAttrs;
+
+        postgres.members = optional usingPg "postgres";
       };
     };
-
-    groups = {
-      "${userName}" = {
-        gid = uid;
-        members = [ userName ];
-      } // groupAttrs;
-
-      postgres.members = optional usingPg "postgres";
-    };
-  };
 
 
 in
@@ -84,7 +96,7 @@ in
 
   hardware.graphics = mkIf enableHardwareTranscoding {
     enable = true;
-    extraPackages = with pkgs; [ vpl-gpu-rt intel-media-driver intel-media-sdk intel-ocl vaapiVdpau libvdpau-va-gl vaapiIntel ];
+    extraPackages = with pkgs; [ intel-media-driver intel-compute-runtime-legacy1 ];
   };
 
   containers."${name}" = utils.recursiveMerge [
@@ -95,8 +107,8 @@ in
       hostAddress = config.host.networking.containerHostIP;
       localAddress = containerIP;
 
-      bindMounts = mkMerge [ bindMounts (mkIf enableHardwareTranscoding { "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; };}) ];
-      allowedDevices = optionals (enableHardwareTranscoding) [ { node = "/dev/dri/renderD128"; modifier = "rw"; } { node = "/dev/dri/card0"; modifier = "rw"; } ];
+      bindMounts = mkMerge [ bindMounts (mkIf enableHardwareTranscoding { "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; }; }) ];
+      allowedDevices = optionals (enableHardwareTranscoding) [{ node = "/dev/dri/renderD128"; modifier = "rw"; } { node = "/dev/dri/card0"; modifier = "rw"; }];
 
       config = { pkgs, config, lib, ... }: utils.recursiveMerge [
         cfg
@@ -105,10 +117,15 @@ in
           networking.firewall.allowedTCPPorts = [ containerPort ];
           imports = [ ../../users/root.nix ../../system.nix ] ++ imports ++ pgImport;
 
+          # I have no clue why this doesn't propage inside the container, but this makes unfree work
+          nixpkgs.config.allowUnfree = true;
+
           hardware.graphics = mkIf enableHardwareTranscoding {
             enable = true;
-            extraPackages = with pkgs; [ vpl-gpu-rt intel-media-driver intel-media-sdk intel-ocl vaapiVdpau libvdpau-va-gl vaapiIntel ];
+            extraPackages = with pkgs; [ intel-media-driver intel-compute-runtime-legacy1 ];
           };
+
+          environment.sessionVariables = mkIf enableHardwareTranscoding { LIBVA_DRIVER_NAME = "iHD"; };
 
           users = userConfig;
         }

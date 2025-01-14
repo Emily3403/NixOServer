@@ -78,12 +78,14 @@ in
 
     (mkIf cfg.luks.enable {
       boot.initrd.luks.devices = mkMerge (map
-        (diskName: { "luks-${diskName}${cfg.partitionScheme.rootPool}" = {
+        (diskName: {
+          "luks-${diskName}${cfg.partitionScheme.rootPool}" = {
             device = (cfg.devNodes + diskName + cfg.partitionScheme.rootPool);
             allowDiscards = true;
             bypassWorkqueues = true;
           };
-        }) cfg.bootDevices);
+        })
+        cfg.bootDevices);
     })
 
     {
@@ -115,11 +117,13 @@ in
             copyKernels = true;
             efiSupport = true;
             zfsSupport = true;
-            extraInstallCommands = (toString (map (diskName: ''
+            extraInstallCommands = (toString (map
+              (diskName: ''
                 set -x
                 ${pkgs.coreutils-full}/bin/cp -r ${config.boot.loader.efi.efiSysMountPoint}/EFI /boot/efis/${diskName}${cfg.partitionScheme.efiBoot}
                 set +x
-              '') ((tail cfg.bootDevices) ++ hcfg.additionalBootLoaderDevices)));
+              '')
+              ((tail cfg.bootDevices) ++ hcfg.additionalBootLoaderDevices)));
           };
         };
       };

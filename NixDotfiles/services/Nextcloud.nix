@@ -129,15 +129,15 @@ in
               inherit (pkgs.nextcloud30Packages.apps)
                 calendar
                 contacts
-#                files_markdown  # Not supported: https://github.com/icewind1991/files_markdown/issues/218
+                #                files_markdown  # Not supported: https://github.com/icewind1991/files_markdown/issues/218
                 groupfolders
                 # phonetrack  # TODO: Look into this
-                onlyoffice  # TODO: Documentserver
+                onlyoffice# TODO: Documentserver
                 ;
 
               oidc_login = pkgs.fetchNextcloudApp rec {
                 url = "https://github.com/pulsejet/nextcloud-oidc-login/releases/download/v3.2.0/oidc_login.tar.gz";
-                sha256 = "141xkbvrwmhgmcicpd9g86jmhihqrp50ijmhgl4n9ksc8cldmdhf";  # get this with `nix-prefetch-url {url}`
+                sha256 = "141xkbvrwmhgmcicpd9g86jmhihqrp50ijmhgl4n9ksc8cldmdhf"; # get this with `nix-prefetch-url {url}`
                 license = "agpl3Only";
               };
             };

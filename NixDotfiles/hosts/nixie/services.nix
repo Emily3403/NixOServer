@@ -2,7 +2,7 @@
   imports = map (it: ../../services/${it}) [
     # System
     "Nginx.nix"
-    "Backup.nix"
+#    "Backup/Restic-Client.nix"
 
     # Core Services
     "Monitoring"
@@ -14,13 +14,15 @@
     "YouTrack.nix"
     "Get.nix"
 
+    "Seafile.nix"
+
     # Ruwusch but hosted on SSD
     "Stirling-PDF.nix"
     "Tandoor.nix"
 
     "PhotoManagement/Ente.nix"
-#    "PhotoManagement/PhotoPrism.nix"
-#    "PhotoManagement/Piwigo.nix"
+    #    "PhotoManagement/PhotoPrism.nix"
+    #    "PhotoManagement/Piwigo.nix"
   ];
 
   config = {

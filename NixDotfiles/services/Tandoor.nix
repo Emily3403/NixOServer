@@ -24,7 +24,7 @@ in
   config = {
     systemd.tmpfiles.rules = [
       "d ${cfg.dataDir} 0750 tandoor_recipes nginx"
-      "d ${cfg.dataDir}/tandoor-recipes 0750 tandoor_recipes nginx"  # Nginx has to be able to serve the images
+      "d ${cfg.dataDir}/tandoor-recipes 0750 tandoor_recipes nginx" # Nginx has to be able to serve the images
       "d ${cfg.dataDir}/postgresql 0750 postgres"
     ];
 
@@ -72,8 +72,9 @@ in
               POSTGRES_HOST = "/run/postgresql/";
               POSTGRES_DB = "tandoor_recipes";
               POSTGRES_USER = "tandoor_recipes";
+              SOCIAL_PROVIDERS = "allauth.socialaccount.providers.openid_connect";
 
-              ENABLE_METRICS = 0;  # Once Prometheus is set up, this can be enabled
+              ENABLE_METRICS = 0; # Once Prometheus is set up, this can be enabled
               TZ = "Europe/Berlin";
             };
           };

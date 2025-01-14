@@ -17,7 +17,7 @@ in
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
 
-#  nixpkgs.config.allowUnfree = lib.mkForce true;
+  #  nixpkgs.config.allowUnfree = lib.mkForce true;
 
   # Podman
   virtualisation.podman = {
@@ -28,6 +28,10 @@ in
 
   environment.defaultPackages = with pkgs; [
     inputs.agenix.packages.x86_64-linux.default
+  ];
+
+  systemd.tmpfiles.rules = [
+    "d /data 0750 root root"
   ];
 
 }

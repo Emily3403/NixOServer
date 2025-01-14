@@ -113,11 +113,17 @@ in
                     type = "prometheus";
                     access = "proxy";
                     url = "https://${config.host.services.prometheus.subdomain}.${config.host.networking.domainName}";
-                    isDefault = true;
+                    isDefault = false; # TODO: This doesn't quite work yet
+
                     jsonData = {
                       basicAuth = true;
                       basicAuthUser = "admin";
+
+                      timeInterval = "5s";
+                      queryTimeout = "500s";
+                      prometheusType = "Prometheus"; # TODO: Why?
                     };
+
                     secureJsonData = {
                       basicAuthPassword = "$__file{${config.age.secrets.Prometheus_nixie-pw.path}}";
                     };

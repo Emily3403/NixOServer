@@ -1,6 +1,7 @@
 { pkgs, config, lib, ... }:
 let
   cfg = config.host.services.transmission;
+  _cfg = config;
   utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 in
@@ -34,8 +35,14 @@ in
       owner = "root";
     };
 
+    age.secrets.Monitoring_host-htpasswd = mkIf cfg.enableExporter {
+      file = ../secrets/nixie/Monitoring/Nginx/${config.host.name}.age;
+      owner = "nginx";
+      group = "nginx";
+    };
+
     age.secrets.Transmission_Exporter-environment = mkIf cfg.enableExporter {
-      file = ../secrets/${config.host.name}/Monitoring/Exporters/Transmission.age;
+      file = ../secrets/nixie/Monitoring/Exporters/Transmission.age;
       owner = "root";
     };
   };
@@ -64,13 +71,19 @@ in
         volumes = [
           "${cfg.dataDir}/data:/data"
           "${cfg.dataDir}/config:/config"
+          "${cfg.dataDir}/custom-configs:/etc/openvpn/custom/"
         ];
       }
     )
   ];
 
   config = {
-#    services.nginx.virtualHosts."${config.networking.hostName}.status.${config.host.networking.domainName}" = mkIf cfg.enableExporter utils.makeNginxMetricConfig "transmission" "10.88.2.10";
+    services.nginx.virtualHosts."${_cfg.networking.hostName}.status.${_cfg.host.networking.domainName}" = mkIf cfg.enableExporter {
+      forceSSL = true;
+      enableACME = true;
+      basicAuthFile = _cfg.age.secrets.Monitoring_host-htpasswd.path;
+      locations."/transmission-metrics".proxyPass = "http://10.88.2.10:19091/metrics";
+    };
 
     virtualisation.oci-containers.containers.transmission-exporter = mkIf cfg.enableExporter {
       image = "evanofslack/transmission-exporter:latest";
@@ -79,15 +92,32 @@ in
 
       volumes = [
         "/etc/resolv.conf:/etc/resolv.conf:ro"
-        "${config.age.secrets.Transmission_Exporter-environment.path}:${config.age.secrets.Transmission_Exporter-environment.path}"
+        "${_cfg.age.secrets.Transmission_Exporter-environment.path}:${_cfg.age.secrets.Transmission_Exporter-environment.path}"
       ];
 
       environment = {
         TZ = "Europe/Berlin";
-        TRANSMISSION_ADDR = "https://${cfg.subdomain}.${config.host.networking.domainName}/transmission/rpc";
+        TRANSMISSION_ADDR = "https://${cfg.subdomain}.${_cfg.host.networking.domainName}/transmission/rpc";
       };
-      environmentFiles = [ config.age.secrets.Transmission_Exporter-environment.path ];
+      environmentFiles = [ _cfg.age.secrets.Transmission_Exporter-environment.path ];
     };
+
+#    systemd.services.restart-transmission-exporter = mkIf cfg.enableExporter {
+#      description = "Restart the Transmission exporter";
+#      enable = true;
+#      script = "systemctl restart podman-transmission-exporter";
+#    };
+#
+#    systemd.timers.restart-transmission-exporter = mkIf cfg.enableExporter {
+#      description = "Restart the Transmission exporter regularly";
+#      enable = true;
+#      wantedBy = [ "timers.target" ];
+#      timerConfig = {
+#        OnCalendar = "*-*-* 7:00:00";
+#        Persistent = true;
+#        RandomizedDelaySec = 10;
+#      };
+#    };
   };
 
 

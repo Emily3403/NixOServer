@@ -30,7 +30,7 @@
       initialHashedPassword = "rootHash_placeholder";
       openssh.authorizedKeys.keys = [
         "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg"
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj"
+        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj nana"
       ];
 
       shell = pkgs.fish;
@@ -38,40 +38,49 @@
   };
 
   environment.systemPackages = with pkgs; [
+    # Unix Tools
+    util-linux
+    inetutils
     sudo
-    jq
+    parted
     wget
-    fish
-    zsh
-    neofetch
-    btop
-    eza
-    cowsay
-    direnv
-    htop
+    curl
+    openssl
+    jq
     rsync
     nmap
-    inetutils
-    util-linux
-    parted
+    unzip
+
     python3
-    python311Packages.pip
     groff
-    openssl
+    pv
+    mediainfo
+
+    # Rust tools
+    unzrip
+    eza
+    du-dust
+    ripgrep
+
+    # system monitoring tools
+    btop
+    htop
+    intel-gpu-tools
+    smartmontools
+    dmidecode
     tcpdump
     traceroute
     dig
     sysstat
-    pv
-    du-dust
-    ripgrep
-    unzip
-    unzrip
-    intel-gpu-tools
-#    wireguard-tools
-    mediainfo
     termshark
     trippy
     fd
+
+    # Customization
+    zsh
+    fish
+    neofetch
+    cowsay
+    direnv
   ];
 }

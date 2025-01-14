@@ -17,11 +17,24 @@ in
     defaults.email = LETSENCRYPT_EMAIL;
   };
 
-  services.nginx.virtualHosts."_" = {
-    default = true;
-    rejectSSL = true;
-    locations."/".return = "426";
-  };
 
   users.users.nginx.extraGroups = [ "acme" ];
+
+
+  # Default site configuration
+  services.nginx.virtualHosts = {
+    "_" = {
+      default = true;
+      rejectSSL = true;
+      locations."/".return = "426";
+    };
+
+    "${config.host.name}.status.${config.host.networking.domainName}" = {
+      forceSSL = true;
+      enableACME = true;
+      locations."/".return = "403";
+    };
+  };
+
+
 }

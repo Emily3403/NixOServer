@@ -17,6 +17,16 @@ in
     };
   };
 
+  config = {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0750 13001 13001"
+      "d ${cfg.dataDir}/data/ 0750 13001 13001"
+      "d ${cfg.dataDir}/conf/ 0750 13001 13001"
+      "d ${cfg.dataDir}/logs/ 0750 13001 13001"
+      "d ${cfg.dataDir}/backups/ 0750 13001 13001"
+    ];
+  };
+
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
@@ -40,14 +50,4 @@ in
       }
     )
   ];
-
-  config = {
-    systemd.tmpfiles.rules = [
-      "d ${cfg.dataDir} 0750 13001 13001"
-      "d ${cfg.dataDir}/data/ 0750 13001 13001"
-      "d ${cfg.dataDir}/conf/ 0750 13001 13001"
-      "d ${cfg.dataDir}/logs/ 0750 13001 13001"
-      "d ${cfg.dataDir}/backups/ 0750 13001 13001"
-    ];
-  };
 }
