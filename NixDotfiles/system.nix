@@ -6,10 +6,16 @@
 
   users.users = {
     postgres = {
-      uid = 71;
+      uid = config.ids.uids.postgres;
       group = "postgres";
+    };
+
+    mysql = {
+      uid = config.ids.uids.mysql;
+      group = "mysql";
     };
   };
 
   users.groups.postgres.members = [ "postgres" ];
+  users.groups.mysql.members = [ "mysql" ];
 }

@@ -2,8 +2,8 @@
 let DATA_DIR = "/data/Anki"; in
 {
   systemd.tmpfiles.rules = [
-#    "d ${cfg.dataDir} 0750 TODO"
-#    "d ${cfg.dataDir}/anki-sync-server 0750 TODO"
+    #    "d ${cfg.dataDir} 0750 TODO"
+    #    "d ${cfg.dataDir}/anki-sync-server 0750 TODO"
   ];
 
   imports = [
