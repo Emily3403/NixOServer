@@ -39,17 +39,17 @@ in
     ];
 
     age.secrets.Nextcloud_admin-password = {
-      file = ../secrets/nixie/Nextcloud/admin-password.age;
+      file = ../secrets/${config.host.name}/Nextcloud/admin-password.age;
       owner = "nextcloud";
     };
 
     age.secrets.Nexcloud_keycloak-client-secret = {
-      file = ../secrets/nixie/Nextcloud/keycloak-client-secret.age;
+      file = ../secrets/${config.host.name}/Nextcloud/keycloak-client-secret.age;
       owner = "nextcloud";
     };
 
     age.secrets.Nextcloud_exporter-tokenfile = mkIf ncfg.enableExporter {
-      file = ../secrets/nixie/Monitoring/Exporters/Nextcloud-Token.age;
+      file = ../secrets/${config.host.name}/Monitoring/Exporters/Nextcloud-Token.age;
       owner = "nextcloud-exporter";
     };
   };

@@ -13,7 +13,7 @@
 let
 
   inherit (lib) mkIf optional optionals mkMerge;
-  utils = import ../../utils.nix { inherit lib; };
+  utils = import ../../utils.nix { inherit config lib; };
   containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort;
   stateVersion = config.system.stateVersion;
   containerIP = "192.168.7.${toString (containerID + 1)}";
@@ -84,7 +84,7 @@ in
 
   hardware.graphics = mkIf enableHardwareTranscoding {
     enable = true;
-    extraPackages = [ pkgs.intel-media-driver ];
+    extraPackages = with pkgs; [ vpl-gpu-rt intel-media-driver intel-media-sdk intel-ocl vaapiVdpau libvdpau-va-gl vaapiIntel ];
   };
 
   containers."${name}" = utils.recursiveMerge [
@@ -107,7 +107,7 @@ in
 
           hardware.graphics = mkIf enableHardwareTranscoding {
             enable = true;
-            extraPackages = [ pkgs.intel-media-driver ];
+            extraPackages = with pkgs; [ vpl-gpu-rt intel-media-driver intel-media-sdk intel-ocl vaapiVdpau libvdpau-va-gl vaapiIntel ];
           };
 
           users = userConfig;

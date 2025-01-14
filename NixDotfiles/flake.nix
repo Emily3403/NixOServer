@@ -28,6 +28,12 @@
               config.packageOverrides = pkgs: { vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; }; };
             };
 
+            pkgs-unfree = {
+              inherit system;
+              config.allowUnfree = true;
+              config.packageOverrides = pkgs: { vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; }; };
+            };
+
             pkgs-unstable = import nixpkgs-unstable {
               inherit system;
               config.packageOverrides = pkgs: { ente-web = pkgs.ente-web.overrideAttrs {

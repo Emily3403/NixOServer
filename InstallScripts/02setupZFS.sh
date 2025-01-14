@@ -23,7 +23,7 @@ convert_dev_names_to_cryptsetup_name() {
 
     local cryptsetup_names=()
     for dev_name in "${dev_names[@]}"; do
-        cryptsetup_names+=( "/dev/mapper/luks-rpool-${dev_name##*/}-$part_name" )
+        cryptsetup_names+=( "/dev/mapper/luks-${dev_name##*/}-$part_name" )
     done
 
     echo "${cryptsetup_names[@]}"
@@ -80,7 +80,7 @@ zpool create -f \
     -O normalization=formD \
     -O relatime=on \
     -O xattr=sa \
-    -O com.sun:auto-snapshot=true \
+    -O com.sun:auto-snapshot=false \
     -O mountpoint=/boot \
     -R /mnt \
     bpool \
@@ -101,7 +101,7 @@ zpool create -f \
     -O normalization=formD \
     -O relatime=on \
     -O xattr=sa \
-    -O com.sun:auto-snapshot=true \
+    -O com.sun:auto-snapshot=false \
     -O mountpoint=/ \
     -R /mnt \
     rpool \
@@ -110,26 +110,25 @@ zpool create -f \
 
 check_zpool_status rpool
 
-zfs create -o canmount=off -o mountpoint=none rpool/nixos
-zfs create -o mountpoint=legacy rpool/nixos/root
-zfs create -o mountpoint=legacy rpool/nixos/var
-zfs create -o mountpoint=legacy rpool/nixos/var/lib
-zfs create -o mountpoint=legacy rpool/nixos/var/log
-zfs create -o mountpoint=legacy rpool/nixos/home -o com.sun:auto-snapshot=false  # Disable auto-snapshotting of user-data as my home directories contain backups and they do their own versioning
+# Now create the datasets
+zfs create -o mountpoint=legacy bpool/root
+zfs create -o mountpoint=legacy rpool/root
+zfs create -o mountpoint=legacy rpool/data -o com.sun:auto-snapshot=true  # Only /data should be snapshotted. Everything else is either versioned by Nix or the home users.
+zfs create -o mountpoint=legacy rpool/home
 
-zfs create -o mountpoint=none bpool/nixos
-zfs create -o mountpoint=legacy bpool/nixos/root
-zfs create -o mountpoint=legacy rpool/nixos/empty
-
-mount -t zfs rpool/nixos/root /mnt/
+mount -t zfs rpool/root /mnt/
 mkdir /mnt/home
 mkdir /mnt/boot
-mount -t zfs rpool/nixos/home /mnt/home
-mount -t zfs bpool/nixos/root /mnt/boot
+mkdir /mnt/data
 
-zfs snapshot rpool/nixos/empty@start
+mount -t zfs bpool/root /mnt/boot
 
-for disk in "${DRIVES[@]}"; do
+for disk in "${DRIVES[@]}" "$ADDITIONAL_EFI_DEVICE"; do
+    if [ -z "$disk" ]; then
+        # Skip the iteration if $ADDITIONAL_EFI_DEVICE is empty
+        continue
+    fi
+
     mkdir -p /mnt/boot/efis/"${disk##*/}"-part1
     mount -t vfat -o iocharset=iso8859-1 "$disk"-part1 /mnt/boot/efis/"${disk##*/}"-part1
 done

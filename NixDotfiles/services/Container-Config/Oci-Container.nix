@@ -1,5 +1,5 @@
 {
-  name, image, dataDir, subdomain ? null, containerID, containerPort, volumes, makeLocaltimeVolume ? true, additionalContainers ? {},
+  enable, name, image, dataDir, subdomain ? null, containerID, containerPort, volumes, makeLocaltimeVolume ? true, additionalContainers ? {},
   imports ? [], environment ? { }, environmentFiles ? [ ], postgresEnvFile ? null, redisEnvFile ? null, additionalContainerConfig ? {}, additionalDomains ? [ ],
   makeNginxConfig ? true, additionalNginxConfig ? {}, additionalNginxLocationConfig ? {}, additionalNginxHostConfig ? {},
   config, lib, pkgs
@@ -7,7 +7,7 @@
 let
 
   inherit (lib) mkIf optional optionals;
-  utils = import ../../utils.nix { inherit lib; };
+  utils = import ../../utils.nix { inherit config lib; };
 
   containerIP = "10.88.1.${toString (containerID + 1)}";
   containerPortStr = if !builtins.isString containerPort then toString containerPort else containerPort;
@@ -15,7 +15,7 @@ let
 
   podName = "pod-${name}";
 
-  nginxImport = if makeNginxConfig == false then [ ] else [
+  nginxImport = if enable == false || makeNginxConfig == false then [ ] else [
     (
       import ./Nginx.nix {
         inherit containerIP config additionalDomains lib;
@@ -32,7 +32,7 @@ in
 {
   imports = imports ++ nginxImport;
 
-  systemd.services."create-pod-${name}" = {
+  systemd.services."create-pod-${name}" = mkIf enable {
     serviceConfig.Type = "oneshot";
     wantedBy = [ "${config.virtualisation.oci-containers.backend}-${name}.service" ];
     script = ''
@@ -42,7 +42,7 @@ in
     '';
   };
 
-  virtualisation.oci-containers.containers = {
+  virtualisation.oci-containers.containers =mkIf enable {
     "${name}" = utils.recursiveMerge [
       additionalContainerConfig
       {
@@ -75,10 +75,10 @@ in
     };
   } // additionalContainers;
 
-  systemd.tmpfiles.rules = optionals (postgresEnvFile != null) [
+  systemd.tmpfiles.rules = optionals (enable && postgresEnvFile != null) [
     "d ${dataDir}/postgresql/ 0750 70"  # TODO: This currently only works when the top dir is owned by root
     "d ${dataDir}/postgresql/17/ 0750 70"
-  ] ++ optionals (redisEnvFile != null) [
+  ] ++ optionals (enable && redisEnvFile != null) [
     "d ${dataDir}/redis/ 0750 999"
   ];
 }

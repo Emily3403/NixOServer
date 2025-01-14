@@ -3,22 +3,24 @@
     # System
     "Nginx.nix"
     "Backup.nix"
-#    "Monitoring"
 
-#    # Core Services
+    # Core Services
+    "Monitoring"
+    "Syncthing.nix"
     "Keycloak.nix"
     "Nextcloud.nix"
     "HedgeDoc.nix"
     "Wiki-js.nix"
-
-    "Syncthing.nix"
     "YouTrack.nix"
-    "Tandoor.nix"
     "Get.nix"
 
+    # Ruwusch but hosted on SSD
+    "Stirling-PDF.nix"
+    "Tandoor.nix"
+
+    "PhotoManagement/Ente.nix"
 #    "PhotoManagement/PhotoPrism.nix"
 #    "PhotoManagement/Piwigo.nix"
-    "PhotoManagement/Ente.nix"
   ];
 
   config = {
@@ -41,6 +43,5 @@
 
     hardware.raid.HPSmartArray.enable = true;
   };
-
 
 }

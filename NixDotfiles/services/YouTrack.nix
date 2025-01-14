@@ -21,6 +21,8 @@ in
     (
       import ./Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
+
+        enable = true;
         name = "youtrack";
         image = "jetbrains/youtrack:2024.3.55417";
         dataDir = cfg.dataDir;

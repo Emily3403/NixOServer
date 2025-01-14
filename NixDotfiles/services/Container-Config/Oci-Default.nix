@@ -6,6 +6,8 @@ let DATA_DIR = "/data/TODO"; in
     (
       import ./Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
+
+        enable = true;
         name = "TODO";
         image = "TODO";
         dataDir = cfg.dataDir;

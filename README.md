@@ -40,60 +40,66 @@ curl -L https://github.com/nix-community/nixos-images/releases/download/nixos-<v
 
 ### Installation Procedure
 
-```shell
-nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
-nix-channel --update
-nix-shell -p git util-linux vim wget cryptsetup
-git clone https://github.com/Emily3403/NixOServer
-cd NixOServer/bin
+1. Prepare the Environment
+   ```shell
+   nix-channel --add https://nixos.org/channels/nixos-unstable nixpkgs
+   nix-channel --update
+   nix-shell -p git util-linux vim wget cryptsetup
+   ```
+2. Get the Repository
+   ```
+   git clone https://github.com/Emily3403/NixOServer
+   cd NixOServer/bin
+   ```
+3. It is recommended to clean the drives before the installation procedure:
+   ```shell
+   ./clean.sh
+   ```
+4. Configure the installation: 
+   ```shell
+   $EDITOR ./config.sh
+   ```
+5. Next, if you are planning on using the remote ssh unlock feature, check if the correct ethernet driver is already included in `initrd.availableKernelModules` by executing
+   ```shell
+   nix-shell -p pciutils --command "lspci -v | grep -iA20 'network\|ethernet' | grep 'Kernel driver in use'"
+   ```
+6. Make sure to specify the correct boot devices either with `bootDevices_placeholder` or setting them directly in `hosts/{host}/default.nix`.
+
+   Detect them with
+    ```shell
+   find /dev/disk/by-id -type l -not -name "*part*" -name "wwn*" -exec ls -la {} \;
+   ```
+7. Now, install the server with
+   ```shell
+   ./install.sh
+   ```
+   This will read the configuration from `./config.sh` and create a ZFS Raid specified by `$RAID_LEVEL` with the number of drives specified by `$NUM_DRIVES`.
+
+   Additionally, the script will install NixOS with the configuration specified in the `NixOServer/NixDotfiles` directory.
+8. After the installation is complete, you'll have to clone the repository once more and rebuild
+   ```shell
+   git clone https://github.com/Emily3403/NixOServer
+   cd NixOServer/bin
+   ./postInstall.sh
+   ```
+
+### Useful Shell Commands
+To quickly pull changes and attempt a reinstall, use the following
 ```
-
-It is recommended to clean the drives before the installation procedure:
-
-```shell
-sudo ./clean.sh
+git stash && git pull --rebase && git stash pop && echo "y" | ./clean.sh && echo "y" | ./install.sh
 ```
-
-Next, edit the config to your liking. You might want to edit things like `NUM_DRIVES`, `RAID_LEVEL`, `SWAP_AMOUNT_GB` or `LUKS_PASSWORD`.
-
-```shell
-$EDITOR ./config.sh
-```
-
-Now, install the server with
-
-```
-sudo ./install.sh
-```
-
-This will read the configuration from `./config.sh` and create a ZFS Raid specified by `$RAID_LEVEL` with the number of drives specified by `$NUM_DRIVES`.
-
-Additionally, the script will install NixOS with the configuration specified in the `NixOServer/NixDotfiles` directory.
 
 # Debugging
 
-This installation is meant to provide a very easy way of installing NixOS on a Hetzner Server. However, sometimes life is not that simple.
+To see what's going on with your server, go to the support page and select remote console. You will then be able to view the output.
 
-One big problem with Hetzner, in particular with the Server Auction, is that you have *very little* debug info. In fact, when auctioning servers, you have **no** output available. So you'll have to guess what the errors are and how to fix them.
 
-In order to circumvent this, one can use [VNC](https://wiki.archlinux.de/title/VNC) to get the output of the console. Now, how can one activate VNC if importing the `zpool` fails and no root or boot filesystem can be loaded? [QEMU](https://wiki.archlinux.org/title/QEMU#VNC)!
+### ZFS Pool can't be imported
+This usually is due to an incompatibility in the zfs that installed the pool and the one that is trying to load it. Did you check `zfs --version` on both systems if they are the same?
 
-More specifically, one can execute qemu with VNC and pass the drives (assuming `/dev/sda, ...`) as follows:
-
-```shell
-qemu-system-x86_64 -enable-kvm -m 10240 \
--drive file=/dev/sda,format=raw \
--drive file=/dev/sdb,format=raw \
--drive file=/dev/sdc,format=raw \
--boot d -vnc :0,password=on -monitor stdio
-```
-
-Then you can have a look at the boot process with 
-
-```shell
-vncviewer <ip>
-```
+### ipconfig: no devices to configure
+The remote ssh unlock does not work because the correct driver isn't loaded. Have a look at step 5 of the installation.
 
 # Credit
 
-This installation procedure in the `InstallScripts` directory is heavily inspired by [this](https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/Root%20on%20ZFS) guide. The `NixDotfiles` directory is inspired by [this](https://github.com/ne9z/dotfiles-flake) repository.
+This installation procedure in the `InstallScripts` directory is heavily inspired by [this](https://openzfs.github.io/openzfs-docs/Getting%20Started/NixOS/Root%20on%20ZFS) guide.

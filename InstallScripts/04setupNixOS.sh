@@ -4,8 +4,8 @@
 
 # Check if the group 'nixbld' exists, if not, create it
 if ! getent group nixbld > /dev/null; then
-    sudo groupadd -g 30000 nixbld
-    sudo useradd -u 30000 -g nixbld -G nixbld nixbld
+    groupadd -g 30000 nixbld
+    useradd -u 30000 -g nixbld -G nixbld nixbld
 fi
 
 mkdir -p /root/.config/nix

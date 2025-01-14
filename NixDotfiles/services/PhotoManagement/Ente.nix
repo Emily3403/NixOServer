@@ -49,12 +49,12 @@ in
     ];
 
     age.secrets.Ente_Minio = {
-      file = ../../secrets/nixie/Ente/Minio.age;
+      file = ../../secrets/${config.host.name}/Ente/Minio.age;
       owner = "root";
     };
 
     age.secrets.Ente_Postgres = {
-      file = ../../secrets/nixie/Ente/Postgres.age;
+      file = ../../secrets/${config.host.name}/Ente/Postgres.age;
       owner = "root";
     };
 
@@ -100,6 +100,7 @@ in
       import ../Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
 
+        enable = true;
         name = "ente";
         image = "ghcr.io/ente-io/server";
         subdomain = "api.ente";
@@ -122,6 +123,7 @@ in
       import ../Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
 
+        enable = true;
         name = "ente-minio";
         image = "minio/minio";
         subdomain = cfg.minio-web-subdomain;

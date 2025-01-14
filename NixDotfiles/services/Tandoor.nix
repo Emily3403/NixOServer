@@ -29,7 +29,7 @@ in
     ];
 
     age.secrets.Tandoor = {
-      file = ../secrets/nixie/Tandoor.age;
+      file = ../secrets/${config.host.name}/Tandoor-secret-key.age;
       owner = "tandoor_recipes";
     };
   };
@@ -54,7 +54,7 @@ in
         user.name = "tandoor_recipes";
 
         bindMounts = {
-#          "/var/lib/tandoor-recipes/" = { hostPath = "${cfg.dataDir}/tandoor-recipes"; isReadOnly = false; };
+          "/var/lib/tandoor-recipes/" = { hostPath = "${cfg.dataDir}/tandoor-recipes"; isReadOnly = false; };
           "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
           "${config.age.secrets.Tandoor.path}".hostPath = config.age.secrets.Tandoor.path;
         };

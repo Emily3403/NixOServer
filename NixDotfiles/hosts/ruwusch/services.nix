@@ -3,7 +3,6 @@
     # System
     "Nginx.nix"
     "Backup.nix"
-#    "Monitoring"
     "Wireguard.nix"
 
     # Core Services
@@ -16,5 +15,15 @@
     "HedgeDoc.nix"
   ];
 
-  host.services.keycloak.realm = "Super-Realm";
+  config = {
+    host.services = {
+      nextcloud.enableExporter = false;
+      transmission.enableExporter = false;
+
+      keycloak = {
+        realm = "Super-Realm";
+        subdomain = "kc";
+      };
+    };
+  };
 }

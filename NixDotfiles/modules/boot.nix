@@ -43,11 +43,11 @@ in
 
     partitionScheme = mkOption {
       default = {
-        biosBoot = "-part5";
         efiBoot = "-part1";
-        swap = "-part4";
         bootPool = "-part2";
         rootPool = "-part3";
+        swap = "-part4";
+        biosBoot = "-part5";
       };
       description = "Describe on disk partitions";
       type = types.attrsOf types.str;
@@ -69,24 +69,21 @@ in
   config = mkIf (cfg.enable) (mkMerge [
     {
       zfs-root.fileSystems.datasets = {
-        "bpool/nixos/root" = "/boot";
-        "rpool/nixos/root" = "/";
-        "rpool/nixos/home" = mkDefault "/home";
-        "rpool/nixos/var/lib" = mkDefault "/var/lib";
-        "rpool/nixos/var/log" = mkDefault "/var/log";
+        "bpool/root" = "/boot";
+        "rpool/root" = "/";
+        "rpool/data" = "/data";
+        "rpool/home" = "/home";
       };
     }
 
     (mkIf cfg.luks.enable {
       boot.initrd.luks.devices = mkMerge (map
-        (diskName: {
-          "luks-rpool-${diskName}${cfg.partitionScheme.rootPool}" = {
+        (diskName: { "luks-${diskName}${cfg.partitionScheme.rootPool}" = {
             device = (cfg.devNodes + diskName + cfg.partitionScheme.rootPool);
             allowDiscards = true;
             bypassWorkqueues = true;
           };
-        })
-        cfg.bootDevices);
+        }) cfg.bootDevices);
     })
 
     {
@@ -96,7 +93,8 @@ in
       };
 
       boot = {
-        supportedFilesystems = { zfs = true; };
+        supportedFilesystems.zfs = true;
+
         zfs = {
           devNodes = cfg.devNodes;
           forceImportRoot = mkDefault false;
@@ -104,8 +102,9 @@ in
 
         loader = {
           generationsDir.copyKernels = true;
+
           efi = {
-            canTouchEfiVariables = (if cfg.removableEfi then false else true);
+            canTouchEfiVariables = (!cfg.removableEfi);
             efiSysMountPoint = ("/boot/efis/" + (head cfg.bootDevices) + cfg.partitionScheme.efiBoot);
           };
 
@@ -127,15 +126,13 @@ in
     }
 
     (mkIf cfg.sshUnlock.enable {
-
       boot = {
-        kernelParams = [ "ip=dhcp" ];
+        kernelParams = config.host.kernelParams;
         initrd = {
-          availableKernelModules = [ "e1000e" ];
+          availableKernelModules = config.host.initrdAdditionalKernelModules;
 
           network = {
             enable = true;
-            udhcpc.enable = true;
 
             ssh = {
               enable = true;
@@ -145,14 +142,6 @@ in
               authorizedKeys = cfg.sshUnlock.authorizedKeys;
               shell = "/bin/cryptsetup-askpass";
             };
-
-            postCommands = ''
-              tee -a /root/.profile >/dev/null <<EOF
-              if zfs load-key rpool/nixos; then
-                 pkill zfs
-              fi
-              exit
-              EOF'';
           };
         };
       };

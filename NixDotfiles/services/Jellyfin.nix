@@ -1,53 +1,74 @@
-{ pkgs, config, lib, ... }:
-let DATA_DIR = "/data/Jellyfin"; in
-{
-  systemd.tmpfiles.rules = [
-    "d ${cfg.dataDir} 0750 jellyfin jellyfin"
-    "d ${cfg.dataDir}/jellyfin/ 0750 jellyfin jellyfin"
-    "d ${cfg.dataDir}/Media-Emily/ 0750 jellyfin jellyfin"
-    "d ${cfg.dataDir}/Media-Carsten/ 0750 jellyfin jellyfin"
-    "d ${cfg.dataDir}/Media-Shared/ 0750 jellyfin jellyfin"
+{ pkgs, pkgs-unfree, config, lib, ... }:
+let
+  users = [ "Emily" "Carsten" "Buddy" "Shalin" "Martin" "Jannes" ];
 
-    "d ${cfg.dataDir}/Media-Shalin/ 0750 jellyfin jellyfin"
-    "d ${cfg.dataDir}/Media-Martin/ 0750 jellyfin jellyfin"
-    "d ${cfg.dataDir}/Media-Jannes/ 0750 jellyfin jellyfin"
-  ];
+  cfg = config.host.services.jellyfin;
+  inherit (lib) mkIf mkOption types;
+in
+{
+  options.host.services.jellyfin = {
+    dataDir = mkOption {
+      type = types.str;
+      default = "/data/Jellyfin";
+    };
+
+    subdomain = mkOption {
+      type = types.str;
+      default = "kino";
+    };
+
+    enableExporter = mkOption {
+      type = types.bool;
+      default = true;
+    };
+  };
+
+  config = {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0750 jellyfin jellyfin"
+      "d ${cfg.dataDir}/jellyfin/ 0750 jellyfin jellyfin"
+    ] ++
+      map (user: "d ${cfg.dataDir}/Media-${user}/ 0750 jellyfin jellyfin") users;
+
+    users.groups.video.members = [ "jellyfin" ];
+    users.groups.render.members = [ "jellyfin" ];
+
+  };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
         inherit config lib pkgs;
+
         name = "jellyfin";
-        containerIP = "192.168.7.109";
+        subdomain = cfg.subdomain;
+        containerID = 9;
         containerPort = 8096;
-        imports = [ ../users/services/jellyfin.nix ];
+
+        user.extraGroups = [ "render" "video" ];
+        isSystemUser = true;
         enableHardwareTranscoding = true;
 
-        additionalDomains = [ "kino" ];
-        additionalNginxLocationConfig.proxyWebsockets = true;
-        additionalNginxConfig.locations."/metrics".return = "403";
-
-        additionalContainerConfig.forwardPorts = [
-          { containerPort = 1900; hostPort = 1900; protocol = "udp"; }
-          { containerPort = 7359; hostPort = 7359; protocol = "udp"; }
-        ];
+        additionalNginxConfig.locations = {
+          "/".proxyWebsockets = true;
+          "/metrics".return = "403";
+        };
 
         bindMounts = {
           "/var/lib/jellyfin" = { hostPath = "${cfg.dataDir}/jellyfin"; isReadOnly = false; };
           "/var/lib/data" = { hostPath = "/data/Transmission/data"; };
+        } //  # Will generate /var/lib/Media-Emily = { hostPath = cfg.dataDir/Media-Emily };
+          builtins.listToAttrs ( map ( user: { name = "/var/lib/Media-${user}"; value = { hostPath = "${cfg.dataDir}/Media-${user}"; };  } ) users ) ;
 
-          "/var/lib/Media-Emily" = { hostPath = "${cfg.dataDir}/Media-Emily"; };
-          "/var/lib/Media-Carsten" = { hostPath = "${cfg.dataDir}/Media-Carsten"; };
-          "/var/lib/Media-Shared" = { hostPath = "${cfg.dataDir}/Media-Shared"; };
+        cfg = {
+          services.jellyfin = {
+            enable = true;
+            openFirewall = true;
+          };
 
-          "/var/lib/Media-Shalin" = { hostPath = "${cfg.dataDir}/Media-Shalin"; };
-          "/var/lib/Media-Martin" = { hostPath = "${cfg.dataDir}/Media-Martin"; };
-          "/var/lib/Media-Jannes" = { hostPath = "${cfg.dataDir}/Media-Jannes"; };
-        };  # TODO: Factor people out into a for-lopp
+          users.groups.video.members = [ "jellyfin" ];
+          users.groups.render.members = [ "jellyfin" ];
 
-        cfg.services.jellyfin = {
-          enable = true;
-          openFirewall = true;
         };
       }
     )

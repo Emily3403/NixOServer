@@ -3,7 +3,7 @@
   additionalDomains ? [ ], additionalConfig ? {}, additionalLocationConfig ? {}, additionalHostConfig ? {},
   config, lib
 }:
-let utils = import ../../utils.nix { inherit lib; }; in
+let utils = import ../../utils.nix { inherit config lib; }; in
 {
   services.nginx.virtualHosts = utils.recursiveMerge [
     additionalHostConfig

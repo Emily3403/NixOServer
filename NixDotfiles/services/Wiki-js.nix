@@ -24,7 +24,7 @@ in
     ];
     
     age.secrets.Wiki-js_ssh-key = {
-      file = ../secrets/nixie/Wiki-js.age;
+      file = ../secrets/${config.host.name}/Wiki-js.age;
       owner = "wiki-js";
     };
   };

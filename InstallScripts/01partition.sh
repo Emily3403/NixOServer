@@ -12,15 +12,15 @@ partition_disk () {
     blkdiscard -f "${disk}" || true
 
     parted --script --align=optimal  "${disk}" -- \
-    mklabel gpt \
-    mkpart EFI 2MiB 1GiB \
-    mkpart bpool 1GiB 5GiB \
-    mkpart rpool 5GiB -$((EFFECTIVE_SWAP_PER_DRIVE + RESERVE))GiB \
-    mkpart swap  -$((EFFECTIVE_SWAP_PER_DRIVE + RESERVE))GiB -"${RESERVE}"GiB \
-    mkpart BIOS 1MiB 2MiB \
-    set 1 esp on \
-    set 5 bios_grub on \
-    set 5 legacy_boot on
+        mklabel gpt \
+        mkpart EFI 2MiB 1GiB \
+        mkpart bpool 1GiB 5GiB \
+        mkpart rpool 5GiB -$((EFFECTIVE_SWAP_PER_DRIVE + RESERVE))GiB \
+        mkpart swap  -$((EFFECTIVE_SWAP_PER_DRIVE + RESERVE))GiB -"${RESERVE}"GiB \
+        mkpart BIOS 1MiB 2MiB \
+        set 1 esp on \
+        set 5 bios_grub on \
+        set 5 legacy_boot on
 
     partprobe "${disk}"
     udevadm settle
@@ -32,9 +32,9 @@ for disk in "${DRIVES[@]}" "${HOT_SPARES[@]}"; do
     partition_disk "${disk}"
     # If using LUKS_PASSWORD, setup cryptsetup
     if [[ -n "$LUKS_PASSWORD" ]]; then
-        echo -e "\n\nSetting up LUKS on $disk\n"
+        echo -e "\n\nSetting up encryption on $disk-part3\n"
         printf "%s" "$LUKS_PASSWORD" | cryptsetup luksFormat --type luks2 "${disk}-part3" -
-        printf "%s" "$LUKS_PASSWORD" | cryptsetup luksOpen "${disk}-part3" "luks-rpool-${disk##*/}-part3" -
+        printf "%s" "$LUKS_PASSWORD" | cryptsetup luksOpen "${disk}-part3" "luks-${disk##*/}-part3" -
     fi
 
     sync && udevadm settle

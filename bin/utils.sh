@@ -29,4 +29,6 @@ check_root_pw() {
     fi
 }
 
-check_root_pw
+if echo "$0" | grep -v "postInstall"; then
+    check_root_pw
+fi

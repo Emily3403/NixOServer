@@ -1,8 +1,8 @@
 { config, modulesPath, pkgs, lib, ... }: {
   host = {
     name = "nixie";
-    id = "abcd1234";
-    bootDevices = [ "wwn-0x600508b1001c5029b5a15539c6e5c036" "wwn-0x600508b1001cbe28f550555fc3bd3cbe" "wwn-0x600508b1001c6475f8f96e4aaf5cfa76" "wwn-0x600508b1001c9652ea88895b0976fc23" ];
+    id = "69420420";
+    bootDevices = [ "wwn-0x600508b1001c45ba5b71f00bcbda09c6" "wwn-0x600508b1001c455e43aa950f99f84287" "wwn-0x600508b1001cd6bba7589bc2985434fa" "wwn-0x600508b1001c100c12a98dee2b4cec1f" ];
 #    additionalBootLoaderDevices = [ "usb-HP_iLO_Internal_SD-CARD_000002660A01-0:0" ];
 
     zfs = {
@@ -21,17 +21,20 @@
       encrypted = true;
     };
 
-    additionalKernelModules = [
+    initrdAdditionalKernelModules = [
       "uhci_hcd"
       "kvm-intel"
+      "tg3"
     ];
+
+    kernelParams = [ "ip=130.149.220.19::130.149.220.126:255.255.255.128:nixie:enp7s0f0" ];
 
     networking.domainName = "ruwusch.de";
   };
 
   networking = {
-    hostName = "nixie";
-    hostId = "abcd1234";  # TODO: Set this manually
+#    hostName = "nixie";
+#    hostId = "abcd1234";  # TODO: Set this manually
     useDHCP = false;
 
     nameservers = [ "1.1.1.1" "8.8.8.8" ];
@@ -69,10 +72,12 @@
     # For the nixos-containers and wireguard
     nat = {
       enable = true;
-      internalInterfaces = [ "ve-+" "wg0" ];
+      internalInterfaces = [ "ve-+" ];
       externalInterface = "enp7s0f0";
     };
   };
+
+  powerManagement.cpuFreqGovernor = "performance";
 
   # import other host-specific things
   imports = [

@@ -6,6 +6,8 @@ let DATA_DIR = "/data/Piwigo"; in
     (
       import ../Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
+
+        enable = true;
         name = "piwigo";
         image = "linuxserver/piwigo:14.3.0";
         dataDir = cfg.dataDir;
@@ -27,6 +29,8 @@ let DATA_DIR = "/data/Piwigo"; in
     (
       import ../Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
+
+        enable = true;
         name = "piwigo-mariadb";
         image = "linuxserver/mariadb:10.11.6";
         dataDir = cfg.dataDir;

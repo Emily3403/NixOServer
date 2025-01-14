@@ -12,92 +12,65 @@
 
 
 { config, modulesPath, pkgs, lib, ... }: {
-  zfs-root = {
-    boot = {
-      devNodes = "/dev/disk/by-id/";
-      bootDevices = [ "bootDevices_placeholder" ];
-      removableEfi = true;
-      luks.enable = true;
+  host = {
+    name = "ruwusch";
+    id = "42069420";
+    bootDevices = [ "wwn-0x5000c500db1e5ef4" "wwn-0x5000c500db3750a7" ];
+#    bootDevices = [ "wwn-0x5000c500db24ffb3" "wwn-0x5000c500db235066" ];
 
-      sshUnlock = {
+    authorizedKeys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj"
+    ];
+
+    zfs = {
+      autoSnapshot = {
         enable = true;
-        authorizedKeys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMooVZ98Wkne2js4jPgypBlPuxZGxJBu8QEhOdCkSTQj"
-        ];
+        daily = 15;
+        weekly = 9;
+        monthly = 60;  # 5 years
       };
+
+      arc = {
+        minGB = 32;
+        maxGB = 56;
+      };
+
+      encrypted = true;
+    };
+
+    initrdAdditionalKernelModules = [
+      "uhci_hcd"
+      "kvm-amd"
+      "e1000e"
+    ];
+
+    networking.domainName = "ruwusch.de";
+  };
+
+  networking = {
+    useDHCP = true;
+    nameservers = [ "1.1.1.1" "8.8.8.8" ];
+    timeServers = [ "0.nixos.pool.ntp.org" "1.nixos.pool.ntp.org" "2.nixos.pool.ntp.org" "3.nixos.pool.ntp.org" ];
+
+    firewall.allowedTCPPorts = [ 22 80 443 ];
+    firewall.allowedUDPPorts = [ ];
+
+    # For the nixos-containers
+    nat = {
+      enable = true;
+      internalInterfaces = [ "ve-+" ];
+      externalInterface = "eno1";
     };
   };
 
   # This option is discouraged, however in all scenarios we want to import the root anymays as there is no other way of solving the problem
   boot.zfs.forceImportRoot = lib.mkForce true;
-
-  services.zfs = {
-    autoSnapshot = {
-      enable = true;
-      flags = "-k -p --utc";
-      weekly = 7; # How many snapshots to keep
-      monthly = 48;
-    };
-  };
-
-  # Hardware accelleration
-  hardware.graphics = {
-    enable = true;
-    extraPackages = [ pkgs.intel-media-driver ];
-  };
-
-  boot.initrd.availableKernelModules = [
-    # "Normal" disk Support
-    "sd_mod"
-    "sr_mod"
-    "nvme"
-    "ahci"
-
-    # QEMU
-    "virtio_pci"
-    "virtio_blk"
-    "virtio_scsi"
-    "virtio_net"
-
-    # USB
-    "uas"
-    "usb_storage"
-    "usbhid"
-
-    # Hetzner Specific
-    "ata_piix"
-    "kvm-intel"
-
-    # Transmission
-    "tun"
-  ];
-
-  boot.kernelParams = [
-    "zfs.zfs_arc_max=103079215104"
-    "zfs.zfs_arc_min=12884901888"
-    "zfs.zfs_arc_meta_limit=51539607552"
-  ];
-
-  networking = {
-    hostName = "ruwusch";
-    hostId = "abcd1234";
-  };
-
-  time.timeZone = "Europe/Berlin";
+  powerManagement.cpuFreqGovernor = "performance";
 
   # import other host-specific things
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")
-    ./networking.nix
     ./services.nix
-    ./secrets.nix
   ];
-
-  monitoredServices = {
-    prometheus = true;
-    transmission = true;
-    syncthing = true;
-    nextcloud = true;
-  };
 }

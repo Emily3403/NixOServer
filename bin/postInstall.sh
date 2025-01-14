@@ -45,7 +45,14 @@ cores = $(nproc)
 max-jobs = auto" > /root/.config/nix/nix.conf
 
 # Move and symlink the Nix directory
-cp -r /etc/nixos /etc/_backup-nixos
+if [ -L /etc/nixos ]; then
+    echo "ERROR: Is a symlink: /etc/nixos. Aborting!"
+elif [ ! -d /etc/nixos ]; then
+    echo "ERROR: Not a directory: /etc/nixos. Aborting!"
+    exit 1
+fi
+
+cp -r /etc/nixos /etc/backup-nixos
 rm -rf /etc/nixos/.git
 rm -rf "$SCRIPT_DIR/../NixDotfiles"
 mv /etc/nixos "$SCRIPT_DIR/../NixDotfiles"
@@ -56,3 +63,5 @@ git -C "$SCRIPT_DIR" add -A
 git -C "$SCRIPT_DIR" commit -m "Replace placeholders"
 
 nixos-rebuild switch
+
+echo "Done with the installation procedure, consider deleting /etc/backup-nixos"

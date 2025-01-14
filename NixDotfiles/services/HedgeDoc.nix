@@ -2,6 +2,7 @@
 let
   cfg = config.host.services.hedgedoc;
   kcfg = config.host.services.keycloak;
+  utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 in
 {
@@ -30,7 +31,7 @@ in
     ];
     
     age.secrets.HedgeDoc = {
-      file = ../secrets/nixie/HedgeDoc.age;
+      file = ../secrets/${config.host.name}/HedgeDoc.age;
       owner = "hedgedoc";
     };
   };
@@ -106,4 +107,8 @@ in
       }
     )
   ];
+
+  config = {
+#    services.nginx.virtualHosts."${config.networking.hostName}.status.${config.host.networking.domainName}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "hedgedoc" "192.168.7.");
+  };
 }

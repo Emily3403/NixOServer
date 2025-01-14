@@ -1,4 +1,4 @@
-{ lib }:
+{ config, lib }:
 
 {
   # https://stackoverflow.com/a/54505212
@@ -16,4 +16,12 @@
         );
     in
     f [ ] attrList;
+
+  makeNginxMetricConfig = service: ip: {
+    forceSSL = true;
+    enableACME = true;
+    basicAuthFile = config.age.secrets.Monitoring_host-htpasswd.path;
+    locations."/${service}-metrics".proxyPass = "http://${ip}/metrics";
+  };
+
 }

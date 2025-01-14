@@ -32,16 +32,21 @@ in
           default = [ ];
         };
 
-        additionalKernelModules = mkOption {
-          description = "Additional kernel modules to load";
+        kernelParams = mkOption {
+          description = "Parameters added to the kernel command line";
+          type = types.listOf types.str;
+          default = [ "ip=dhcp" ];
+        };
+
+        initrdAdditionalKernelModules = mkOption {
+          description = "Additional kernel modules to load for initrd";
           type = types.listOf types.str;
           default = [ ];
         };
 
-        enableHardwareAcceleration = mkOption {
-          description = "Enable hardware acceleration";
-          type = types.bool;
-          default = false;
+        authorizedKeys = mkOption {
+          type = types.listOf types.str;
+          default = [ "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily" ];
         };
 
         zfs = mkOption {
@@ -127,6 +132,7 @@ in
                 type = types.bool;
                 default = false;
               };
+
             };
           };
         };
@@ -168,18 +174,11 @@ in
       luks.enable = config.host.zfs.encrypted;
       sshUnlock = mkIf config.host.zfs.encrypted {
         enable = true;
-        authorizedKeys = [
-          "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"
-        ];
+        authorizedKeys = config.host.authorizedKeys;
       };
     };
 
     boot.zfs.forceImportRoot = false;
-
-    hardware.graphics = mkIf config.host.enableHardwareAcceleration {
-      enable = true;
-      extraPackages = [ pkgs.intel-media-driver ];
-    };
 
     services.zfs = {
       autoSnapshot = {
@@ -213,6 +212,8 @@ in
       "nvme"
       "ahci"
 
+      "igb"
+
       # QEMU
       "virtio_pci"
       "virtio_blk"
@@ -233,9 +234,13 @@ in
       # Legacy RAID modules
       "megaraid_sas"
       "hpsa"
-    ] ++ config.host.additionalKernelModules;
+    ] ++ config.host.initrdAdditionalKernelModules;
 
     time.timeZone = config.host.networking.timeZone;
+    networking = {
+      hostName = config.host.name;
+      hostId = config.host.id;
+    };
     services.timesyncd.enable = true;
 
 

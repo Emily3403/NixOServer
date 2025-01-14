@@ -35,13 +35,8 @@ in
 
     age.secrets = mkIf cfg.enableExporter {
       Prometheus_syncthing-exporter-environment = {
-        file = ../secrets/nixie/Monitoring/Exporters/Syncthing-Exporter.age;
+        file = ../secrets/${config.host.name}/Monitoring/Exporters/Syncthing-Exporter.age;
         owner = "root";
-      };
-
-      Prometheus_syncthing-API-key = {
-        file = ../secrets/nixie/Monitoring/Exporters/Syncthing-Token.age;
-        owner = "prometheus";
       };
     };
   };
@@ -54,11 +49,11 @@ in
         name = "syncthing";
         subdomain = config.host.services.syncthing.subdomain;
         containerID = 1;
+        containerPort = 8080;
 
         user.uid = 237;
         isSystemUser = true;
 
-        containerPort = 8080;
         additionalContainerConfig.forwardPorts = [ { hostPort = 22000; } { hostPort = 22000; protocol = "udp"; } { hostPort = 21027; protocol = "udp"; } ];
 
         bindMounts = {

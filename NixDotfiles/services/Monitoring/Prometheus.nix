@@ -1,8 +1,9 @@
 { pkgs, config, lib, ... }:
 let
 
-  inherit (lib) foldl';
-  DATA_DIR = "/data/Prometheus";
+  cfg = config.host.services.prometheus;
+  inherit (lib) mkIf mkOption types foldl';
+
   mkBasicAuth = secretName: { username = "admin"; password_file = config.age.secrets.${secretName}.path; };
 
   # TODO: Refactor this
@@ -31,36 +32,65 @@ let
 
 in
 {
-  systemd.tmpfiles.rules = [
-    "d ${cfg.dataDir} 0750 prometheus prometheus"
-    "d ${cfg.dataDir}/prometheus2 0750 prometheus prometheus"
-    "d ${cfg.dataDir}/prometheus2/config 0750 prometheus prometheus"
-    "d ${cfg.dataDir}/prometheus2/data 0750 prometheus prometheus"
-  ];
+
+  options.host.services.prometheus = {
+    dataDir = mkOption {
+      type = types.str;
+      default = "/data/Prometheus";
+    };
+
+    subdomain = mkOption {
+      type = types.str;
+      default = "prometheus";
+    };
+  };
+
+  config = {
+    systemd.tmpfiles.rules = [
+      "d ${cfg.dataDir} 0750 prometheus prometheus"
+      "d ${cfg.dataDir}/prometheus2 0750 prometheus prometheus"
+      "d ${cfg.dataDir}/prometheus2/config 0750 prometheus prometheus"
+      "d ${cfg.dataDir}/prometheus2/data 0750 prometheus prometheus"
+    ];
+
+    age.secrets.Prometheus_syncthing-API-key = {
+      file = ../../secrets/${config.host.name}/Monitoring/Access/Syncthing.age;
+      owner = "prometheus";
+    };
+
+    age.secrets.Prometheus_ruwusch-pw = {
+      file = ../../secrets/${config.host.name}/Monitoring/Access/ruwusch.age;
+      owner = "prometheus";
+    };
+  };
+
 
   imports = [
     (
       import ../Container-Config/Nix-Container.nix {
         inherit config lib pkgs;
-        name = "prometheus";
-        containerIP = "192.168.7.112";
-        containerPort = 9090;
-        subdomain = "prometheus";
 
-        imports = [ ../../users/services/Monitoring/prometheus.nix ];
+        name = "prometheus";
+        subdomain = cfg.subdomain;
+        containerID = 12;
+        containerPort = 9090;
+
+        user.uid = 255;
+        isSystemUser = true;
+
         bindMounts = {
           "/var/lib/prometheus2/" = { hostPath = "${cfg.dataDir}/prometheus2"; isReadOnly = false; };
+          "${config.age.secrets.Prometheus_nixie-pw.path}".hostPath = config.age.secrets.Prometheus_nixie-pw.path;
           "${config.age.secrets.Prometheus_ruwusch-pw.path}".hostPath = config.age.secrets.Prometheus_ruwusch-pw.path;
           "${config.age.secrets.Prometheus_syncthing-API-key.path}".hostPath = config.age.secrets.Prometheus_syncthing-API-key.path;
-          "${config.age.secrets.Prometheus_photoprism-API-key.path}".hostPath = config.age.secrets.Prometheus_photoprism-API-key.path;
         };
 
         cfg = {
           services.prometheus = {
             enable = true;
-            retentionTime = "5y";
+            retentionTime = "15y";
             checkConfig = "syntax-only";  # "If you use credentials stored in external files they will not be visible to promtool and it will report errors"
-            webExternalUrl = "https://prometheus.${config.host.networking.domainName}";
+            webExternalUrl = "https://${cfg.subdomain}.${config.host.networking.domainName}";
 
             # Needed for htpasswd with basic_auth_users (https://prometheus.io/docs/prometheus/latest/configuration/https/)
             webConfigFile = "/var/lib/prometheus2/config/web-config.yaml";
@@ -71,7 +101,7 @@ in
               in
               # This can easily be extended to include more hosts
               (mkScrapers "ruwusch" ([ "prometheus" "transmission" "syncthing-exporter" "jellyfin" "nextcloud" "hedgedoc" ] ++ def)) ++
-              (mkBearerScrapers "ruwusch" ([ "syncthing" "photoprism" ]))
+              (mkBearerScrapers "ruwusch" ([ "syncthing" ]))
             ;
 
           };

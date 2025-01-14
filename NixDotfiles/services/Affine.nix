@@ -6,6 +6,8 @@ let DATA_DIR = "/data/Affine"; in
     (
       import ./Container-Config/Oci-Container.nix {
         inherit config lib pkgs;
+
+        enable = true;
         name = "affine";
         image = "ghcr.io/toeverything/affine-graphql:beta";
         dataDir = cfg.dataDir;

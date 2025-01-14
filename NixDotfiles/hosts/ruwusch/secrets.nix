@@ -6,31 +6,12 @@
       group = "nginx";
     };
 
-    Prometheus_ruwusch-pw = {
-      file = ../../secrets/Monitoring/Prometheus/ruwusch-pw.age;
-      owner = "prometheus";
-      mode = "440";
-    };
 
-    Grafana_admin-pw = {
-      file = ../../secrets/Monitoring/Grafana/admin-pw.age;
-      owner = "grafana";
-    };
 
-    Grafana_secret-key = {
-      file = ../../secrets/Monitoring/Grafana/secret-key.age;
-      owner = "grafana";
-    };
 
-    Transmission_EnvironmentFile = {
-      file = ../../secrets/Transmission.age;
-      owner = "root";
-    };
 
-    Transmission_Exporter-environment = {
-      file = ../../secrets/Monitoring/Exporters/Transmission.age;
-      owner = "root";
-    };
+
+
 
 
 
@@ -40,11 +21,6 @@
     };
 
 
-
-    Wireguard = {
-      file = ../../secrets/Wireguard.age;
-      owner = "root";
-    };
 
     PhotoPrism = {
       file = ../../secrets/PhotoPrism.age;

@@ -80,8 +80,8 @@ in
       "d ${cfg.dataDir}/postgresql 0750 postgres"
     ];
 
-    age.secrets.Keycloak_database-pw = {
-      file = ../secrets/nixie/Keycloak.age;
+    age.secrets.Keycloak = {
+      file = ../secrets/${config.host.name}/Keycloak.age;
       owner = "keycloak";
     };
   };
@@ -99,7 +99,7 @@ in
 
         bindMounts = {
           "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
-          "${config.age.secrets.Keycloak_database-pw.path}".hostPath = config.age.secrets.Keycloak_database-pw.path;
+          "${config.age.secrets.Keycloak.path}".hostPath = config.age.secrets.Keycloak.path;
         };
 
         additionalNginxConfig.locations = {
@@ -151,7 +151,7 @@ in
 #              metrics-enabled = true;  # TODO
             };
 
-            database.passwordFile = config.age.secrets.Keycloak_database-pw.path;
+            database.passwordFile = config.age.secrets.Keycloak.path;
             initialAdminPassword = "changeme";
 
             themes.keywind = pkgs.stdenv.mkDerivation rec {
