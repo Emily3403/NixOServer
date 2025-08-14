@@ -2,6 +2,15 @@
   # Don't build man pages. This saves a *lot* of time when rebuilding
   documentation.man.generateCaches = false;
 
+  # nixpkgs
+  nixpkgs.config = {
+    allowUnfree = true;
+    packageOverrides = pkgs: {
+      vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
+    };
+  };
+
+
   # Podman
   virtualisation.podman = {
     enable = true;

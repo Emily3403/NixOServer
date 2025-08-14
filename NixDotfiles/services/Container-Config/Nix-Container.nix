@@ -14,6 +14,7 @@
 , additionalContainerConfig ? { }
 , makeNginxConfig ? true
 , nginxLocation ? "/"
+, nginxMaxUploadSize ? null
 , additionalNginxConfig ? { }
 , additionalNginxLocationConfig ? { }
 , additionalNginxHostConfig ? { }
@@ -106,6 +107,7 @@ in
       privateNetwork = true;
       hostAddress = config.host.networking.containerHostIP;
       localAddress = containerIP;
+      timeoutStartSec = "15min";  # Give containers all the time they need to start up
 
       bindMounts = mkMerge [ bindMounts (mkIf enableHardwareTranscoding { "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; }; }) ];
       allowedDevices = optionals (enableHardwareTranscoding) [{ node = "/dev/dri/renderD128"; modifier = "rw"; } { node = "/dev/dri/card0"; modifier = "rw"; }];

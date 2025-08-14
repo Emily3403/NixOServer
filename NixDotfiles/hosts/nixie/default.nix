@@ -7,10 +7,12 @@
 
     zfs = {
       autoSnapshot = {
-        enable = true;
-        daily = 15;
-        weekly = 9;
-        monthly = 60; # 5 years
+        enable = true;      # All values are chosen +1 to account for rounding issues
+        quarterHourly = 9;  #  2h  of every 15min
+        hourly = 49;        #  2d  of every 1h  (60m)
+        daily = 15;         #  14d of every 1d  (24h)
+        weekly = 9;         #  2m  of every 1w   (7d)
+        monthly = 61;       #  5y  of every 1m  (30d)
       };
 
       arc = {
@@ -27,7 +29,7 @@
       "tg3"
     ];
 
-    kernelParams = [ "ip=130.149.220.19::130.149.220.126:255.255.255.128:nixie:enp7s0f0" ];
+    kernelParams = [ "ip=130.149.220.19::130.149.220.126:255.255.255.128:nixie:ens2f0" ];
     networking.domainName = "ruwusch.de";
   };
 
@@ -41,17 +43,17 @@
     firewall.allowedUDPPorts = [ ];
 
     defaultGateway = {
-      interface = "enp7s0f0";
+      interface = "ens2f0";
       address = "130.149.220.126";
     };
 
     defaultGateway6 = {
-      interface = "enp7s0f0";
+      interface = "ens2f0";
       address = "fe80::1";
     };
 
     interfaces = {
-      enp7s0f0 = {
+      ens2f0 = {
         ipv4.addresses = [{
           address = "130.149.220.19";
           prefixLength = 25;
@@ -63,7 +65,7 @@
         }];
       };
 
-      enp7s0f1 = {
+      ens2f1 = {
         ipv4.addresses = [{
           address = "192.168.200.19";
           prefixLength = 25;
@@ -75,7 +77,7 @@
     nat = {
       enable = true;
       internalInterfaces = [ "ve-+" ];
-      externalInterface = "enp7s0f0";
+      externalInterface = "ens2f0";
     };
   };
 

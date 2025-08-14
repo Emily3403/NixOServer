@@ -80,7 +80,7 @@ in
         '';
 
         postShutdown = ''
-          ${pkgs.iptables}/bin/iptables  -t nat -D POSTROUTING -s ${ip-range}  -o ${config.networking.nat.externalInterface} -j MASQUERADE
+          ${pkgs.iptables}/bin/iptables  -t nat -D POSTROUTING -s ${ip-range}  -o ${config.networking.nat.externalInterface} -j MASQUERADE#
           ${pkgs.iptables}/bin/ip6tables -t nat -D POSTROUTING -s ${ip6-range} -o ${config.networking.nat.externalInterface} -j MASQUERADE
 
         '';

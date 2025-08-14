@@ -57,6 +57,12 @@ in
               description = "Enable zfs-auto-snapshot";
             };
 
+            quarterHourly  = mkOption {
+              default = 0;
+              type = types.int;
+              description = "Number of 15min auto-snapshots that you wish to keep.";
+            };
+
             hourly = mkOption {
               default = 0;
               type = types.int;
@@ -164,7 +170,7 @@ in
         enable = config.host.zfs.autoSnapshot.enable;
         flags = "-k -p --utc";
 
-        frequent = 0;
+        frequent = config.host.zfs.autoSnapshot.quarterHourly;
         hourly = config.host.zfs.autoSnapshot.hourly;
         daily = config.host.zfs.autoSnapshot.daily;
         weekly = config.host.zfs.autoSnapshot.weekly;

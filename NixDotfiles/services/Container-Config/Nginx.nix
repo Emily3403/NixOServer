@@ -6,6 +6,7 @@
 , containerIP
 , containerPort /* int */
 , useHttps ? false
+, maxUploadSize ? "10M"
 , additionalDomains ? [ ]
 , additionalConfig ? { }
 , additionalLocationConfig ? { }

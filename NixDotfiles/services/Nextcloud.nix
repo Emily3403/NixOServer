@@ -103,16 +103,17 @@ in
               dbname = "nextcloud";
             };
 
+            poolSettings = {
+              pm = "dynamic";
+              "pm.max_children" = "200";
+              "pm.max_requests" = "500";
+              "pm.max_spare_servers" = "24";
+              "pm.min_spare_servers" = "6";
+              "pm.start_servers" = "24";
+            };
+
             # Configure the opcache module as recommended
             phpOptions = {
-              # Tune Nextcloud
-              "pm" = "dynamic";
-              "pm.max_children" = "200";
-              "pm.start_servers" = "32";
-              "pm.min_spare_servers" = "6";
-              "pm.max_spare_servers" = "24";
-
-              # Tune OPCache
               "opcache.jit" = "tracing";
               "opcache.jit_buffer_size" = "100M";
               "opcache.interned_strings_buffer" = "16";

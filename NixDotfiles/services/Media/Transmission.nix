@@ -61,7 +61,7 @@ in
         dataDir = cfg.dataDir;
 
         name = "transmission";
-        image = "haugene/transmission-openvpn:latest";
+        image = "haugene/transmission-openvpn:5.3";
         containerPort = 9091;
 
         additionalContainerConfig.extraOptions = [ "--cap-add=NET_ADMIN" "--device=/dev/net/tun" ];
@@ -74,7 +74,7 @@ in
         volumes = [
           "${cfg.dataDir}/data:/data"
           "${cfg.dataDir}/config:/config"
-#          "${cfg.dataDir}/ui/config.json:/opt/transmission-ui/flood-for-transmission/" # TODO: Default config
+          "${cfg.dataDir}/ui/:/opt/transmission-ui/" # TODO: Default config
           "${cfg.dataDir}/custom-configs:/etc/openvpn/custom/"
         ];
       }

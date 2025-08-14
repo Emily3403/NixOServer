@@ -54,6 +54,7 @@ in
         };
 
         user.name = "tandoor_recipes";
+        isSystemUser = true;
 
         bindMounts = {
           "/var/lib/tandoor-recipes/" = { hostPath = "${cfg.dataDir}/tandoor-recipes"; isReadOnly = false; };
