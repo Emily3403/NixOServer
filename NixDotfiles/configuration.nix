@@ -9,6 +9,9 @@
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 #  nix.settings.download-buffer-size = 134217728;  # Double the default
 
+  # 25.05 features
+  system.rebuild.enableNg = true;
+
   environment.defaultPackages = with pkgs; [
     inputs.agenix.packages.x86_64-linux.default
   ];

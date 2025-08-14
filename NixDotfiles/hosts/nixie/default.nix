@@ -7,10 +7,12 @@
 
     zfs = {
       autoSnapshot = {
-        enable = true;
-        daily = 15;
-        weekly = 9;
-        monthly = 60; # 5 years
+        enable = true;      # All values are chosen +1 to account for rounding issues
+        quarterHourly = 9;  #  2h  of every 15min
+        hourly = 49;        #  2d  of every 1h  (60m)
+        daily = 15;         #  14d of every 1d  (24h)
+        weekly = 9;         #  2m  of every 1w   (7d)
+        monthly = 61;       #  5y  of every 1m  (30d)
       };
 
       arc = {

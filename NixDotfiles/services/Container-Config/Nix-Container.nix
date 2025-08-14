@@ -14,6 +14,7 @@
 , additionalContainerConfig ? { }
 , makeNginxConfig ? true
 , nginxLocation ? "/"
+, nginxMaxUploadSize ? null
 , additionalNginxConfig ? { }
 , additionalNginxLocationConfig ? { }
 , additionalNginxHostConfig ? { }

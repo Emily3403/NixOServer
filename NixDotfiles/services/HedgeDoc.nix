@@ -49,6 +49,7 @@ in
         containerPort = 3000;
         isSystemUser = true;
 
+        nginxMaxUploadSize = "100M";
         additionalNginxConfig.locations = {
           "/metrics".return = "403";
           "/status".return = "403";

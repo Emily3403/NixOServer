@@ -77,6 +77,7 @@ in
               options = {
                 urAccepted = -1;
                 maxFolderConcurrency = 8; # Turn this down if using HDDs
+                databaseTuning = "large";
               };
 
               devices =
