@@ -2,7 +2,7 @@
   host = {
     name = "ruwusch";
     id = "42042069";
-    bootDevices = [ "wwn-0x5000cca267f080f2" "wwn-0x5000cca267ebaefd" "wwn-0x5000cca252d156af" ];
+    bootDevices = [ "wwn-0x5000cca257f559a4" "wwn-0x5000cca267f05a8f" "wwn-0x5000cca27dc00547" ];
 
     authorizedKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHAzQFMYrSvjGtzcOUbR1YHawaPMCBDnO4yRKsV7WHkg emily"
@@ -44,18 +44,18 @@
     nat = {
       enable = true;
       internalInterfaces = [ "ve-+" ];
-      externalInterface = "eno1";
+      externalInterface = "enp0s31f6";
     };
 
     # IPv6 Connectivity
-    interfaces.eno1.ipv6.addresses = [{
-        address = "2a01:4f8:172:3d0d::";
+    interfaces.enp0s31f6.ipv6.addresses = [{
+        address = "2a01:4f8:10b:2f83::";
         prefixLength = 64;
     }];
 
     defaultGateway6 = {
       address = "fe80::1";
-      interface = "eno1";
+      interface = "enp0s31f6";
     };
   };
 
