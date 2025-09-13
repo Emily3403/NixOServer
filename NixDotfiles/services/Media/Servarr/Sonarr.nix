@@ -42,7 +42,10 @@ in
           uid = 12009;
         };
 
-        bindMounts = { "/var/lib/sonarr/" = { hostPath = "${cfg.dataDir}/sonarr"; isReadOnly = false; }; };
+        bindMounts = {
+          "/var/lib/sonarr/" = { hostPath = "${cfg.dataDir}/sonarr"; isReadOnly = false; };
+          "/var/lib/data/" = { hostPath = "${config.host.services.transmission.dataDir}/data"; isReadOnly = false; };
+        };
 
         cfg = {
           nixpkgs.config.permittedInsecurePackages = [

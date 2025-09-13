@@ -43,7 +43,7 @@ in
 
         bindMounts = {
           "/var/lib/radarr/" = { hostPath = "${cfg.dataDir}/radarr"; isReadOnly = false; };
-          "/var/lib/Movies/" = { hostPath = "${config.host.services.transmission.dataDir}/data/completed/Movies"; isReadOnly = false; };
+          "/var/lib/data/" = { hostPath = "${config.host.services.transmission.dataDir}/data"; isReadOnly = false; };
         };
 
         cfg = {

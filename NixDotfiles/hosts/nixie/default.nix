@@ -81,6 +81,14 @@
     };
   };
 
+  zfs-root.boot.partitionScheme = {
+    efiBoot = "-part1";
+    bootPool = "-part2";
+    rootPool = "-part3";
+    swap = "-part4";
+    biosBoot = "-part5";
+  };
+
   # import other host-specific things
   imports = [
     (modulesPath + "/installer/scan/not-detected.nix")

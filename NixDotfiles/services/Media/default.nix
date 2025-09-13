@@ -3,5 +3,5 @@
   ./Jellyfin.nix
   ./Jellyseerr.nix
   ./FileBrowser.nix
-  ./Arr
+  ./Servarr.nix
 ]; }
