@@ -78,6 +78,7 @@
     termshark
     trippy
     mtr
+    iotop
 
     # Customization
     zsh

@@ -31,10 +31,6 @@ in
       "d ${cfg.dataDir}/data/ 0750 jellyfin jellyfin"
       "d ${cfg.dataDir}/config/ 0750 jellyfin jellyfin"
       "d ${cfg.dataDir}/ui/ 0750 jellyfin jellyfin"
-
-
-      "d /home/emily/transmission/data/ 0750 1042 1042"
-      "d /home/emily/transmission/config/ 0750 1042 1042"
     ];
 
     age.secrets.Transmission = {
@@ -76,33 +72,6 @@ in
           "${cfg.dataDir}/config:/config"
           "${cfg.dataDir}/ui/:/opt/transmission-ui/" # TODO: Default config
           "${cfg.dataDir}/custom-configs:/etc/openvpn/custom/"
-        ];
-      }
-    )
-
-    # Second instance for Benchmarking
-    (
-      import ../Container-Config/Oci-Container.nix {
-        inherit config lib pkgs;
-        containerID = 33;
-        subdomain = "other-trans";
-        dataDir = cfg.dataDir;
-
-        name = "other-transmission";
-        image = "haugene/transmission-openvpn:latest";
-        containerPort = 9091;
-
-        additionalContainerConfig.extraOptions = [ "--cap-add=NET_ADMIN" "--device=/dev/net/tun" ];
-        environment = {
-          PUID = "1042";
-          PGID = "1042";
-        };
-        environmentFiles = [ config.age.secrets.Other-Transmission.path ];
-
-        volumes = [
-          "/home/emily/transmission/data:/data"
-          "/home/emily/transmission/config:/config"
-          "/home/emily/transmission/custom-configs:/etc/openvpn/custom/"
         ];
       }
     )

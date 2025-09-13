@@ -41,13 +41,16 @@ in
       default = true;
     };
 
+    # TODO: This should be changed to the new default once it's verified.
     partitionScheme = mkOption {
       default = {
-        efiBoot = "-part1";
-        bootPool = "-part2";
-        rootPool = "-part3";
-        swap = "-part4";
-        biosBoot = "-part5";
+        biosBoot = "-part1";
+    efiBoot = "-part2";
+    bootPool = "-part3";
+    swap = "-part4";
+    rootPool = "-part5";
+
+
       };
       description = "Describe on disk partitions";
       type = types.attrsOf types.str;

@@ -32,8 +32,8 @@ convert_dev_names_to_cryptsetup_name() {
 if [ "$NUM_HOT_SPARES" -gt 0 ]; then
     check_variables HOT_SPARES
     # TODO: I think this always makes encrypted boot and root pool
-    spare_bpool="spare $(convert_dev_names_to_cryptsetup_name "part2" "${HOT_SPARES[@]}")"
-    spare_rpool="spare $(convert_dev_names_to_cryptsetup_name "part3" "${HOT_SPARES[@]}")"
+    spare_bpool="spare $(convert_dev_names_to_cryptsetup_name "part3" "${HOT_SPARES[@]}")"
+    spare_rpool="spare $(convert_dev_names_to_cryptsetup_name "part5" "${HOT_SPARES[@]}")"
 else
     spare_bpool=""
     spare_rpool=""
@@ -52,12 +52,12 @@ for ((i = 0; i < ${#DRIVES[@]}; i += NUM_DRIVES)); do
     group=("${DRIVES[@]:i:NUM_DRIVES}")
     for drive in "${group[@]}"; do
         # Convert the drive into a full path
-        bpool_grouped_drives+=("${drive[*]/%/-part2}")  # Don't encrypt the boot pool
+        bpool_grouped_drives+=("${drive[*]/%/-part3}")  # Don't encrypt the boot pool
 
         if [[ -n "$LUKS_PASSWORD" ]]; then
-            rpool_grouped_drives+=("$(convert_dev_names_to_cryptsetup_name "part3" "$drive")")
+            rpool_grouped_drives+=("$(convert_dev_names_to_cryptsetup_name "part5" "$drive")")
         else
-            rpool_grouped_drives+=("${drive[*]/%/-part3}")
+            rpool_grouped_drives+=("${drive[*]/%/-part5}")
         fi
     done
 
@@ -128,6 +128,6 @@ for disk in "${DRIVES[@]}" "$ADDITIONAL_EFI_DEVICE"; do
         continue
     fi
 
-    mkdir -p /mnt/boot/efis/"${disk##*/}"-part1
-    mount -t vfat -o iocharset=iso8859-1 "$disk"-part1 /mnt/boot/efis/"${disk##*/}"-part1
+    mkdir -p /mnt/boot/efis/"${disk##*/}"-part2
+    mount -t vfat -o iocharset=iso8859-1 "$disk"-part2 /mnt/boot/efis/"${disk##*/}"-part2
 done
