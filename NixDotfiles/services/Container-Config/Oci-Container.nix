@@ -5,7 +5,7 @@
 , dataDir
 , subdomain ? null
 , fqdn ? null
-, containerID
+, cID
 , containerPort /* int */
 , volumes ? []
 , makeLocaltimeVolume ? true
@@ -36,7 +36,7 @@ let
   inherit (lib) mkIf optional optionals;
   utils = import ../../utils.nix { inherit config lib; };
 
-  containerIP = utils.makeOciContainerIP containerID;
+  containerIP = utils.makeOciContainerIP cID;
   defVolumes = [ "/etc/resolv.conf:/etc/resolv.conf:ro" ] ++ optional makeLocaltimeVolume "/etc/localtime:/etc/localtime:ro";
 
   podName = "pod-${name}";
@@ -102,8 +102,8 @@ in
       extraOptions = [ "--pod=${podName}" ];
 
       environment = {
-        PUID = "40${toString containerID}";  # TODO: This is terrible. I need padding on the string
-        PGID = "40${toString containerID}";
+        PUID = "40${toString cID}";  # TODO: This is terrible. I need padding on the string
+        PGID = "40${toString cID}";
         TZ = config.host.networking.timeZone;
         MYSQL_USER = name;
         MYSQL_DATABASE = name;
@@ -147,7 +147,7 @@ in
   ] ++ optionals (enable && redisEnvFile != null) [
     "d ${dataDir}/redis/ 0750 999"
   ] ++ optionals (enable && mysqlEnvFile != null) [
-    "d ${dataDir}/mysql/ 0750 40${toString containerID}"
+    "d ${dataDir}/mysql/ 0750 40${toString cID}"
   ];
 
 }

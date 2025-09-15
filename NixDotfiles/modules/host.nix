@@ -70,19 +70,19 @@ in
             };
 
             daily = mkOption {
-              default = 7;
+              default = 15;
               type = types.int;
               description = "Number of daily auto-snapshots that you wish to keep.";
             };
 
             weekly = mkOption {
-              default = 4;
+              default = 9;
               type = types.int;
               description = "Number of weekly auto-snapshots that you wish to keep.";
             };
 
             monthly = mkOption {
-              default = 12;
+              default = 120;  # 10 years
               type = types.int;
               description = "Number of monthly auto-snapshots that you wish to keep.";
             };
@@ -220,6 +220,9 @@ in
     ] ++ config.host.initrdAdditionalKernelModules;
 
     time.timeZone = config.host.networking.timeZone;
+    virtualisation.containers.containersConf.settings = {
+      containers.tz = "${config.time.timeZone}";
+    };
 
     networking = {
       hostName = config.host.name;

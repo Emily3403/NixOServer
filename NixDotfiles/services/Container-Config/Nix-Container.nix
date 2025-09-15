@@ -1,7 +1,7 @@
 { name
 , subdomain ? null
 , fqdn ? null
-, containerID /* Integer ID that counts up from 1 */
+, cID /* Integer ID that counts up from 1 */
 , containerPort /* int */
 , additionalPorts ? []
 , bindMounts
@@ -29,7 +29,7 @@ let
   inherit (lib) mkIf optional optionals mkMerge;
   utils = import ../../utils.nix { inherit config lib; };
   stateVersion = config.system.stateVersion;
-  containerIP = utils.makeNixContainerIP containerID;
+  containerIP = utils.makeNixContainerIP cID;
 
   pgImport = if postgresqlName == null then [ ] else [
     (
@@ -44,6 +44,7 @@ let
     let
       userAttrs = if user == null then { } else user;
       groupAttrs = if group == null then { } else group;
+
       userName = if builtins.hasAttr "name" userAttrs then user.name else name;
       groupName = if builtins.hasAttr "name" groupAttrs then group.name else userName;
       uid = if builtins.hasAttr "uid" userAttrs then user.uid else containerID + 12000;

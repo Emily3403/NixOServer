@@ -4,7 +4,7 @@ let
   utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 
-  containerID = 5;
+  cID = 5;
 in
 {
   options.host.services.wiki-js = {
@@ -35,7 +35,7 @@ in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config lib pkgs cID;
         subdomain = cfg.subdomain;
 
         name = "wiki-js";

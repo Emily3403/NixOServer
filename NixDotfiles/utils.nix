@@ -19,7 +19,6 @@
 
 
   makeNixContainerIP = id: "192.168.7.${toString (id + 1)}";
-  makeOciContainerIP = id: "10.88.1.${toString (id + 1)}";
 
 #  makeOciContainerUID = id: "";
 
@@ -39,5 +38,19 @@
     };
   };
 
+  # Oci-Container Stuff
+  makeOci-netName = name: "podman-${name}";
+
+  makeOci-subnet = id: "10.42.${toString id}.0/24";
+  makeOci-gateway = id: "10.42.${toString id}.254";
+
+  makeOci-IP = id: num: "10.42.${toString id}.${num}";
+  makeOci-mainIP = id: "10.42.${toString id}.1";
+  makeOci-postgresIP = id: "10.42.${toString id}.2";
+  makeOci-mysqlIP = id: "10.42.${toString id}.3";
+  makeOci-redisIP = id: "10.42.${toString id}.4";
+
+  makeOci-uid = id: "13${lib.strings.fixedWidthString 2 "0" (toString id)}0";
+  makeOci-gid = id: "13${lib.strings.fixedWidthString 2 "0" (toString id)}0";
 
 }

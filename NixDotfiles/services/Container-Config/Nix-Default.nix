@@ -5,7 +5,7 @@ let
   utils = import ../../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 
-  containerID = TODO;
+  cID = TODO;
 in
 {
   options.host.services.todo = {
@@ -42,13 +42,13 @@ in
       owner = "root";
     };
 
-    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "todo" (utils.makeNixContainerIP containerID) "TODO");
+    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "todo" (utils.makeNixContainerIP cID) "TODO");
   };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config lib pkgs cID;
         subdomain = cfg.subdomain;
 
         name = "todo";

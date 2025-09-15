@@ -5,7 +5,7 @@ let
   utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 
-  containerID = 4;
+  cID = 4;
 in
 {
   options.host.services.hedgedoc = {
@@ -42,7 +42,7 @@ in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config lib pkgs cID;
         subdomain = cfg.subdomain;
 
         name = "hedgedoc";
@@ -110,5 +110,5 @@ in
     )
   ];
 
-  config.services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "hedgedoc" (utils.makeNixContainerIP containerID) "3000");
+  config.services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "hedgedoc" (utils.makeNixContainerIP cID) "3000");
 }

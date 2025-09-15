@@ -4,21 +4,20 @@ let
   utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 
-  containerID = TODO;
+  cID = TODO;
 in
 {
 
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib pkgs;
+        inherit config lib pkgs cID;
         enable = cfg.enableExporter;
         dataDir = cfg.dataDir;
         fqdn = config.host.networking.monitoringDomain;
 
         name = "TODO";
         image = "TODO";
-        containerID = TODO;
 
         containerPort = TODO;
         nginxLocation = "/todo-metrics";

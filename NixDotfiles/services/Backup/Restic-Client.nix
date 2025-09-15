@@ -1,10 +1,10 @@
 { pkgs, config, lib, ... }:
 let
-  cfg = config.host.services.restic;
+  cfg = config.host.services.restic-client;
   inherit (lib) mkIf mkOption types;
 in
 {
-  options.host.services.restic = {
+  options.host.services.restic-client = {
     dataDir = mkOption {
       type = types.str;
       default = "/data";

@@ -4,7 +4,7 @@ let
   utils = import ../../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 
-  containerID = 11;
+  cID = 11;
 in
 {
 

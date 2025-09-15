@@ -4,7 +4,7 @@ let
   utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 
-  containerID = 2;
+  cID = 2;
   format = pkgs.formats.json { };
 in
 {
@@ -88,13 +88,13 @@ in
       owner = "keycloak";
     };
 
-    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "keycloak" (utils.makeNixContainerIP containerID) "9000");
+    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "keycloak" (utils.makeNixContainerIP cID) "9000");
   };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config lib pkgs cID;
         subdomain = cfg.subdomain;
 
         name = "keycloak";

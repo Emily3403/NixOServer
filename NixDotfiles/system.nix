@@ -10,12 +10,20 @@
     };
   };
 
+  # Nix Containers
+  virtualisation.containers.containersConf.settings = {
+    containers.tz = "${config.time.timeZone}";
+  };
 
   # Podman
   virtualisation.podman = {
     enable = true;
-    defaultNetwork.settings = { dns_enabled = false; };
     dockerCompat = true;
+
+    defaultNetwork.settings = {
+      default_subnet = "10.0.0.0/24";
+      dns_enabled = false;
+    };
   };
 
   i18n.supportedLocales = [

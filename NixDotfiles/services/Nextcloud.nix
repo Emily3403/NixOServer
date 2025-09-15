@@ -5,8 +5,9 @@ let
 
   ncfg = config.host.services.nextcloud;
   kcfg = config.host.services.keycloak;
+  domain = config.host.networking.domainName;
 
-  containerID = 3;
+  cID = 3;
 
   nginxConfig = ''
     client_body_buffer_size 400M;
@@ -57,13 +58,13 @@ in
       owner = "995";
     };
 
-    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf ncfg.enableExporter (utils.makeNginxMetricConfig "nextcloud" (utils.makeNixContainerIP containerID) "9205");
+    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf ncfg.enableExporter (utils.makeNginxMetricConfig "nextcloud" (utils.makeNixContainerIP cID) "9205");
   };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config lib pkgs cID;
         subdomain = ncfg.subdomain;
 
         name = "nextcloud";
@@ -83,12 +84,12 @@ in
         };
 
         cfg = {
-          services.nginx.virtualHosts."${ncfg.subdomain}.${config.host.networking.domainName}".extraConfig = nginxConfig;
+          services.nginx.virtualHosts."${ncfg.subdomain}.${domain}".extraConfig = nginxConfig;
 
           services.nextcloud = {
             enable = true;
             package = pkgs.nextcloud31;
-            hostName = "${ncfg.subdomain}.${config.host.networking.domainName}";
+            hostName = "${ncfg.subdomain}.${domain}";
             https = true;
             maxUploadSize = "200G";
             secretFile = config.age.secrets.Nextcloud_keycloak.path;
@@ -157,7 +158,7 @@ in
 
               # Behaviour of OpenID Connect with Keycloak
               oidc_login_provider_url = "https://${kcfg.subdomain}.${kcfg.domain}/realms/${kcfg.realm}";
-              oidc_login_logout_url = "https://${ncfg.subdomain}.${config.host.networking.domainName}/apps/oidc_login/oidc";
+              oidc_login_logout_url = "https://${ncfg.subdomain}.${domain}/apps/oidc_login/oidc";
               oidc_login_client_id = "Nextcloud";
 
               oidc_login_auto_redirect = true;
@@ -216,7 +217,7 @@ in
 
           services.prometheus.exporters.nextcloud = mkIf ncfg.enableExporter {
             enable = true;
-            url = "https://${ncfg.subdomain}.${config.host.networking.domainName}";
+            url = "https://${ncfg.subdomain}.${domain}";
             tokenFile = config.age.secrets.Nextcloud_exporter-tokenfile.path;
             openFirewall = true;
           };

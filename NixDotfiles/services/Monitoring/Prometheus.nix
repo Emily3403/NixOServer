@@ -5,7 +5,7 @@ let
   utils = import ../../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types foldl';
 
-  containerID = 12;
+  cID = 12;
 
   mkBasicAuth = secretName: { username = "admin"; password_file = config.age.secrets.${secretName}.path; };
 
@@ -66,14 +66,13 @@ in
       owner = "prometheus";
     };
 
-    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = utils.makeNginxMetricConfig "prometheus" (utils.makeNixContainerIP containerID) "9090";
+    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = utils.makeNginxMetricConfig "prometheus" (utils.makeNixContainerIP cID) "9090";
   };
-
 
   imports = [
     (
       import ../Container-Config/Nix-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config lib pkgs cID;
         subdomain = cfg.subdomain;
 
         name = "prometheus";

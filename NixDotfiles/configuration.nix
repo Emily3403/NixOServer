@@ -4,7 +4,7 @@
   # Safety mechanism: refuse to build unless everything is tracked by git
   system.configurationRevision = if (inputs.self ? rev) then inputs.self.rev else throw "refusing to build: git tree is dirty";
 
-  # NixOS Setup
+  # NixOS Setup  TODO: Migrate this to system.nix
   nix.registry.nixpkgs.flake = inputs.nixpkgs;
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 #  nix.settings.download-buffer-size = 134217728;  # Double the default
@@ -15,4 +15,10 @@
   environment.defaultPackages = with pkgs; [
     inputs.agenix.packages.x86_64-linux.default
   ];
+
+  systemd.tmpfiles.rules = [
+    "d /data 0750 root nginx"
+    "d /mnt 0750 root root"
+  ];
+
 }

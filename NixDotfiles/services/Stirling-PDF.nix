@@ -1,10 +1,9 @@
 { pkgs, config, lib, ... }:
 let
   cfg = config.host.services.stirling-pdf;
-  utils = import ../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 
-  containerID = 13;
+  cID = 13;
 in
 {
   options.host.services.stirling-pdf = {
@@ -38,7 +37,7 @@ in
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config lib pkgs cID;
         dataDir = cfg.dataDir;
         subdomain = cfg.subdomain;
 
@@ -67,7 +66,6 @@ in
           SECURITY_OAUTH2_CLIENT_KEYCLOAK_CLIENTID = "Stirling-PDF";
           SECURITY_OAUTH2_CLIENT_KEYCLOAK_USEASUSERNAME = "preferred_username";
 
-#         Set via secrets: SECURITY_OAUTH2_CLIENT_KEYCLOAK_CLIENTSECRET
           SECURITY_OAUTH2_AUTOCREATEUSER = "true";
           SECURITY_OAUTH2_PROVIDER = "keycloak";
         };

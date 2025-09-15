@@ -4,7 +4,7 @@ let
   utils = import ../../utils.nix { inherit config lib; };
   inherit (lib) mkIf mkOption types;
 
-  containerID = TODO;
+  cID = TODO;
 in
 {
   options.host.services.todo = {
@@ -40,13 +40,13 @@ in
       owner = "TODO";
     };
 
-    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "todo" (utils.makeNixContainerIP containerID) "TODO");
+    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "todo" (utils.makeNixContainerIP cID) "TODO");
   };
 
   imports = [
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config lib pkgs cID;
         dataDir = cfg.dataDir;
         subdomain = cfg.subdomain;
 
@@ -69,14 +69,13 @@ in
 
     (
       import ./Container-Config/Oci-Container.nix {
-        inherit config lib pkgs;
+        inherit config lib pkgs cID;
         enable = cfg.enableExporter;
         dataDir = cfg.dataDir;
         fqdn = config.host.networking.monitoringDomain;
 
         name = "TODO";
         image = "TODO";
-        containerID = TODO;
 
         containerPort = TODO;
         nginxLocation = "/todo-metrics";
