@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, pkgs-unstable, config, lib, ... }:
 let
 
   cfg = config.host.services.paperless;
@@ -33,38 +33,76 @@ in
     ];
 
     age.secrets.Paperless = {
-      file = ../secrets/${config.host.name}/Paperless.age;
+      file = ../../secrets/${config.host.name}/Paperless/password.age;
+      owner = "paperless";
+    };
+
+    age.secrets.Paperless_keycloak = {
+      file = ../../secrets/${config.host.name}/Paperless/keycloak.age;
       owner = "paperless";
     };
 
     age.secrets.Prometheus_Paperless-exporter = mkIf cfg.enableExporter {
-      file = ../secrets/nixie/Monitoring/Exporters/${config.host.name}/Paperless.age;
+      file = ../../secrets/nixie/Monitoring/Exporters/${config.host.name}/Paperless.age;
       owner = "root";
     };
-
-    services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf cfg.enableExporter (utils.makeNginxMetricConfig "paperless" (utils.makeNixContainerIP containerID) "TODO");
   };
 
   imports = [
     (
-      import ./Container-Config/Nix-Container.nix {
+      import ../Container-Config/Nix-Container.nix {
         inherit config lib pkgs containerID;
         subdomain = cfg.subdomain;
 
         name = "paperless";
-        containerPort = TODO;
-        postgresqlName = "paperless";
+        containerPort = 28981;
+
+        user.uid = 315;
+        isSystemUser = true;
 
         bindMounts = {
           "/var/lib/paperless/" = { hostPath = "${cfg.dataDir}/paperless"; isReadOnly = false; };
           "/var/lib/postgresql" = { hostPath = "${cfg.dataDir}/postgresql"; isReadOnly = false; };
           ${config.age.secrets.Paperless.path}.hostPath = config.age.secrets.Paperless.path;
-          ${config.age.secrets.Prometheus_Paperless-exporter.path}.hostPath = config.age.secrets.Prometheus_Paperless-exporter.path;
+          ${config.age.secrets.Paperless_keycloak.path}.hostPath = config.age.secrets.Paperless_keycloak.path;
         };
 
         cfg = {
+          services.paperless = {
+              enable = true;
+              package = pkgs-unstable.paperless-ngx;
+              passwordFile = config.age.secrets.Paperless.path;
+              database.createLocally = true;
+              exporter.enable = true;
+              configureTika = true;
+
+              # todo: settings keyscloak
+              settings.PAPERLESS_APPS = "allauth.socialaccount.providers.openid_connect";
+              environmentFile = config.age.secrets.Paperless_keycloak.path;
+          };
+        };
+      }
+    )
+
+    (
+      import ../Container-Config/Oci-Container.nix {
+        inherit config lib pkgs;
+        enable = cfg.enableExporter;
+        dataDir = cfg.dataDir;
+        fqdn = config.host.networking.monitoringDomain;
+
+        name = "paperless-exporter";
+        image = "ghcr.io/hansmi/prometheus-paperless-exporter:v0.0.8";
+        containerID = 35;
+
+        containerPort = 8081;
+        nginxLocation = "/paperless-metrics";
+        nginxProxyPassLocation = "/metrics";
+
+        environment = {
 
         };
+        environmentFiles = [ config.age.secrets.Prometheus_Paperless-exporter.path ];
       }
     )
   ];
