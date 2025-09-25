@@ -49,10 +49,12 @@ in
         containerPort = 3000;
         isSystemUser = true;
 
-        nginxMaxUploadSize = "100M";
-        additionalNginxConfig.locations = {
-          "/metrics".return = "403";
-          "/status".return = "403";
+        additionalNginxConfig = {
+          locations = {
+            "/metrics".return = "403";
+            "/status".return = "403";
+          };
+          extraConfig = "client_max_body_size 100M;";
         };
 
         postgresqlName = "hedgedoc";

@@ -10,11 +10,15 @@ in
   "nixie/Tandoor.age".publicKeys = [ nixie ];
   "nixie/Wiki-js.age".publicKeys = [ nixie ];
 
+
   "nixie/Nextcloud/admin-password.age".publicKeys = [ nixie ];
   "nixie/Nextcloud/keycloak-client-secret.age".publicKeys = [ nixie ];
 
   "nixie/Firefly-III/app-key.age".publicKeys = [ nixie ];
   "nixie/Firefly-III/access-token.age".publicKeys = [ nixie ];
+
+  "nixie/Paperless/password.age".publicKeys = [ nixie ];
+  "nixie/Paperless/keycloak.age".publicKeys = [ nixie ];
 
   "nixie/Photo-Management/Ente/Minio.age".publicKeys = [ nixie ];
   "nixie/Photo-Management/Ente/Postgres.age".publicKeys = [ nixie ];
@@ -45,6 +49,7 @@ in
   ### Exporters
   "nixie/Monitoring/Exporters/nixie/Syncthing.age".publicKeys = [ nixie ];
   "nixie/Monitoring/Exporters/nixie/Nextcloud.age".publicKeys = [ nixie ];
+  "nixie/Monitoring/Exporters/nixie/Paperless.age".publicKeys = [ nixie ];
 
   "nixie/Monitoring/Exporters/ruwusch/Nextcloud.age".publicKeys = [ ruwusch ];
   "nixie/Monitoring/Exporters/ruwusch/Transmission.age".publicKeys = [ ruwusch ];

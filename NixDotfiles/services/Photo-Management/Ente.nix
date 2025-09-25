@@ -116,7 +116,7 @@ in
         dataDir = cfg.dataDir;
 
         name = "ente";
-        image = "ghcr.io/ente-io/server:ceb25651f2ae2f70fdae0a3702d405be781bbd86";
+        image = "ghcr.io/ente-io/server:613c6a96390d7a624cf30b946955705d632423cc";
         containerPort = 8080;
 
 #        environment = { ENVIRONMENT = "production"; };  # TODO

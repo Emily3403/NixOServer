@@ -19,6 +19,7 @@
     "Stirling-PDF.nix"
     "Tandoor.nix"
 
+    "Archiving"
     "Photo-Management"
   ];
 
