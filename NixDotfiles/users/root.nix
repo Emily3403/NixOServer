@@ -60,7 +60,7 @@
     # Rust tools
     unzrip
     eza
-    du-dust
+    dust
     ripgrep
     fd
 

@@ -89,14 +89,15 @@ in
                 in
                 {
 
-                  nyaa = { id = "6OGY4LN-KQ3XE33-X5QIWVN-IUZ6F5E-7DNZHQ6-7DVBR6G-FIVWZPC-GMKYXQN"; } // defconfig;
                   UwU = { id = "3P2KUWI-C7GCARO-LAHCSIB-M3O7LE7-X4RFYQ6-7HNFJ7I-Y72NUOV-3HNYAAA"; } // defconfig;
+                  UwUonWindows = { id = "XSQSL6O-RBBBCWY-DO44ILU-AT6DCSR-F5QR7U4-E4ZQHBT-RVSLUWK-CWWUTQ7"; } // defconfig;
+                  Cashew = { id = "6OGY4LN-KQ3XE33-X5QIWVN-IUZ6F5E-7DNZHQ6-7DVBR6G-FIVWZPC-GMKYXQN"; } // defconfig;
+
+                  Pixel = { id = "XLVNMQQ-Q7UNI5E-IR3PCGW-OYHIM5Z-W2ZAWLQ-SIT7ZUG-IDYNMPO-ODTDYQ6"; } // defconfig;
+
                   OwO = { id = "PZE3EAA-W6LXTIY-XUPBPL7-2TKLG35-ZPUY27U-6PP6ECF-UHVGBEJ-AI4RAQJ"; } // defconfig;
                   MightyMarshmellow = { id = "JB4YIH6-TXCJIWD-LRWIQYK-D6EUPAD-ER2BCUA-NEGOXO5-R4AUKI6-ME6QOAQ"; } // defconfig;
-                  Pixel = { id = "XLVNMQQ-Q7UNI5E-IR3PCGW-OYHIM5Z-W2ZAWLQ-SIT7ZUG-IDYNMPO-ODTDYQ6"; } // defconfig;
-                  JellyfinPlayer = { id = "REBDHNA-MYY6MQY-RQKI7T3-2BPGKST-3NJN3J4-UD7PGUF-TI7WXWX-RPUECQD"; } // defconfig;
-                  UwUonWindows = { id = "XSQSL6O-RBBBCWY-DO44ILU-AT6DCSR-F5QR7U4-E4ZQHBT-RVSLUWK-CWWUTQ7"; } // defconfig;
-
+                  JellyfinPlayer = { id = "ZNNKUJ7-XD4OPT5-7QEDWVD-DME43EB-B7LCOBP-EIPIYM7-ZKMS5QA-SS7WPA2"; } // defconfig;
                 };
             };
           };

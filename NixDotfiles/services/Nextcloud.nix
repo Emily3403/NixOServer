@@ -132,7 +132,7 @@ in
             autoUpdateApps.startAt = "05:00:00";
 
             extraApps = {
-              inherit (pkgs.nextcloud30Packages.apps)
+              inherit (pkgs.nextcloud31Packages.apps)
                 calendar
                 contacts
 #                files_markdown  # Not supported: https://github.com/icewind1991/files_markdown/issues/218
