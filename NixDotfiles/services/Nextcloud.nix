@@ -1,4 +1,4 @@
-{ pkgs, config, options, lib, ... }:
+{ pkgs, config, inputs, options, lib, ... }:
 let
   inherit (lib) mkIf mkOption types;
   utils = import ../utils.nix { inherit config lib; };
@@ -27,6 +27,16 @@ in
     subdomain = mkOption {
       type = types.str;
       default = "cloud";
+    };
+
+    calendar-subdomain = mkOption {
+      type = types.str;
+      default = "calendar";
+    };
+
+    enableCalendar = mkOption {
+      type = types.bool;
+      default = true;
     };
 
     enableExporter = mkOption {
@@ -58,12 +68,19 @@ in
     };
 
     services.nginx.virtualHosts."${config.host.networking.monitoringDomain}" = mkIf ncfg.enableExporter (utils.makeNginxMetricConfig "nextcloud" (utils.makeNixContainerIP containerID) "9205");
+
+    services.nginx.virtualHosts."${ncfg.calendar-subdomain}" = mkIf ncfg.enableCalendar {
+      forceSSL = true;
+      enableACME = true;
+
+      globalRedirect = "https://${ncfg.subdomain}.${config.host.networking.domainName}/apps/calendar/";
+    };
   };
 
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config inputs lib pkgs containerID;
         subdomain = ncfg.subdomain;
 
         name = "nextcloud";

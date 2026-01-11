@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, inputs, config, lib, ... }:
 let
   cfg = config.host.services.restic;
   inherit (lib) mkIf mkOption types;

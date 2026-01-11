@@ -23,6 +23,7 @@
 , lib
 , config
 , pkgs
+, inputs
 }:
 let
 
@@ -112,7 +113,7 @@ in
       bindMounts = mkMerge [ bindMounts (mkIf enableHardwareTranscoding { "/dev/dri" = { hostPath = "/dev/dri"; isReadOnly = false; }; }) ];
       allowedDevices = optionals (enableHardwareTranscoding) [{ node = "/dev/dri/renderD128"; modifier = "rw"; } { node = "/dev/dri/card0"; modifier = "rw"; }];
 
-      config = { pkgs, config, lib, ... }: utils.recursiveMerge [
+      config = utils.recursiveMerge [
         cfg
         {
           system.stateVersion = stateVersion;

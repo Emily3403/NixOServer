@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, inputs, config, lib, ... }: {
   users.users.data-backup = {
     isNormalUser = true;
     home = "/home/data-backup";

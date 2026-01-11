@@ -4,9 +4,6 @@ SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
 source "$SCRIPT_DIR/utils.sh"
 
 check_variables DRIVES SWAP_AMOUNT_GB NUM_DRIVES
-EFFECTIVE_SWAP_PER_DRIVE=$((SWAP_AMOUNT_GB / NUM_DRIVES))
-BPOOL_END=5
-SWAP_END=$((BPOOL_END + EFFECTIVE_SWAP_PER_DRIVE))
 
 partition_disk () {
     local disk="${1}"
@@ -14,14 +11,21 @@ partition_disk () {
 
     parted --script --align=optimal "${disk}" -- \
       mklabel gpt \
+
+      # First 128GiB are ro-protected by the Server (usually)
       mkpart "BIOS" 1MiB 2MiB \
       mkpart "EFI" 2MiB 1GiB \
-      mkpart "bpool" 1GiB ${BPOOL_END}GiB \
-      mkpart "swap" ${BPOOL_END}GiB ${SWAP_END}GiB \
-      mkpart "rpool" ${SWAP_END}GiB 100% \
+      mkpart "swap" 1GiB 100GiB \
+      mkpart "bpool" 100GiB 127GiB \
+
+      # Install the zfs "big data" pool; starting at 128G
+      mkpart "rpool" 128GiB 100% \
+
+      # Hard Drive Labels (not needed with SAS Drives)
       set 1 bios_grub on \
       set 2 esp on
 
+    # Now, wait for the devices to settle
     partprobe "${disk}"
     udevadm settle
 }

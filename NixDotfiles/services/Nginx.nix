@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, inputs, config, lib, ... }:
 let
   LETSENCRYPT_EMAIL = "noanswer98+letsencrypt@gmail.com";
   utils = import ../utils.nix { inherit config lib; };

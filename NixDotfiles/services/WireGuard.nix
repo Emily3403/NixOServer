@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, inputs, config, lib, ... }:
 let
   wgcfg = config.host.services.wireguard;
   wscfg = config.host.services.wstunnel;

@@ -45,10 +45,10 @@ in
     partitionScheme = mkOption {
       default = {
         biosBoot = "-part1";
-    efiBoot = "-part2";
-    bootPool = "-part3";
-    swap = "-part4";
-    rootPool = "-part5";
+        efiBoot = "-part2";
+        bootPool = "-part3";
+        swap = "-part4";
+        rootPool = "-part5";
 
 
       };

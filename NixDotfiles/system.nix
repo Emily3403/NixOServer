@@ -1,8 +1,7 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, inputs, config, lib, ... }: {
   # Don't build man pages. This saves a *lot* of time when rebuilding
   documentation.man.generateCaches = false;
 
-  # nixpkgs
   nixpkgs.config = {
     allowUnfree = true;
     packageOverrides = pkgs: {
@@ -10,6 +9,7 @@
     };
   };
 
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
   # Podman
   virtualisation.podman = {

@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, inputs, config, lib, ... }: {
   users.users.emily-backup = {
     isNormalUser = true;
     home = "/home/emily-backup";

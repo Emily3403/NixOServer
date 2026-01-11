@@ -48,7 +48,7 @@ in
   imports = [
     (
       import ../Container-Config/Nix-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config inputs lib pkgs containerID;
         subdomain = cfg.subdomain;
 
         name = "servarr";
