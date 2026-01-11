@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, inputs, config, lib, ... }:
 let DATA_DIR = "/data/Affine"; in
 {
 

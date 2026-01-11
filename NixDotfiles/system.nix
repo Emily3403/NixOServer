@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, inputs, config, lib, ... }: {
   # Don't build man pages. This saves a *lot* of time when rebuilding
   documentation.man.generateCaches = false;
 
@@ -9,6 +9,9 @@
       vaapiIntel = pkgs.vaapiIntel.override { enableHybridCodec = true; };
     };
   };
+
+  # NixOS Setup
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
 
   # Podman

@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, inputs, config, lib, ... }: {
   programs.zsh.enable = true;
 
   users.users.nana = {

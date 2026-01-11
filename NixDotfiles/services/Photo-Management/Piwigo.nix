@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }:
+{ pkgs, inputs, config, lib, ... }:
 let
   cfg = config.host.services.piwigo;
   utils = import ../../utils.nix { inherit config lib; };

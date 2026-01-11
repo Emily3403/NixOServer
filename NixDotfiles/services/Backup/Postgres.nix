@@ -1,4 +1,4 @@
-{ pkgs, config, lib, ... }: {
+{ pkgs, inputs, config, lib, ... }: {
   systemd.services.backup-postgres = {
     description = "Backup all PostgreSQL containers";
     wantedBy = [ "multi-user.target" ];

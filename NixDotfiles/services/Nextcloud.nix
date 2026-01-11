@@ -1,4 +1,4 @@
-{ pkgs, config, options, lib, ... }:
+{ pkgs, config, inputs, options, lib, ... }:
 let
   inherit (lib) mkIf mkOption types;
   utils = import ../utils.nix { inherit config lib; };
@@ -63,7 +63,7 @@ in
   imports = [
     (
       import ./Container-Config/Nix-Container.nix {
-        inherit config lib pkgs containerID;
+        inherit config inputs lib pkgs containerID;
         subdomain = ncfg.subdomain;
 
         name = "nextcloud";

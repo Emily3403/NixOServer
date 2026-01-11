@@ -4,9 +4,7 @@
   # Safety mechanism: refuse to build unless everything is tracked by git
   system.configurationRevision = if (inputs.self ? rev) then inputs.self.rev else throw "refusing to build: git tree is dirty";
 
-  # NixOS Setup
-  nix.registry.nixpkgs.flake = inputs.nixpkgs;
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
 #  nix.settings.download-buffer-size = 134217728;  # Double the default
 
   # 25.05 features
