@@ -15,7 +15,7 @@ in
 
     subdomain = mkOption {
       type = types.str;
-      defult = "recipes";
+      default = "recipes";
     };
 
     enableExporter = mkOption {
