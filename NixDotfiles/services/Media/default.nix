@@ -1,5 +1,5 @@
 { config, lib, pkgs, ... }: { imports = [
-  ./Transmission.nix
+#  ./Transmission.nix
   ./Jellyfin.nix
   ./Jellyseerr.nix
   ./FileBrowser.nix
